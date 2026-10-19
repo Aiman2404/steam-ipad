@@ -1,0 +1,15 @@
+# Secrets & Environment
+secrets.h
+.env
+*.env
+
+# Editor / OS artifacts
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Build outputs
+dist/
+build/
+node_modules/
