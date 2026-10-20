@@ -163,7 +163,7 @@
 
         <!-- TOP BAR: SteamOS Brand + "+ Add Spotify URL / Song" Action + Status -->
         <header class="relative z-10 flex items-center justify-between border-b border-white/10 pb-2.5 shrink-0">
-          <!-- Left: SteamOS Badge + Quick Add Spotify URL / Search Bar Trigger -->
+          <!-- Left: SteamOS Badge + Quick Add Playlist + Spotify Full Songs Link -->
           <div class="flex items-center gap-2.5">
             <div class="flex items-center gap-2 bg-white/5 border border-white/10 px-3 py-1.5 rounded-xl">
               <svg class="w-4 h-4 text-cyan-400" viewBox="0 0 24 24" fill="currentColor">
@@ -177,12 +177,12 @@
                 <line x1="12" y1="5" x2="12" y2="19"></line>
                 <line x1="5" y1="12" x2="19" y2="12"></line>
               </svg>
-              <span>+ Add Spotify URL / Song</span>
+              <span>+ Add Playlist</span>
             </button>
 
-            <button onclick="toggleSpotifyEngineDrawer()" id="engineToggleBtn" class="deck-btn flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-[11px] font-semibold text-gray-300" title="Show/Hide Official Spotify Embedded Controller">
+            <button onclick="window.open('https://open.spotify.com', '_blank')" class="deck-btn flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-[11px] font-semibold text-[#1db954]" title="Sign in to Spotify in Safari once to stream full songs without 30-second preview limits">
               <span class="w-2 h-2 rounded-full bg-[#1db954]"></span>
-              <span id="engineStatusText">Spotify Engine</span>
+              <span>Spotify Sign-In (Full Songs)</span>
             </button>
           </div>
 
@@ -203,37 +203,21 @@
           </div>
         </header>
 
-        <!-- UNIFIED SINGLE PLAYER BODY: Left Art+Name | Right Lyrics | Bottom Transport -->
+        <!-- UNIFIED SINGLE PLAYER BODY: Left Art | Right Song Name + Lyrics | Bottom Full-Width Transport -->
         <div class="relative z-10 flex-1 flex gap-3.5 pt-3 min-h-0 overflow-hidden">
 
           <!-- =============================================================== -->
           <!-- PANEL A: UNIFIED NOW PLAYING + LYRICS (single rectangle, ~65%)  -->
           <!-- =============================================================== -->
-          <div class="w-[65%] h-full bg-black/40 border border-white/10 rounded-2xl flex flex-col relative overflow-hidden min-w-0">
+          <div class="w-[65%] h-full bg-black/40 border border-white/10 rounded-2xl flex flex-col justify-between relative overflow-hidden min-w-0 p-3.5">
 
-            <!-- Hidden Official Spotify IFrame Engine (drives real playback silently) -->
-            <div id="spotifyEngineDrawer" class="hidden absolute inset-x-3 top-3 z-30 bg-[#0d1118]/95 backdrop-blur-xl border border-[#1db954]/50 rounded-2xl p-3 shadow-2xl flex-col gap-2">
-              <div class="flex items-center justify-between">
-                <div class="flex items-center gap-2">
-                  <span class="w-2.5 h-2.5 rounded-full bg-[#1db954] animate-pulse"></span>
-                  <span class="text-xs font-extrabold uppercase tracking-wider text-white">Official Spotify IFrame Engine</span>
-                  <span class="text-[10px] text-gray-400">(Sign into Spotify in Safari or tap inside if prompted)</span>
-                </div>
-                <button onclick="toggleSpotifyEngineDrawer()" class="px-2.5 py-1 rounded-lg bg-white/10 hover:bg-white/20 text-xs font-bold text-white">Hide</button>
-              </div>
-              <div class="w-full h-40 rounded-xl overflow-hidden bg-black border border-white/10">
-                <div id="spotifyEmbedMount"></div>
-              </div>
-            </div>
+            <!-- TOP/CENTER AREA: Song Icon (Left) + Song Name on Top & Live Lyrics Beneath It (Right) -->
+            <div class="flex-1 flex gap-4 min-h-0 overflow-hidden">
 
-            <!-- TOP CONTENT AREA: Song Art (left) + Song Name & Live Lyrics (right) -->
-            <div class="flex-1 flex gap-0 min-h-0 overflow-hidden">
-
-              <!-- LEFT: Square Song Art + Status Badge -->
-              <div class="w-[42%] h-full flex flex-col items-center justify-center p-4 shrink-0 gap-3">
-                <!-- Song Cover Art -->
-                <div class="relative w-full max-w-[180px] aspect-square rounded-2xl overflow-hidden shadow-2xl border border-white/15 group">
-                  <img id="nowPlayingCover" src="https://placehold.co/400x400/0f172a/1db954?text=Add+Song" alt="Song Cover" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
+              <!-- LEFT: Song Cover Art / Icon ONLY (Song Artwork, not Playlist) -->
+              <div class="w-36 sm:w-44 h-full flex flex-col justify-center items-center shrink-0">
+                <div class="relative w-36 h-36 sm:w-44 sm:h-44 rounded-2xl overflow-hidden shadow-2xl border border-white/15 group">
+                  <img id="nowPlayingCover" src="https://placehold.co/400x400/0f172a/1db954?text=Select+Song" alt="Song Cover" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
                   <div class="absolute inset-0 bg-gradient-to-t from-black/75 via-transparent to-transparent"></div>
                   <div class="absolute bottom-2 left-2 right-2 flex items-center justify-between px-2 py-0.5 rounded-lg bg-black/70 backdrop-blur-md border border-white/10">
                     <div class="flex items-center gap-1.5">
@@ -243,35 +227,29 @@
                     <span id="sourceTypeBadge" class="text-[9px] font-bold text-[#1db954] uppercase">SPOTIFY</span>
                   </div>
                 </div>
-
-                <!-- Song Title & Artist (below art) -->
-                <div class="w-full text-center px-1">
-                  <h1 id="nowPlayingTitle" class="text-sm font-extrabold text-white tracking-tight truncate leading-tight">No Song Selected</h1>
-                  <p id="nowPlayingArtist" class="text-[11px] font-medium text-gray-400 truncate mt-0.5">Pick a playlist from the Deck Library →</p>
-                </div>
               </div>
 
-              <!-- RIGHT: Live Lyrics only (no Sync/Edit buttons) -->
-              <div class="flex-1 h-full flex flex-col bg-gradient-to-b from-[#131924]/90 to-[#0b0e14]/95 border-l border-white/10 relative overflow-hidden">
-                <!-- Lyrics Header (label only, no buttons) -->
-                <div class="flex items-center gap-1.5 px-4 pt-3 pb-2 border-b border-white/10 shrink-0">
-                  <span class="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></span>
-                  <span class="text-[11px] font-extrabold uppercase tracking-wider text-white">Live Lyrics</span>
+              <!-- RIGHT: Song Title on Top + Live Lyrics Beneath It -->
+              <div class="flex-1 h-full flex flex-col min-w-0 overflow-hidden">
+                <!-- Song Title on Top, slightly to the right -->
+                <div class="pb-2 border-b border-white/10 shrink-0">
+                  <h1 id="nowPlayingTitle" class="text-base sm:text-lg font-extrabold text-white tracking-tight truncate leading-tight">No Song Selected</h1>
+                  <p id="nowPlayingArtist" class="text-xs font-medium text-gray-400 truncate mt-0.5">Select a library on the right to start playing</p>
                 </div>
 
-                <!-- Scrolling Lyrics Viewport -->
-                <div id="lyricsViewport" class="relative flex-1 overflow-y-auto custom-scroll py-4 px-4 space-y-3 text-left scroll-smooth">
-                  <div class="text-xs text-gray-400 italic">Select a playlist then tap a track to see live synced lyrics...</div>
+                <!-- Beneath Title: Live Lyrics Scrolling Viewport (clean viewing only) -->
+                <div id="lyricsViewport" class="relative flex-1 overflow-y-auto custom-scroll py-3 pr-2 space-y-2.5 text-left scroll-smooth">
+                  <div class="text-xs text-gray-400 italic">Live lyrics will appear here as the song plays...</div>
                 </div>
 
-                <!-- Bottom Fade Mask -->
-                <div class="pointer-events-none absolute bottom-0 inset-x-0 h-8 bg-gradient-to-t from-[#0b0e14] to-transparent"></div>
+                <!-- Bottom Fade Mask for lyrics -->
+                <div class="pointer-events-none absolute bottom-0 inset-x-0 h-6 bg-gradient-to-t from-[#0b0e14] to-transparent"></div>
               </div>
 
             </div>
 
-            <!-- BOTTOM TRANSPORT BAR: full width across both columns -->
-            <div class="shrink-0 border-t border-white/10 bg-black/50 px-4 py-2.5 flex flex-col gap-1.5">
+            <!-- BOTTOM TRANSPORT BAR: Full-width spanning across both sides -->
+            <div class="shrink-0 pt-2 border-t border-white/10 flex flex-col gap-1.5 mt-2">
               <!-- Seek / Scrubber Bar -->
               <div class="flex items-center gap-3">
                 <span id="currentTimeLabel" class="text-[11px] mono-num text-gray-400 w-9 text-right">0:00</span>
@@ -281,10 +259,10 @@
                 <span id="durationTimeLabel" class="text-[11px] mono-num text-gray-400 w-9">0:00</span>
               </div>
 
-              <!-- Transport Controls Row -->
-              <div class="flex items-center justify-between">
+              <!-- Transport Controls Row (Shuffle, Prev, Play/Pause, Stop, Next, Heart) -->
+              <div class="flex items-center justify-between px-1">
                 <!-- Shuffle -->
-                <button onclick="toggleShuffleMode()" id="shuffleBtn" class="deck-btn p-1.5 rounded-lg text-gray-400 hover:text-white hover:bg-white/10" title="Shuffle">
+                <button onclick="toggleShuffleMode()" id="shuffleBtn" class="deck-btn p-1.5 rounded-lg text-gray-400 hover:text-white hover:bg-white/10" title="Random / Shuffle">
                   <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
                     <polyline points="16 3 21 3 21 8"></polyline><line x1="4" y1="20" x2="21" y2="3"></line>
                     <polyline points="21 16 21 21 16 21"></polyline><line x1="15" y1="15" x2="21" y2="21"></line>
@@ -293,28 +271,28 @@
                 </button>
 
                 <!-- Previous -->
-                <button onclick="playPreviousTrack()" class="deck-btn p-1.5 rounded-lg text-gray-200 hover:text-white hover:bg-white/10" title="Previous">
-                  <svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor"><path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/></svg>
+                <button onclick="playPreviousTrack()" class="deck-btn p-2 rounded-lg text-gray-200 hover:text-white hover:bg-white/10" title="Previous Track">
+                  <svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor"><path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/></svg>
                 </button>
 
-                <!-- Play / Pause -->
+                <!-- Play / Pause Main Button -->
                 <button onclick="togglePlayPause()" id="playPauseBtn" class="deck-btn w-11 h-11 rounded-full bg-[#1db954] hover:bg-[#1ed760] text-black flex items-center justify-center shadow-[0_0_18px_rgba(29,185,84,0.5)]" title="Play / Pause">
-                  <svg id="playIcon" class="w-5 h-5 ml-0.5" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
-                  <svg id="pauseIcon" class="w-5 h-5 hidden" viewBox="0 0 24 24" fill="currentColor"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+                  <svg id="playIcon" class="w-6 h-6 ml-0.5" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+                  <svg id="pauseIcon" class="w-6 h-6 hidden" viewBox="0 0 24 24" fill="currentColor"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
                 </button>
 
-                <!-- Stop -->
-                <button onclick="stopPlayback()" class="deck-btn p-1.5 rounded-lg text-gray-300 hover:text-rose-400 hover:bg-white/10" title="Stop">
-                  <svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="6" width="12" height="12" rx="2"/></svg>
+                <!-- Stop Button -->
+                <button onclick="stopPlayback()" class="deck-btn p-2 rounded-lg text-gray-300 hover:text-rose-400 hover:bg-white/10" title="Stop">
+                  <svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="6" width="12" height="12" rx="2"/></svg>
                 </button>
 
                 <!-- Next -->
-                <button onclick="playNextTrack()" class="deck-btn p-1.5 rounded-lg text-gray-200 hover:text-white hover:bg-white/10" title="Next">
-                  <svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg>
+                <button onclick="playNextTrack()" class="deck-btn p-2 rounded-lg text-gray-200 hover:text-white hover:bg-white/10" title="Next Track">
+                  <svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg>
                 </button>
 
-                <!-- Favorite -->
-                <button onclick="toggleFavoriteCurrent()" id="favoriteBtn" class="deck-btn p-1.5 rounded-lg text-gray-400 hover:text-[#1db954] hover:bg-white/10" title="Favorite">
+                <!-- Favorite / Heart -->
+                <button onclick="toggleFavoriteCurrent()" id="favoriteBtn" class="deck-btn p-1.5 rounded-lg text-gray-400 hover:text-[#1db954] hover:bg-white/10" title="Favorite Song">
                   <svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
                 </button>
               </div>
@@ -325,39 +303,56 @@
           <!-- =============================================================== -->
           <!-- PANEL B: RIGHT DECK LIBRARY (~35% WIDTH)                        -->
           <!-- =============================================================== -->
-          <aside class="w-[35%] h-full bg-black/45 border border-white/10 rounded-2xl p-3 flex flex-col justify-between shrink-0 min-w-0">
+          <aside class="w-[35%] h-full bg-black/45 border border-white/10 rounded-2xl p-3 flex flex-col justify-between shrink-0 min-w-0 overflow-hidden">
 
-            <!-- Library Header -->
-            <div class="flex flex-col gap-2 border-b border-white/10 pb-2.5 shrink-0">
-              <div class="flex items-center justify-between">
+            <!-- VIEW 1: LIBRARIES LIST (Shows saved playlists) -->
+            <div id="deckLibraryListView" class="w-full h-full flex flex-col justify-between">
+              <!-- Header -->
+              <div class="flex items-center justify-between border-b border-white/10 pb-2.5 shrink-0">
                 <div>
                   <h2 class="text-xs font-extrabold uppercase tracking-wider text-white">Deck Library</h2>
-                  <p id="librarySubtitle" class="text-[10px] text-gray-400">Your Spotify Playlists & Links</p>
+                  <p class="text-[10px] text-gray-400">Your Spotify Playlists</p>
                 </div>
-                <span id="libraryCountBadge" class="px-2 py-0.5 rounded-md bg-[#1db954]/20 text-[#1db954] text-[10px] font-bold mono-num">0 Playlists</span>
+                <div class="flex items-center gap-1.5">
+                  <span id="libraryCountBadge" class="px-2 py-0.5 rounded-md bg-[#1db954]/20 text-[#1db954] text-[10px] font-bold mono-num">0 Playlists</span>
+                  <button onclick="clearDeckLibrary()" class="deck-btn p-1 rounded-lg bg-white/5 hover:bg-rose-500/20 text-gray-400 hover:text-rose-300 text-[10px]" title="Clear Playlists">✕</button>
+                </div>
               </div>
 
-              <!-- Utility Buttons: Favs + Clear only (no Add URL here — use top bar button) -->
-              <div class="flex items-center gap-1.5">
-                <button onclick="toggleFavoritesFilter()" id="favFilterBtn" class="deck-btn flex-1 py-1.5 px-2.5 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-[10px] font-semibold text-gray-300" title="Show Favorites Only">
-                  ♥ Favs
-                </button>
-                <button onclick="clearDeckLibrary()" class="deck-btn py-1.5 px-2 rounded-lg bg-white/5 hover:bg-rose-500/20 border border-white/10 text-[10px] font-semibold text-gray-400 hover:text-rose-300" title="Clear Library">
-                  Clear
-                </button>
+              <!-- Playlists list -->
+              <div id="playlistContainer" class="flex-1 overflow-y-auto custom-scroll my-2 space-y-1.5 pr-1">
+                <!-- Populated dynamically -->
+              </div>
+
+              <!-- Footer tip -->
+              <div class="pt-2 border-t border-white/10 text-[10px] text-gray-400 truncate">
+                Tap any playlist to open its songs
               </div>
             </div>
 
-            <!-- Scrollable List: either playlists OR tracks inside a playlist (with back button) -->
-            <div id="playlistContainer" class="flex-1 overflow-y-auto custom-scroll my-2 space-y-1.5 pr-1">
-              <!-- Populated dynamically -->
+            <!-- VIEW 2: ACTIVE PLAYLIST / SPOTIFY EMBED (Fits in Deck Library ONLY!) -->
+            <div id="deckLibraryPlayerView" class="hidden w-full h-full flex flex-col justify-between">
+              <!-- Top bar with Back Arrow -->
+              <div class="flex items-center justify-between border-b border-white/10 pb-2 shrink-0">
+                <button onclick="closeActivePlaylistView()" class="deck-btn flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-white/10 hover:bg-white/20 text-xs font-bold text-cyan-300">
+                  <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+                  <span>Back to Libraries</span>
+                </button>
+                <span id="activePlaylistTitleBadge" class="text-[10px] font-extrabold uppercase text-gray-300 truncate max-w-[120px]">Playlist</span>
+              </div>
+
+              <!-- Gray Spotify IFrame Widget (mounted right here inside Deck Library!) -->
+              <div class="flex-1 w-full my-1.5 rounded-xl overflow-hidden bg-black/60 border border-white/10">
+                <iframe id="deckLibraryIframe" class="w-full h-full border-0" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+              </div>
+
+              <!-- Footer info -->
+              <div class="pt-1 border-t border-white/10 text-[10px] text-gray-400 flex items-center justify-between">
+                <span>Controlled on Spotify</span>
+                <span class="text-[#1db954] font-bold">● Active</span>
+              </div>
             </div>
 
-            <!-- Bottom Tip -->
-            <div class="pt-2 border-t border-white/10 flex items-center justify-between text-[10px] text-gray-400">
-              <span id="libraryTip" class="truncate">Tap a playlist to browse its tracks</span>
-              <button onclick="toggleSpotifyEngineDrawer()" class="text-[#1db954] font-bold hover:underline shrink-0 ml-2">Spotify Engine</button>
-            </div>
           </aside>
 
         </div>
@@ -556,69 +551,36 @@
   <!-- =================================================================== -->
   <!-- APPLICATION LOGIC (Web Audio Synth + Visualizer + Sliders + Dock)   -->
   <!-- =================================================================== -->
-  <!-- MODAL 2: ADD SPOTIFY URL OR SEARCH REAL SONG FOR DECK LIBRARY       -->
+  <!-- MODAL 2: ADD SPOTIFY PLAYLIST TO DECK LIBRARY                       -->
   <!-- =================================================================== -->
   <div id="addMusicModal" class="fixed inset-0 z-40 bg-black/80 backdrop-blur-md hidden items-center justify-center p-6">
-    <div class="steam-glass carbon-surface w-full max-w-xl rounded-2xl border border-[#1db954]/40 p-5 shadow-2xl">
+    <div class="steam-glass carbon-surface w-full max-w-lg rounded-2xl border border-[#1db954]/40 p-5 shadow-2xl">
       <div class="flex items-center justify-between border-b border-white/10 pb-3">
         <div class="flex items-center gap-2">
           <span class="w-3 h-3 rounded-full bg-[#1db954]"></span>
           <div>
-            <h3 class="text-base font-extrabold uppercase tracking-wider text-white">Add to Deck Library</h3>
-            <p class="text-[11px] text-gray-400">Paste any Spotify Track/Playlist/Album link OR search any song to add with real cover & synced lyrics.</p>
+            <h3 class="text-base font-extrabold uppercase tracking-wider text-white">Add Spotify Playlist</h3>
+            <p class="text-[11px] text-gray-400">Paste any Spotify Playlist or Album link to load into your Deck Library.</p>
           </div>
         </div>
         <button onclick="closeAddMusicModal()" class="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-gray-300">✕</button>
       </div>
 
       <div class="space-y-4 my-4 text-xs text-gray-300">
-        <!-- Option A: Paste Spotify URL -->
         <div class="p-3.5 rounded-xl bg-black/50 border border-white/10">
-          <label class="block font-bold text-white mb-1">Option 1: Paste a Spotify Link (Track, Playlist, or Album URL)</label>
-          <p class="text-[11px] text-gray-400 mb-2">Automatically fetches the official cover icon, title, Spotify embedded player, and synced lyrics:</p>
+          <label class="block font-bold text-white mb-1">Spotify Playlist / Album Link</label>
+          <p class="text-[11px] text-gray-400 mb-2">Paste a public link (e.g. https://open.spotify.com/playlist/...):</p>
           <div class="flex gap-2">
-            <input id="spotifyUrlInput" type="text" placeholder="https://open.spotify.com/track/... or /playlist/..." class="flex-1 px-3 py-2 rounded-lg bg-black/80 border border-white/15 text-xs text-white focus:outline-none focus:border-[#1db954]" />
+            <input id="spotifyUrlInput" type="text" placeholder="https://open.spotify.com/playlist/..." class="flex-1 px-3 py-2 rounded-lg bg-black/80 border border-white/15 text-xs text-white focus:outline-none focus:border-[#1db954]" onkeydown="if(event.key==='Enter') addFromSpotifyUrl()" />
             <button onclick="addFromSpotifyUrl()" id="addSpotifyUrlBtn" class="px-4 py-2 rounded-lg bg-[#1db954] hover:bg-[#1ed760] text-black font-extrabold shrink-0">
-              Add Link
+              Add Playlist
             </button>
           </div>
-        </div>
-
-        <!-- Option B: Direct Song Search (Fetches real Cover Art + Audio Preview + Real Synced Lyrics) -->
-        <div class="p-3.5 rounded-xl bg-black/50 border border-white/10">
-          <label class="block font-bold text-white mb-1">Option 2: Search Any Song by Title or Artist</label>
-          <p class="text-[11px] text-gray-400 mb-2">Adds the song directly to your Deck Library with high-res album art and live bottom-to-top scrolling lyrics:</p>
-          <div class="flex gap-2">
-            <input id="songSearchInput" type="text" placeholder="e.g. Blinding Lights The Weeknd, Starboy, After Dark..." class="flex-1 px-3 py-2 rounded-lg bg-black/80 border border-white/15 text-xs text-white focus:outline-none focus:border-cyan-400" onkeydown="if(event.key==='Enter') searchRealSongs()" />
-            <button onclick="searchRealSongs()" id="searchSongBtn" class="px-4 py-2 rounded-lg bg-cyan-400 hover:bg-cyan-300 text-black font-extrabold shrink-0">
-              Search
-            </button>
-          </div>
-          <!-- Search Results List -->
-          <div id="songSearchResults" class="mt-2.5 max-h-40 overflow-y-auto custom-scroll space-y-1.5"></div>
         </div>
       </div>
 
       <div class="flex justify-end">
         <button onclick="closeAddMusicModal()" class="px-4 py-2 rounded-xl bg-white/10 text-xs font-bold text-white">Close</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- =================================================================== -->
-  <!-- MODAL 3: PASTE / EDIT CUSTOM SYNCED OR PLAIN LYRICS                 -->
-  <!-- =================================================================== -->
-  <div id="customLyricsModal" class="fixed inset-0 z-40 bg-black/80 backdrop-blur-md hidden items-center justify-center p-6">
-    <div class="steam-glass carbon-surface w-full max-w-lg rounded-2xl border border-cyan-400/40 p-5 shadow-2xl">
-      <div class="flex items-center justify-between border-b border-white/10 pb-3">
-        <h3 class="text-sm font-extrabold uppercase tracking-wider text-white">Edit / Paste Song Lyrics</h3>
-        <button onclick="closeCustomLyricsModal()" class="p-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-gray-300">✕</button>
-      </div>
-      <p class="text-[11px] text-gray-400 my-2">Supports `[mm:ss.xx] Lyric line` LRC format or plain text lines (auto-timed across the song duration):</p>
-      <textarea id="customLyricsTextarea" rows="8" class="w-full p-3 rounded-xl bg-black/70 border border-white/15 text-xs text-white font-mono focus:outline-none focus:border-cyan-400" placeholder="[00:12.00] First line of lyrics..."></textarea>
-      <div class="flex justify-end gap-2 mt-3">
-        <button onclick="closeCustomLyricsModal()" class="px-4 py-2 rounded-xl bg-white/10 text-xs font-semibold text-white">Cancel</button>
-        <button onclick="saveCustomLyrics()" class="px-4 py-2 rounded-xl bg-cyan-400 text-xs font-extrabold text-black">Save Lyrics</button>
       </div>
     </div>
   </div>
@@ -741,11 +703,11 @@
     }
 
     /*************************************************************************
-     * 3. REAL SPOTIFY DECK LIBRARY + OFFICIAL SPOTIFY IFRAME CONTROLLER
-     *    + HTML5 AUDIO PREVIEW FALLBACK + LRCLIB REAL SYNCED LYRICS
+     * 3. REAL SPOTIFY DECK LIBRARY & IFRAME CONTROLLER + LRCLIB SYNCED LYRICS
      *************************************************************************/
     let deckLibrary = JSON.parse(localStorage.getItem('steamDeck_userLibrary_v2')) || [];
     let currentSongIndex = -1;
+    let activePlaylistIndex = -1;
     let isPlaying = false;
     let isShuffle = false;
     let showFavoritesOnly = false;
@@ -755,53 +717,8 @@
     let activeLyrics = []; // Array of { time: seconds, text: string }
     let activeLyricIndex = -1;
 
-    // Official Spotify IFrame API Controller
-    let spotifyController = null;
-    // HTML5 Audio Element (plays real song preview if user adds via search or isn't logged into Spotify web)
-    const htmlAudioPlayer = new Audio();
-    htmlAudioPlayer.crossOrigin = 'anonymous';
     let fallbackTimer = null;
-
     let currentVolume = 0.80;
-
-    window.onSpotifyIframeApiReady = (IFrameAPI) => {
-      const element = document.getElementById('spotifyEmbedMount');
-      const defaultUri = deckLibrary[0]?.spotifyUri || 'spotify:track:0VjIjW4GlUZAMYd2vXMi3b';
-      const options = {
-        width: '100%',
-        height: '152',
-        uri: defaultUri
-      };
-      const callback = (EmbedController) => {
-        spotifyController = EmbedController;
-        spotifyController.addListener('playback_update', (e) => {
-          if (!e || !e.data) return;
-          const { position, duration, isPaused } = e.data;
-          if (duration > 0) {
-            currentPositionSec = position / 1000;
-            currentDurationSec = duration / 1000;
-            isPlaying = !isPaused;
-            updateTransportUI();
-            updateScrubberAndLyricsUI();
-          }
-        });
-      };
-      IFrameAPI.createController(element, options, callback);
-    };
-
-    // HTML5 Audio Events for direct track playback & real volume slider control
-    htmlAudioPlayer.addEventListener('timeupdate', () => {
-      if (!htmlAudioPlayer.paused && htmlAudioPlayer.duration) {
-        currentPositionSec = htmlAudioPlayer.currentTime;
-        // If full song duration is stored from metadata, scale or show real time
-        if (!currentDurationSec) currentDurationSec = htmlAudioPlayer.duration;
-        updateScrubberAndLyricsUI();
-      }
-    });
-
-    htmlAudioPlayer.addEventListener('ended', () => {
-      playNextTrack();
-    });
 
     function saveLibraryToStorage() {
       localStorage.setItem('steamDeck_userLibrary_v2', JSON.stringify(deckLibrary));
@@ -823,7 +740,7 @@
       return null;
     }
 
-    // Add a Spotify Track, Playlist, or Album URL via Spotify's official oEmbed endpoint + iTunes/LRCLIB enrichment
+    // Add a Spotify Playlist or Album URL
     async function addFromSpotifyUrl() {
       const inputEl = document.getElementById('spotifyUrlInput');
       const rawUrl = inputEl.value.trim();
@@ -842,29 +759,12 @@
       btn.textContent = 'Loading...';
 
       try {
-        // 1. Fetch official title & high-res cover art from Spotify oEmbed API (CORS-enabled)
         const oembedRes = await fetch(`https://open.spotify.com/oembed?url=${encodeURIComponent(parsed.cleanUrl)}`);
         const oembedData = await oembedRes.json();
 
-        let title = oembedData.title || 'Spotify Track';
-        let artist = parsed.type === 'playlist' ? 'Spotify Playlist' : 'Spotify Artist';
+        let title = oembedData.title || (parsed.type === 'playlist' ? 'Spotify Playlist' : 'Spotify Album');
+        let artist = oembedData.provider_name || 'Spotify';
         let cover = oembedData.thumbnail_url || 'https://placehold.co/400x400/11151d/1db954?text=Spotify';
-        let previewUrl = '';
-        let durationSec = 195;
-
-        // Enrich via iTunes Search API to get artist name, exact track duration, and audio stream preview
-        if (parsed.type === 'track' && title) {
-          try {
-            const itunesRes = await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(title)}&entity=song&limit=1`);
-            const itunesData = await itunesRes.json();
-            if (itunesData.results && itunesData.results.length > 0) {
-              const hit = itunesData.results[0];
-              artist = hit.artistName || artist;
-              durationSec = hit.trackTimeMillis ? Math.round(hit.trackTimeMillis / 1000) : durationSec;
-              previewUrl = hit.previewUrl || '';
-            }
-          } catch (_) {}
-        }
 
         const newItem = {
           id: 'sp_' + Date.now(),
@@ -874,8 +774,7 @@
           spotifyUri: parsed.uri,
           spotifyType: parsed.type,
           spotifyUrl: parsed.cleanUrl,
-          previewUrl,
-          duration: durationSec,
+          duration: 210,
           favorite: false,
           lyrics: []
         };
@@ -884,237 +783,153 @@
         saveLibraryToStorage();
         inputEl.value = '';
         closeAddMusicModal();
-        selectSongFromLibrary(0);
+        openPlaylistInDeck(0);
         showDeckToast(`ADDED "${title.toUpperCase()}" TO DECK LIBRARY`);
       } catch (err) {
-        showDeckToast('ADDED SPOTIFY LINK TO DECK LIBRARY');
         const fallbackItem = {
           id: 'sp_' + Date.now(),
-          title: `Spotify ${parsed.type.toUpperCase()} (${parsed.id.slice(0, 6)})`,
-          artist: 'Spotify Link',
+          title: `Playlist (${parsed.id.slice(0, 6)})`,
+          artist: 'Spotify',
           cover: 'https://placehold.co/400x400/11151d/1db954?text=Spotify',
           spotifyUri: parsed.uri,
           spotifyType: parsed.type,
           spotifyUrl: parsed.cleanUrl,
-          previewUrl: '',
-          duration: 180,
+          duration: 210,
           favorite: false,
           lyrics: []
         };
         deckLibrary.unshift(fallbackItem);
         saveLibraryToStorage();
         closeAddMusicModal();
-        selectSongFromLibrary(0);
+        openPlaylistInDeck(0);
+        showDeckToast('ADDED PLAYLIST TO DECK LIBRARY');
       } finally {
-        btn.textContent = 'Add Link';
+        btn.textContent = 'Add Playlist';
       }
-    }
-
-    // Option 2: Search any real song by name/artist (Fetches real cover, duration, audio, and synced lyrics)
-    async function searchRealSongs() {
-      const query = document.getElementById('songSearchInput').value.trim();
-      if (!query) return;
-      const resultsContainer = document.getElementById('songSearchResults');
-      resultsContainer.innerHTML = `<div class="text-xs text-cyan-300 py-2">Searching songs...</div>`;
-
-      try {
-        const res = await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(query)}&entity=song&limit=6`);
-        const data = await res.json();
-        if (!data.results || data.results.length === 0) {
-          resultsContainer.innerHTML = `<div class="text-xs text-gray-400 py-2">No songs found. Try another search.</div>`;
-          return;
-        }
-
-        window._lastSearchResults = data.results;
-        resultsContainer.innerHTML = data.results.map((item, idx) => {
-          const hiResArt = (item.artworkUrl100 || '').replace('100x100bb', '400x400bb');
-          const dur = item.trackTimeMillis ? formatTime(Math.round(item.trackTimeMillis / 1000)) : '3:00';
-          return `
-            <div class="flex items-center justify-between p-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10">
-              <div class="flex items-center gap-2.5 min-w-0">
-                <img src="${hiResArt}" class="w-9 h-9 rounded-lg object-cover shrink-0" />
-                <div class="min-w-0">
-                  <div class="text-xs font-bold text-white truncate">${item.trackName}</div>
-                  <div class="text-[10px] text-gray-400 truncate">${item.artistName} • ${dur}</div>
-                </div>
-              </div>
-              <button onclick="addSearchedSongToLibrary(${idx})" class="px-3 py-1.5 rounded-lg bg-[#1db954] hover:bg-[#1ed760] text-black font-extrabold text-[10px] shrink-0 ml-2">
-                + Add to Library
-              </button>
-            </div>
-          `;
-        }).join('');
-      } catch (e) {
-        resultsContainer.innerHTML = `<div class="text-xs text-rose-400 py-2">Search error. Check connection.</div>`;
-      }
-    }
-
-    function addSearchedSongToLibrary(resultIdx) {
-      const hit = window._lastSearchResults?.[resultIdx];
-      if (!hit) return;
-
-      const hiResArt = (hit.artworkUrl100 || '').replace('100x100bb', '600x600bb');
-      const durationSec = hit.trackTimeMillis ? Math.round(hit.trackTimeMillis / 1000) : 180;
-
-      const newSong = {
-        id: 'song_' + Date.now() + '_' + resultIdx,
-        title: hit.trackName,
-        artist: hit.artistName,
-        cover: hiResArt,
-        spotifyUri: '',
-        spotifyType: 'track',
-        spotifyUrl: '',
-        previewUrl: hit.previewUrl || '',
-        duration: durationSec,
-        favorite: false,
-        lyrics: []
-      };
-
-      deckLibrary.unshift(newSong);
-      saveLibraryToStorage();
-      closeAddMusicModal();
-      selectSongFromLibrary(0);
-      showDeckToast(`ADDED "${newSong.title.toUpperCase()}" TO LIBRARY`);
     }
 
     /*************************************************************************
-     * 4. SELECTING A SONG -> LOADS ICON, PLAYER, AND REAL SYNCED LYRICS
+     * 4. PLAYLIST SELECTION & DECK LIBRARY CONTROLLER
      *************************************************************************/
-    async function selectSongFromLibrary(index) {
+    function openPlaylistInDeck(index) {
       if (index < 0 || index >= deckLibrary.length) return;
+      activePlaylistIndex = index;
       currentSongIndex = index;
-      const song = deckLibrary[currentSongIndex];
+      const playlist = deckLibrary[activePlaylistIndex];
 
-      // Reset library view to playlist list (not track drill-down)
-      libraryViewMode = 'playlists';
-      activePlaylistIndex = -1;
+      // Hide libraries list, show Spotify embed inside Deck Library ONLY
+      document.getElementById('deckLibraryListView').classList.add('hidden');
+      document.getElementById('deckLibraryPlayerView').classList.remove('hidden');
+      document.getElementById('deckLibraryPlayerView').classList.add('flex');
+      document.getElementById('activePlaylistTitleBadge').textContent = playlist.title;
 
-      // Update Now Playing Icon & Details — show the item's own cover art
-      document.getElementById('nowPlayingCover').src = song.cover;
-      document.getElementById('nowPlayingTitle').textContent = song.title;
-      document.getElementById('nowPlayingArtist').textContent = song.artist;
-      document.getElementById('sourceTypeBadge').textContent = song.spotifyUri ? 'SPOTIFY' : 'DECK AUDIO';
+      // Mount the official Spotify embed inside the Deck Library frame
+      const embedUrl = playlist.spotifyUrl.replace('open.spotify.com/', 'open.spotify.com/embed/');
+      const iframe = document.getElementById('deckLibraryIframe');
+      iframe.src = `${embedUrl}?utm_source=generator&theme=0`;
 
-      currentPositionSec = 0;
-      currentDurationSec = song.duration || 180;
-      updateScrubberAndLyricsUI();
-      updateFavoriteButtonUI();
-      renderDeckLibrary();
+      // Set initial song title/artist placeholder (will be replaced by actual track when played)
+      document.getElementById('nowPlayingTitle').textContent = playlist.title;
+      document.getElementById('nowPlayingArtist').textContent = 'Tap a song in the Deck Library →';
+      document.getElementById('nowPlayingCover').src = playlist.cover;
+      document.getElementById('sourceTypeBadge').textContent = 'SPOTIFY';
 
-      // Load into Official Spotify IFrame Controller silently (NO auto-opening the drawer)
-      if (song.spotifyUri && spotifyController) {
-        try { spotifyController.loadUri(song.spotifyUri); } catch (_) {}
-      }
-
-      // Start playback
-      startPlaybackForCurrentSong();
-
-      // Load or fetch real synced LRC lyrics from LRCLIB
-      if (song.lyrics && song.lyrics.length > 0) {
-        activeLyrics = song.lyrics;
-        renderLyricsViewport();
-      } else {
-        await fetchSyncedLyrics(song);
-      }
+      showDeckToast(`LOADED: ${playlist.title.toUpperCase()}`);
     }
 
-    function startPlaybackForCurrentSong() {
-      const song = deckLibrary[currentSongIndex];
-      if (!song) return;
+    function closeActivePlaylistView() {
+      document.getElementById('deckLibraryPlayerView').classList.add('hidden');
+      document.getElementById('deckLibraryPlayerView').classList.remove('flex');
+      document.getElementById('deckLibraryListView').classList.remove('hidden');
+      document.getElementById('deckLibraryListView').classList.add('flex');
+    }
 
-      clearInterval(fallbackTimer);
-      htmlAudioPlayer.pause();
-
-      if (song.spotifyUri && spotifyController) {
-        try {
-          spotifyController.play();
-        } catch (_) {}
+    // Listen for Spotify Iframe Playback Events (to catch currently playing song & icon)
+    window.addEventListener('message', async (event) => {
+      if (!event.data) return;
+      let data = event.data;
+      if (typeof data === 'string') {
+        try { data = JSON.parse(data); } catch (_) { return; }
       }
 
-      if (song.previewUrl) {
-        htmlAudioPlayer.src = song.previewUrl;
-        htmlAudioPlayer.volume = currentVolume;
-        htmlAudioPlayer.play().catch(() => {});
-      }
+      const payload = data.payload || data.data || data;
+      const track = payload.track || (payload.name ? payload : null);
 
-      isPlaying = true;
-      updateTransportUI();
+      if (track && (track.name || track.title)) {
+        const title = track.name || track.title;
+        const artist = track.artists ? track.artists.map(a => a.name).join(', ') : (track.artist || '');
+        let cover = track.album?.images?.[0]?.url || track.cover || '';
 
-      // Smooth 250ms progression timer (synced or overridden whenever Spotify IFrame emits playback_update)
-      fallbackTimer = setInterval(() => {
-        if (!isPlaying) return;
-        if (htmlAudioPlayer.src && !htmlAudioPlayer.paused) {
-          currentPositionSec = htmlAudioPlayer.currentTime;
-        } else {
-          currentPositionSec += 0.25;
-          if (currentDurationSec > 0 && currentPositionSec >= currentDurationSec) {
-            playNextTrack();
-          }
+        document.getElementById('nowPlayingTitle').textContent = title;
+        if (artist) document.getElementById('nowPlayingArtist').textContent = artist;
+        document.getElementById('sourceTypeBadge').textContent = 'SPOTIFY TRACK';
+
+        // Fetch high-res song artwork so the song's actual icon appears (not the playlist's)
+        if (!cover || cover.includes('placehold.co')) {
+          try {
+            const itunesRes = await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(title + ' ' + artist)}&entity=song&limit=1`);
+            const itunesData = await itunesRes.json();
+            if (itunesData.results?.[0]?.artworkUrl100) {
+              cover = itunesData.results[0].artworkUrl100.replace('100x100bb', '600x600bb');
+            }
+          } catch (_) {}
         }
+
+        if (cover) {
+          document.getElementById('nowPlayingCover').src = cover;
+        }
+
+        // Fetch real synced lyrics for this exact song
+        fetchSyncedLyrics({ title, artist, duration: (payload.duration ? Math.round(payload.duration / 1000) : 210) });
+      }
+
+      if (typeof payload.isPaused === 'boolean') {
+        isPlaying = !payload.isPaused;
+        updateTransportUI();
+      }
+      if (typeof payload.position === 'number') {
+        currentPositionSec = payload.position / 1000;
+        if (payload.duration) currentDurationSec = payload.duration / 1000;
         updateScrubberAndLyricsUI();
-      }, 250);
-    }
+      }
+    });
 
     function togglePlayPause() {
-      if (currentSongIndex === -1) {
-        if (deckLibrary.length > 0) {
-          selectSongFromLibrary(0);
-        } else {
-          openAddMusicModal();
-        }
-        return;
-      }
-
-      const song = deckLibrary[currentSongIndex];
       isPlaying = !isPlaying;
-
-      if (song.spotifyUri && spotifyController) {
-        try {
-          spotifyController.togglePlay();
-        } catch (_) {}
-      }
-
-      if (song.previewUrl) {
-        if (isPlaying) {
-          htmlAudioPlayer.play().catch(() => {});
-        } else {
-          htmlAudioPlayer.pause();
-        }
-      }
-
       updateTransportUI();
-      renderDeckLibrary();
+      // Send toggle play/pause to the embedded Spotify iframe
+      const iframe = document.getElementById('deckLibraryIframe');
+      if (iframe && iframe.contentWindow) {
+        iframe.contentWindow.postMessage({ command: 'toggle' }, '*');
+      }
     }
 
     function stopPlayback() {
       isPlaying = false;
       currentPositionSec = 0;
-      htmlAudioPlayer.pause();
-      htmlAudioPlayer.currentTime = 0;
-      if (spotifyController) {
-        try { spotifyController.pause(); } catch (_) {}
-      }
       updateTransportUI();
       updateScrubberAndLyricsUI();
-      renderDeckLibrary();
+      const iframe = document.getElementById('deckLibraryIframe');
+      if (iframe && iframe.contentWindow) {
+        iframe.contentWindow.postMessage({ command: 'pause' }, '*');
+      }
       showDeckToast('PLAYBACK STOPPED');
     }
 
     function playPreviousTrack() {
-      if (deckLibrary.length === 0) return;
-      const prevIdx = (currentSongIndex - 1 + deckLibrary.length) % deckLibrary.length;
-      selectSongFromLibrary(prevIdx);
+      const iframe = document.getElementById('deckLibraryIframe');
+      if (iframe && iframe.contentWindow) {
+        iframe.contentWindow.postMessage({ command: 'previous' }, '*');
+      }
+      showDeckToast('PREVIOUS TRACK');
     }
 
     function playNextTrack() {
-      if (deckLibrary.length === 0) return;
-      let nextIdx;
-      if (isShuffle && deckLibrary.length > 1) {
-        nextIdx = Math.floor(Math.random() * deckLibrary.length);
-      } else {
-        nextIdx = (currentSongIndex + 1) % deckLibrary.length;
+      const iframe = document.getElementById('deckLibraryIframe');
+      if (iframe && iframe.contentWindow) {
+        iframe.contentWindow.postMessage({ command: 'next' }, '*');
       }
-      selectSongFromLibrary(nextIdx);
+      showDeckToast('NEXT TRACK');
     }
 
     function toggleShuffleMode() {
@@ -1126,16 +941,16 @@
     }
 
     function toggleFavoriteCurrent() {
-      if (currentSongIndex === -1 || !deckLibrary[currentSongIndex]) return;
-      deckLibrary[currentSongIndex].favorite = !deckLibrary[currentSongIndex].favorite;
+      if (activePlaylistIndex === -1 || !deckLibrary[activePlaylistIndex]) return;
+      deckLibrary[activePlaylistIndex].favorite = !deckLibrary[activePlaylistIndex].favorite;
       updateFavoriteButtonUI();
       saveLibraryToStorage();
-      showDeckToast(deckLibrary[currentSongIndex].favorite ? 'ADDED TO FAVORITES ♥' : 'REMOVED FROM FAVORITES');
+      showDeckToast(deckLibrary[activePlaylistIndex].favorite ? 'ADDED TO FAVORITES ♥' : 'REMOVED FROM FAVORITES');
     }
 
     function updateFavoriteButtonUI() {
       const btn = document.getElementById('favoriteBtn');
-      const isFav = deckLibrary[currentSongIndex]?.favorite;
+      const isFav = deckLibrary[activePlaylistIndex]?.favorite;
       btn.classList.toggle('text-[#1db954]', !!isFav);
       btn.classList.toggle('text-gray-400', !isFav);
     }
@@ -1155,9 +970,9 @@
     }
 
     /*************************************************************************
-     * 5. REAL SYNCED LYRICS ENGINE (LRCLIB API + BOTTOM-TO-TOP AUTO-SCROLL)
+     * 5. REAL SYNCED LYRICS ENGINE (LRCLIB API + AUTO-SCROLL)
      *************************************************************************/
-    function parseLrcString(lrcText, fallbackDuration = 180) {
+    function parseLrcString(lrcText, fallbackDuration = 210) {
       const lines = lrcText.split('\n');
       const parsed = [];
       const timeRegex = /\[(\d{2}):(\d{2})(?:\.(\d{2,3}))?\]/g;
@@ -1180,7 +995,6 @@
         }
       }
 
-      // If plain text lyrics without timestamps, space them evenly across the track
       if (parsed.length > 0 && parsed.every(p => p.time === -1)) {
         const step = fallbackDuration / (parsed.length + 1);
         parsed.forEach((p, idx) => {
@@ -1193,35 +1007,31 @@
 
     async function fetchSyncedLyrics(song) {
       const viewport = document.getElementById('lyricsViewport');
-      viewport.innerHTML = `<div class="text-xs text-cyan-300 animate-pulse py-6">Fetching synced lyrics for "${song.title}"...</div>`;
+      viewport.innerHTML = `<div class="text-xs text-cyan-300 animate-pulse py-4">Loading synced lyrics for "${song.title}"...</div>`;
 
       try {
-        const cleanQuery = `${song.title} ${song.artist !== 'Spotify Playlist' && song.artist !== 'Spotify Artist' ? song.artist : ''}`.trim();
+        const cleanQuery = `${song.title} ${song.artist !== 'Spotify Playlist' && song.artist !== 'Spotify' ? song.artist : ''}`.trim();
         const res = await fetch(`https://lrclib.net/api/search?q=${encodeURIComponent(cleanQuery)}`);
         const results = await res.json();
 
         if (Array.isArray(results) && results.length > 0) {
           const best = results.find(r => r.syncedLyrics) || results.find(r => r.plainLyrics) || results[0];
-          if (best.duration && (!song.duration || song.duration === 195)) {
-            song.duration = Math.round(best.duration);
-            currentDurationSec = song.duration;
+          if (best.duration) {
+            currentDurationSec = Math.round(best.duration);
           }
           if (best.syncedLyrics) {
-            activeLyrics = parseLrcString(best.syncedLyrics, song.duration);
+            activeLyrics = parseLrcString(best.syncedLyrics, currentDurationSec || 210);
           } else if (best.plainLyrics) {
-            activeLyrics = parseLrcString(best.plainLyrics, song.duration);
+            activeLyrics = parseLrcString(best.plainLyrics, currentDurationSec || 210);
           }
-          song.lyrics = activeLyrics;
-          saveLibraryToStorage();
           renderLyricsViewport();
           return;
         }
       } catch (_) {}
 
-      // Fallback message if no lyrics found yet
       activeLyrics = [
         { time: 0, text: `♪ ${song.title} — ${song.artist}` },
-        { time: 4, text: 'Lyrics not found. Try the Sync button or tap "Spotify Engine" to control via Spotify.' }
+        { time: 4, text: 'No live lyrics found for this track.' }
       ];
       renderLyricsViewport();
     }
@@ -1229,7 +1039,7 @@
     function renderLyricsViewport() {
       const viewport = document.getElementById('lyricsViewport');
       if (!activeLyrics || activeLyrics.length === 0) {
-        viewport.innerHTML = `<div class="text-xs text-gray-500 italic py-6">No lyrics loaded.</div>`;
+        viewport.innerHTML = `<div class="text-xs text-gray-500 italic py-4">No lyrics loaded.</div>`;
         return;
       }
 
@@ -1237,7 +1047,7 @@
         <div 
           id="lyricRow-${idx}" 
           onclick="seekToSecond(${line.time})"
-          class="lyric-line cursor-pointer py-1.5 px-2 rounded-lg text-sm font-bold text-gray-500 opacity-45 hover:opacity-90"
+          class="lyric-line cursor-pointer py-1.5 px-2 rounded-lg text-sm font-bold text-gray-500 opacity-45 hover:opacity-90 transition-all"
         >
           ${line.text}
         </div>
@@ -1253,7 +1063,6 @@
 
       if (!activeLyrics || activeLyrics.length === 0) return;
 
-      // Determine active lyric line for current playback timestamp
       let newActiveIdx = 0;
       for (let i = 0; i < activeLyrics.length; i++) {
         if (currentPositionSec >= activeLyrics[i].time) {
@@ -1271,7 +1080,6 @@
           if (idx === activeLyricIndex) {
             row.classList.add('lyric-line-active', 'bg-white/5');
             row.classList.remove('text-gray-500', 'opacity-45');
-            // Smoothly scroll active line from bottom toward vertical center of the lyrics box
             row.scrollIntoView({ behavior: 'smooth', block: 'center' });
           } else {
             row.classList.remove('lyric-line-active', 'bg-white/5');
@@ -1283,12 +1091,6 @@
 
     function seekToSecond(targetSec) {
       currentPositionSec = Math.max(0, Math.min(currentDurationSec, targetSec));
-      if (htmlAudioPlayer.src && htmlAudioPlayer.duration) {
-        htmlAudioPlayer.currentTime = Math.min(htmlAudioPlayer.duration - 0.5, currentPositionSec);
-      }
-      if (spotifyController) {
-        try { spotifyController.seek(Math.floor(currentPositionSec)); } catch (_) {}
-      }
       updateScrubberAndLyricsUI();
     }
 
@@ -1299,252 +1101,71 @@
       seekToSecond(clickPct * currentDurationSec);
     });
 
-    function refetchLyricsForCurrent() {
-      if (currentSongIndex === -1 || !deckLibrary[currentSongIndex]) return;
-      fetchSyncedLyrics(deckLibrary[currentSongIndex]);
-    }
-
-    function openCustomLyricsModal() {
-      if (currentSongIndex === -1 || !deckLibrary[currentSongIndex]) {
-        showDeckToast('SELECT A SONG FIRST');
-        return;
-      }
-      const existing = (deckLibrary[currentSongIndex].lyrics || [])
-        .map(l => `[${formatTimePadded(l.time)}] ${l.text}`)
-        .join('\n');
-      document.getElementById('customLyricsTextarea').value = existing;
-      document.getElementById('customLyricsModal').classList.remove('hidden');
-      document.getElementById('customLyricsModal').classList.add('flex');
-    }
-
-    function closeCustomLyricsModal() {
-      document.getElementById('customLyricsModal').classList.add('hidden');
-      document.getElementById('customLyricsModal').classList.remove('flex');
-    }
-
-    function saveCustomLyrics() {
-      if (currentSongIndex === -1 || !deckLibrary[currentSongIndex]) return;
-      const raw = document.getElementById('customLyricsTextarea').value;
-      const song = deckLibrary[currentSongIndex];
-      activeLyrics = parseLrcString(raw, song.duration || 180);
-      song.lyrics = activeLyrics;
-      saveLibraryToStorage();
-      renderLyricsViewport();
-      closeCustomLyricsModal();
-      showDeckToast('LYRICS UPDATED & SYNCED');
-    }
-
     /*************************************************************************
-     * 6. RENDER DECK LIBRARY (Right Panel) — Two-state: Playlists → Tracks
-     *    Clicking a playlist shows its tracks inside the library panel only.
-     *    No pop-up to Spotify iframe. Back arrow returns to playlist list.
+     * 6. RENDER DECK LIBRARY (Playlists View)
      *************************************************************************/
-
-    // Track whether we are viewing a playlist's track list inside the library
-    let libraryViewMode = 'playlists'; // 'playlists' | 'tracks'
-    let activePlaylistIndex = -1; // which library item is expanded to show tracks
-
     function renderDeckLibrary() {
       const container = document.getElementById('playlistContainer');
       const badgeEl = document.getElementById('libraryCountBadge');
-      const tipEl = document.getElementById('libraryTip');
 
-      if (libraryViewMode === 'tracks' && activePlaylistIndex >= 0) {
-        // ── TRACK VIEW: show tracks of the selected playlist/album ──
-        const playlist = deckLibrary[activePlaylistIndex];
-        const tracks = playlist.tracks || [];
-
-        badgeEl.textContent = `${tracks.length} Track${tracks.length !== 1 ? 's' : ''}`;
-        if (tipEl) tipEl.textContent = 'Tap a track to play it';
-
-        if (tracks.length === 0) {
-          container.innerHTML = `
-            <div class="mb-2">
-              <button onclick="backToLibrary()" class="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-[10px] font-semibold text-cyan-300">
-                ← Back to Library
-              </button>
-            </div>
-            <div class="flex flex-col items-center justify-center text-center p-4 border border-dashed border-white/10 rounded-xl mt-2">
-              <p class="text-xs font-bold text-gray-300 mb-1">${playlist.title}</p>
-              <p class="text-[10px] text-gray-500">This is a Spotify Playlist.<br>Playback is controlled by Spotify. Hit play below to start it.</p>
-            </div>`;
-          return;
-        }
-
-        container.innerHTML = `
-          <div class="mb-2">
-            <button onclick="backToLibrary()" class="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-[10px] font-semibold text-cyan-300">
-              ← Back to Library
-            </button>
-          </div>
-          <div class="text-[10px] font-bold uppercase tracking-wider text-gray-400 px-1 mb-1">${playlist.title}</div>
-          ${tracks.map((t, tidx) => {
-            const active = currentSongIndex === activePlaylistIndex && (playlist._activeTrackIdx || 0) === tidx;
-            return `
-              <div
-                onclick="selectTrackFromPlaylist(${activePlaylistIndex}, ${tidx})"
-                class="group cursor-pointer w-full p-2 rounded-xl flex items-center gap-2.5 text-left transition-all ${active ? 'bg-[#1db954]/20 border border-[#1db954]/50' : 'bg-white/5 hover:bg-white/10 border border-transparent'}"
-              >
-                <img src="${t.cover || playlist.cover}" alt="${t.title}" class="w-9 h-9 rounded-lg object-cover shrink-0 border border-white/10" />
-                <div class="min-w-0 flex-1">
-                  <div class="text-xs font-bold truncate ${active ? 'text-[#1db954]' : 'text-white'}">${t.title}</div>
-                  <div class="text-[10px] text-gray-400 truncate">${t.artist || playlist.artist}</div>
-                </div>
-                ${active && isPlaying ? `<span class="w-2 h-2 rounded-full bg-[#1db954] animate-ping shrink-0"></span>` : ''}
-              </div>`;
-          }).join('')}`;
-        return;
-      }
-
-      // ── PLAYLIST VIEW: show the library items (playlists / songs) ──
       const itemsToRender = showFavoritesOnly
         ? deckLibrary.map((s, idx) => ({ s, idx })).filter(x => x.s.favorite)
         : deckLibrary.map((s, idx) => ({ s, idx }));
 
       const count = itemsToRender.length;
       badgeEl.textContent = `${count} ${count === 1 ? 'Playlist' : 'Playlists'}`;
-      if (tipEl) tipEl.textContent = 'Tap a playlist to browse its tracks';
 
       if (count === 0) {
         container.innerHTML = `
           <div class="h-full flex flex-col items-center justify-center text-center p-4 border border-dashed border-white/10 rounded-xl">
             <p class="text-xs font-bold text-gray-300 mb-1">Your Deck Library is Empty</p>
-            <p class="text-[10px] text-gray-500 mb-3">Use "+ Add Spotify URL" in the top bar to add a playlist or track.</p>
+            <p class="text-[10px] text-gray-500 mb-3">Paste a Spotify Playlist link above to load it here.</p>
             <button onclick="openAddMusicModal()" class="px-3 py-1.5 rounded-lg bg-[#1db954] text-black font-extrabold text-[11px]">
-              + Add Playlist / URL
+              + Add Playlist
             </button>
           </div>`;
         return;
       }
 
       container.innerHTML = itemsToRender.map(({ s, idx }) => {
-        const active = (libraryViewMode === 'tracks' && activePlaylistIndex === idx) || (currentSongIndex === idx && libraryViewMode === 'playlists');
-        const isPlaylist = s.spotifyType === 'playlist' || s.spotifyType === 'album';
+        const active = idx === activePlaylistIndex;
         return `
           <div
-            onclick="${isPlaylist ? `openPlaylistTracks(${idx})` : `selectSongFromLibrary(${idx})`}"
+            onclick="openPlaylistInDeck(${idx})"
             class="group cursor-pointer w-full p-2 rounded-xl flex items-center gap-2.5 text-left transition-all ${active ? 'bg-[#1db954]/20 border border-[#1db954]/50' : 'bg-white/5 hover:bg-white/10 border border-transparent'}"
           >
             <img src="${s.cover}" alt="${s.title}" class="w-10 h-10 rounded-lg object-cover shrink-0 border border-white/10" />
             <div class="min-w-0 flex-1">
               <div class="text-xs font-bold truncate ${active ? 'text-[#1db954]' : 'text-white'}">${s.title}</div>
               <div class="text-[10px] text-gray-400 truncate flex items-center gap-1">
-                ${isPlaylist ? '<span class="text-cyan-400">▶ Playlist</span>' : `<span>${s.artist}</span>`}
+                <span class="text-cyan-400">▶ Playlist</span>
               </div>
             </div>
-            ${isPlaylist ? `<svg class="w-3.5 h-3.5 text-gray-500 group-hover:text-cyan-300 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>` : ''}
+            <svg class="w-3.5 h-3.5 text-gray-500 group-hover:text-cyan-300 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
             <button
-              onclick="event.stopPropagation(); removeSongFromLibrary(${idx});"
+              onclick="event.stopPropagation(); removePlaylistFromLibrary(${idx});"
               class="opacity-0 group-hover:opacity-100 p-1 rounded hover:bg-rose-500/20 text-gray-400 hover:text-rose-300 text-[10px] shrink-0"
-              title="Remove"
+              title="Remove Playlist"
             >✕</button>
           </div>`;
       }).join('');
     }
 
-    // Open a playlist to show its tracks inside the library panel
-    function openPlaylistTracks(idx) {
-      const playlist = deckLibrary[idx];
-      if (!playlist) return;
-      activePlaylistIndex = idx;
-      libraryViewMode = 'tracks';
-
-      // Load the playlist into the Spotify controller (silently, no drawer popup)
-      if (playlist.spotifyUri && spotifyController) {
-        try { spotifyController.loadUri(playlist.spotifyUri); } catch (_) {}
-      }
-
-      // Update now playing cover/title to the playlist's art while browsing
-      document.getElementById('nowPlayingCover').src = playlist.cover;
-      document.getElementById('nowPlayingTitle').textContent = playlist.title;
-      document.getElementById('nowPlayingArtist').textContent = playlist.artist || 'Spotify Playlist';
-      document.getElementById('sourceTypeBadge').textContent = 'PLAYLIST';
-
-      renderDeckLibrary();
-    }
-
-    function backToLibrary() {
-      libraryViewMode = 'playlists';
-      activePlaylistIndex = -1;
-      renderDeckLibrary();
-    }
-
-    // Select a single track from within a playlist's track list (shown inside library)
-    function selectTrackFromPlaylist(playlistIdx, trackIdx) {
-      const playlist = deckLibrary[playlistIdx];
-      if (!playlist || !playlist.tracks || !playlist.tracks[trackIdx]) return;
-      const track = playlist.tracks[trackIdx];
-
-      playlist._activeTrackIdx = trackIdx;
-      currentSongIndex = playlistIdx;
-
-      // Show the specific track's art + details in the player (not the playlist art)
-      document.getElementById('nowPlayingCover').src = track.cover || playlist.cover;
-      document.getElementById('nowPlayingTitle').textContent = track.title;
-      document.getElementById('nowPlayingArtist').textContent = track.artist || playlist.artist;
-      document.getElementById('sourceTypeBadge').textContent = 'SPOTIFY TRACK';
-
-      currentPositionSec = 0;
-      currentDurationSec = track.duration || playlist.duration || 180;
-      updateScrubberAndLyricsUI();
-      updateFavoriteButtonUI();
-
-      // Play track via Spotify controller (no drawer popup)
-      if (track.spotifyUri && spotifyController) {
-        try {
-          spotifyController.loadUri(track.spotifyUri);
-          spotifyController.play();
-        } catch (_) {}
-      } else if (track.previewUrl) {
-        htmlAudioPlayer.src = track.previewUrl;
-        htmlAudioPlayer.volume = currentVolume;
-        htmlAudioPlayer.play().catch(() => {});
-      }
-
-      isPlaying = true;
-      updateTransportUI();
-      clearInterval(fallbackTimer);
-      fallbackTimer = setInterval(() => {
-        if (!isPlaying) return;
-        if (htmlAudioPlayer.src && !htmlAudioPlayer.paused) {
-          currentPositionSec = htmlAudioPlayer.currentTime;
-        } else {
-          currentPositionSec += 0.25;
-          if (currentDurationSec > 0 && currentPositionSec >= currentDurationSec) playNextTrack();
-        }
-        updateScrubberAndLyricsUI();
-      }, 250);
-
-      // Fetch lyrics for this specific track
-      fetchSyncedLyrics({ title: track.title, artist: track.artist || playlist.artist, duration: track.duration || 180, lyrics: track.lyrics || [] });
-
-      renderDeckLibrary();
-      showDeckToast(`PLAYING: ${track.title.toUpperCase()}`);
-    }
-
-    function removeSongFromLibrary(idx) {
+    function removePlaylistFromLibrary(idx) {
       deckLibrary.splice(idx, 1);
-      if (currentSongIndex === idx) {
-        stopPlayback();
-        currentSongIndex = -1;
-      } else if (currentSongIndex > idx) {
-        currentSongIndex--;
+      if (activePlaylistIndex === idx) {
+        closeActivePlaylistView();
+        activePlaylistIndex = -1;
+      } else if (activePlaylistIndex > idx) {
+        activePlaylistIndex--;
       }
       saveLibraryToStorage();
     }
 
-    function toggleFavoritesFilter() {
-      showFavoritesOnly = !showFavoritesOnly;
-      const btn = document.getElementById('favFilterBtn');
-      btn.classList.toggle('bg-[#1db954]/25', showFavoritesOnly);
-      btn.classList.toggle('text-[#1db954]', showFavoritesOnly);
-      renderDeckLibrary();
-    }
-
     function clearDeckLibrary() {
       deckLibrary = [];
-      currentSongIndex = -1;
-      stopPlayback();
+      activePlaylistIndex = -1;
+      closeActivePlaylistView();
       saveLibraryToStorage();
       showDeckToast('DECK LIBRARY CLEARED');
     }
@@ -1557,12 +1178,6 @@
     function closeAddMusicModal() {
       document.getElementById('addMusicModal').classList.add('hidden');
       document.getElementById('addMusicModal').classList.remove('flex');
-    }
-
-    function toggleSpotifyEngineDrawer() {
-      const drawer = document.getElementById('spotifyEngineDrawer');
-      drawer.classList.toggle('hidden');
-      drawer.classList.toggle('flex');
     }
 
     function formatTime(sec) {
@@ -1743,8 +1358,7 @@
       renderBottomDock();
       renderDeckLibrary();
       if (deckLibrary.length > 0) {
-        selectSongFromLibrary(0);
-        stopPlayback();
+        openPlaylistInDeck(0);
       }
 
       if ('serviceWorker' in navigator) {
