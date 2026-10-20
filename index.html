@@ -675,6 +675,7 @@
     function triggerDockButton(idx) {
       const slot = dockSlots[idx];
       if (!slot) return;
+      playTactileClick();
       showDeckToast(`LAUNCHING ${slot.name.toUpperCase()}...`);
 
       if (slot.url.startsWith('deck:')) {
@@ -791,6 +792,28 @@
 
       masterGainNode.connect(analyserNode);
       analyserNode.connect(audioCtx.destination);
+    }
+
+    function playTactileClick() {
+      try {
+        initAudioEngine();
+        if (audioCtx && audioCtx.state === 'suspended') {
+          audioCtx.resume();
+        }
+        if (!audioCtx) return;
+        const now = audioCtx.currentTime;
+        const clickOsc = audioCtx.createOscillator();
+        const clickGain = audioCtx.createGain();
+        clickOsc.type = 'sine';
+        clickOsc.frequency.setValueAtTime(800, now);
+        clickOsc.frequency.exponentialRampToValueAtTime(120, now + 0.03);
+        clickGain.gain.setValueAtTime(0.08 * currentVolume, now);
+        clickGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.035);
+        clickOsc.connect(clickGain);
+        clickGain.connect(masterGainNode);
+        clickOsc.start(now);
+        clickOsc.stop(now + 0.04);
+      } catch (e) {}
     }
 
     function triggerSynthStep() {
