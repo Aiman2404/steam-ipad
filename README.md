@@ -1,6 +1,11 @@
 # SteamOS Cyber-Deck — iPad Air 2 Edition
 
+[![Live Cyber-Deck App](https://img.shields.io/badge/Live%20Cyber--Deck-aiman2404.github.io%2Fsteam--ipad-00e5ff?style=for-the-badge&logo=github)](https://aiman2404.github.io/steam-ipad/)
+[![GitHub Actions CI/CD](https://img.shields.io/badge/Deploy-GitHub%20Pages-1db954?style=for-the-badge&logo=githubactions)](https://github.com/Aiman2404/steam-ipad/actions)
+
 A single-file, fully offline-capable **SteamOS / Steam Deck–inspired web dashboard** built for the **iPad Air 2** locked in landscape mode. Designed to sit inside a custom 3D-printed bezel that replicates the Steam Deck's hardware trench aesthetics on a 9.7-inch tablet.
+
+🌐 **Live URL (Always-On, no laptop needed):** [https://aiman2404.github.io/steam-ipad/](https://aiman2404.github.io/steam-ipad/)
 
 ---
 
