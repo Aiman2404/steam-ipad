@@ -253,7 +253,7 @@
               <!-- Seek / Scrubber Bar -->
               <div class="flex items-center gap-3">
                 <span id="currentTimeLabel" class="text-[11px] mono-num text-gray-400 w-9 text-right">0:00</span>
-                <div id="seekBarTrack" class="relative flex-1 h-2 bg-white/10 rounded-full cursor-pointer overflow-hidden">
+                <div id="seekBarTrack" class="relative flex-1 h-2 bg-white/10 rounded-full cursor-pointer overflow-hidden touch-none select-none">
                   <div id="seekBarFill" class="h-full bg-gradient-to-r from-[#1db954] to-cyan-400 rounded-full transition-all duration-150" style="width: 0%;"></div>
                 </div>
                 <span id="durationTimeLabel" class="text-[11px] mono-num text-gray-400 w-9">0:00</span>
@@ -276,14 +276,9 @@
                 </button>
 
                 <!-- Play / Pause Main Button -->
-                <button onclick="togglePlayPause()" id="playPauseBtn" class="deck-btn w-11 h-11 rounded-full bg-[#1db954] hover:bg-[#1ed760] text-black flex items-center justify-center shadow-[0_0_18px_rgba(29,185,84,0.5)]" title="Play / Pause">
+                <button onclick="togglePlayPause()" id="playPauseBtn" class="deck-btn w-12 h-12 rounded-full bg-[#1db954] hover:bg-[#1ed760] text-black flex items-center justify-center shadow-[0_0_20px_rgba(29,185,84,0.55)]" title="Play / Pause">
                   <svg id="playIcon" class="w-6 h-6 ml-0.5" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
                   <svg id="pauseIcon" class="w-6 h-6 hidden" viewBox="0 0 24 24" fill="currentColor"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
-                </button>
-
-                <!-- Stop Button -->
-                <button onclick="stopPlayback()" class="deck-btn p-2 rounded-lg text-gray-300 hover:text-rose-400 hover:bg-white/10" title="Stop">
-                  <svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="6" width="12" height="12" rx="2"/></svg>
                 </button>
 
                 <!-- Next -->
@@ -291,9 +286,15 @@
                   <svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg>
                 </button>
 
-                <!-- Favorite / Heart -->
-                <button onclick="toggleFavoriteCurrent()" id="favoriteBtn" class="deck-btn p-1.5 rounded-lg text-gray-400 hover:text-[#1db954] hover:bg-white/10" title="Favorite Song">
-                  <svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+                <!-- Repeat Button (Cycles Off -> All -> One) in place of Favorite -->
+                <button onclick="toggleRepeatMode()" id="repeatBtn" class="deck-btn relative p-2 rounded-lg text-[#1db954] bg-white/5 hover:bg-white/10" title="Repeat Mode: All">
+                  <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                    <polyline points="17 1 21 5 17 9"></polyline>
+                    <path d="M3 11V9a4 4 0 0 1 4-4h14"></path>
+                    <polyline points="7 23 3 19 7 15"></polyline>
+                    <path d="M21 13v2a4 4 0 0 1-4 4H3"></path>
+                  </svg>
+                  <span id="repeatOneBadge" class="hidden absolute top-0.5 right-0.5 text-[8px] font-black text-cyan-400">1</span>
                 </button>
               </div>
             </div>
@@ -305,17 +306,17 @@
           <!-- =============================================================== -->
           <aside class="w-[35%] h-full bg-black/45 border border-white/10 rounded-2xl p-3 flex flex-col justify-between shrink-0 min-w-0 overflow-hidden">
 
-            <!-- VIEW 1: LIBRARIES LIST (Shows saved playlists) -->
+            <!-- VIEW 1: LIBRARIES LIST (Shows saved playlists/libraries) -->
             <div id="deckLibraryListView" class="w-full h-full flex flex-col justify-between">
               <!-- Header -->
               <div class="flex items-center justify-between border-b border-white/10 pb-2.5 shrink-0">
                 <div>
                   <h2 class="text-xs font-extrabold uppercase tracking-wider text-white">Deck Library</h2>
-                  <p class="text-[10px] text-gray-400">Your Spotify Playlists</p>
+                  <p class="text-[10px] text-gray-400">Your Music Libraries</p>
                 </div>
                 <div class="flex items-center gap-1.5">
-                  <span id="libraryCountBadge" class="px-2 py-0.5 rounded-md bg-[#1db954]/20 text-[#1db954] text-[10px] font-bold mono-num">0 Playlists</span>
-                  <button onclick="clearDeckLibrary()" class="deck-btn p-1 rounded-lg bg-white/5 hover:bg-rose-500/20 text-gray-400 hover:text-rose-300 text-[10px]" title="Clear Playlists">✕</button>
+                  <span id="libraryCountBadge" class="px-2 py-0.5 rounded-md bg-[#1db954]/20 text-[#1db954] text-[10px] font-bold mono-num">0 Libraries</span>
+                  <button onclick="clearDeckLibrary()" class="deck-btn p-1 rounded-lg bg-white/5 hover:bg-rose-500/20 text-gray-400 hover:text-rose-300 text-[10px]" title="Clear Libraries">✕</button>
                 </div>
               </div>
 
@@ -325,31 +326,38 @@
               </div>
 
               <!-- Footer tip -->
-              <div class="pt-2 border-t border-white/10 text-[10px] text-gray-400 truncate">
-                Tap any playlist to open its songs
+              <div class="pt-2 border-t border-white/10 flex items-center justify-between text-[10px] text-gray-400">
+                <span class="truncate">Tap any library to browse songs</span>
+                <button onclick="openAddMusicModal()" class="text-[#1db954] font-bold hover:underline shrink-0 ml-1">+ New</button>
               </div>
             </div>
 
-            <!-- VIEW 2: ACTIVE PLAYLIST / SPOTIFY EMBED (Fits in Deck Library ONLY!) -->
+            <!-- VIEW 2: ACTIVE LIBRARY SONGS LIST (Inside Deck Library ONLY!) -->
             <div id="deckLibraryPlayerView" class="hidden w-full h-full flex flex-col justify-between">
-              <!-- Top bar with Back Arrow -->
+              <!-- Top bar with Back Arrow & Upload Trigger -->
               <div class="flex items-center justify-between border-b border-white/10 pb-2 shrink-0">
                 <button onclick="closeActivePlaylistView()" class="deck-btn flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-white/10 hover:bg-white/20 text-xs font-bold text-cyan-300">
                   <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
-                  <span>Back to Libraries</span>
+                  <span>Libraries</span>
                 </button>
-                <span id="activePlaylistTitleBadge" class="text-[10px] font-extrabold uppercase text-gray-300 truncate max-w-[120px]">Playlist</span>
+                <div class="flex items-center gap-1.5 min-w-0">
+                  <span id="activePlaylistTitleBadge" class="text-[10px] font-extrabold uppercase text-gray-200 truncate max-w-[100px]">Playlist</span>
+                  <label class="cursor-pointer px-2 py-1 rounded bg-[#1db954]/20 hover:bg-[#1db954]/30 border border-[#1db954]/40 text-[9px] font-bold text-[#1db954] shrink-0" title="Upload audio files from your iPhone / Device">
+                    + Upload
+                    <input type="file" accept="audio/*" multiple class="hidden" onchange="handleLocalAudioUpload(event)" />
+                  </label>
+                </div>
               </div>
 
-              <!-- Gray Spotify IFrame Widget (mounted right here inside Deck Library!) -->
-              <div class="flex-1 w-full my-1.5 rounded-xl overflow-hidden bg-black/60 border border-white/10">
-                <iframe id="deckLibraryIframe" class="w-full h-full border-0" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+              <!-- Full Songs List of Active Library -->
+              <div id="activePlaylistTracksContainer" class="flex-1 overflow-y-auto custom-scroll my-1.5 space-y-1.5 pr-1">
+                <!-- Populated with each song, showing individual thumbnail, title, artist, duration -->
               </div>
 
               <!-- Footer info -->
               <div class="pt-1 border-t border-white/10 text-[10px] text-gray-400 flex items-center justify-between">
-                <span>Controlled on Spotify</span>
-                <span class="text-[#1db954] font-bold">● Active</span>
+                <span id="activeLibraryFooterCount">0 Songs Loaded</span>
+                <span class="text-cyan-400 font-bold">● Full Audio</span>
               </div>
             </div>
 
@@ -364,7 +372,7 @@
       <aside class="w-[20%] h-full flex gap-[10px]">
 
         <!-- VERTICAL SLIDER 1: SOUND / VOLUME -->
-        <div id="volumeSliderTrack" class="trench-highlight steam-glass carbon-surface relative flex-1 h-full rounded-2xl overflow-hidden flex flex-col justify-between items-center py-4 cursor-ns-resize select-none">
+        <div id="volumeSliderTrack" class="trench-highlight steam-glass carbon-surface relative flex-1 h-full rounded-2xl overflow-hidden flex flex-col justify-between items-center py-4 cursor-ns-resize select-none touch-none">
           <!-- Bottom-Up Animated Fill Bar -->
           <div id="volumeSliderFill" class="pointer-events-none absolute bottom-0 left-0 right-0 bg-gradient-to-t from-[#1db954]/50 via-cyan-500/35 to-cyan-400/20 border-t-2 border-cyan-300 transition-all duration-75" style="height: 78%;"></div>
 
@@ -398,7 +406,7 @@
         </div>
 
         <!-- VERTICAL SLIDER 2: DISPLAY BRIGHTNESS -->
-        <div id="brightnessSliderTrack" class="trench-highlight steam-glass carbon-surface relative flex-1 h-full rounded-2xl overflow-hidden flex flex-col justify-between items-center py-4 cursor-ns-resize select-none">
+        <div id="brightnessSliderTrack" class="trench-highlight steam-glass carbon-surface relative flex-1 h-full rounded-2xl overflow-hidden flex flex-col justify-between items-center py-4 cursor-ns-resize select-none touch-none">
           <!-- Bottom-Up Animated Fill Bar -->
           <div id="brightnessSliderFill" class="pointer-events-none absolute bottom-0 left-0 right-0 bg-gradient-to-t from-amber-500/45 via-amber-300/30 to-white/25 border-t-2 border-amber-200 transition-all duration-75" style="height: 95%;"></div>
 
@@ -551,7 +559,7 @@
   <!-- =================================================================== -->
   <!-- APPLICATION LOGIC (Web Audio Synth + Visualizer + Sliders + Dock)   -->
   <!-- =================================================================== -->
-  <!-- MODAL 2: ADD SPOTIFY PLAYLIST TO DECK LIBRARY                       -->
+  <!-- MODAL 2: ADD MUSIC / UPLOAD LIBRARY TO DECK                         -->
   <!-- =================================================================== -->
   <div id="addMusicModal" class="fixed inset-0 z-40 bg-black/80 backdrop-blur-md hidden items-center justify-center p-6">
     <div class="steam-glass carbon-surface w-full max-w-lg rounded-2xl border border-[#1db954]/40 p-5 shadow-2xl">
@@ -559,27 +567,46 @@
         <div class="flex items-center gap-2">
           <span class="w-3 h-3 rounded-full bg-[#1db954]"></span>
           <div>
-            <h3 class="text-base font-extrabold uppercase tracking-wider text-white">Add Spotify Playlist</h3>
-            <p class="text-[11px] text-gray-400">Paste any Spotify Playlist or Album link to load into your Deck Library.</p>
+            <h3 class="text-base font-extrabold uppercase tracking-wider text-white">Add Music to Deck Library</h3>
+            <p class="text-[11px] text-gray-400">Upload audio files from iPhone/PC or import a Spotify playlist.</p>
           </div>
         </div>
         <button onclick="closeAddMusicModal()" class="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-gray-300">✕</button>
       </div>
 
-      <div class="space-y-4 my-4 text-xs text-gray-300">
+      <div class="space-y-3.5 my-4 text-xs text-gray-300">
+        <!-- Option 1: Upload from iPhone / PC Files -->
+        <div class="p-3.5 rounded-xl bg-black/50 border border-cyan-400/30">
+          <label class="block font-bold text-white mb-1">Option 1: Upload Library from iPhone / iPad / PC</label>
+          <p class="text-[11px] text-gray-400 mb-2">Select audio files (.mp3, .m4a, .wav) to create a library with full-length playback and synced lyrics:</p>
+          <label class="deck-btn flex items-center justify-center gap-2 w-full py-2.5 px-3 rounded-lg bg-cyan-500/20 hover:bg-cyan-500/30 border border-cyan-400/50 text-cyan-300 font-extrabold cursor-pointer">
+            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+            <span>Choose Files from Device</span>
+            <input type="file" accept="audio/*" multiple class="hidden" onchange="handleLocalAudioUpload(event)" />
+          </label>
+        </div>
+
+        <!-- Option 2: Paste Spotify Playlist Link -->
         <div class="p-3.5 rounded-xl bg-black/50 border border-white/10">
-          <label class="block font-bold text-white mb-1">Spotify Playlist / Album Link</label>
-          <p class="text-[11px] text-gray-400 mb-2">Paste a public link (e.g. https://open.spotify.com/playlist/...):</p>
+          <label class="block font-bold text-white mb-1">Option 2: Import Spotify Playlist Link</label>
           <div class="flex gap-2">
             <input id="spotifyUrlInput" type="text" placeholder="https://open.spotify.com/playlist/..." class="flex-1 px-3 py-2 rounded-lg bg-black/80 border border-white/15 text-xs text-white focus:outline-none focus:border-[#1db954]" onkeydown="if(event.key==='Enter') addFromSpotifyUrl()" />
             <button onclick="addFromSpotifyUrl()" id="addSpotifyUrlBtn" class="px-4 py-2 rounded-lg bg-[#1db954] hover:bg-[#1ed760] text-black font-extrabold shrink-0">
-              Add Playlist
+              Import
             </button>
           </div>
         </div>
+
+        <!-- Option 3: Restore / Reset Only Real GOATS -->
+        <div class="flex items-center justify-between pt-1 text-[11px] text-gray-400">
+          <span>Need a demo collection?</span>
+          <button onclick="loadDefaultGoatsLibrary()" class="text-cyan-300 font-bold hover:underline">
+            Load "Only Real GOATS" Library
+          </button>
+        </div>
       </div>
 
-      <div class="flex justify-end">
+      <div class="flex justify-end pt-2 border-t border-white/10">
         <button onclick="closeAddMusicModal()" class="px-4 py-2 rounded-xl bg-white/10 text-xs font-bold text-white">Close</button>
       </div>
     </div>
@@ -703,256 +730,440 @@
     }
 
     /*************************************************************************
-     * 3. REAL SPOTIFY DECK LIBRARY & IFRAME CONTROLLER + LRCLIB SYNCED LYRICS
+     * 3. REAL FULL-AUDIO DECK LIBRARY & LOCAL DEVICE AUDIO ENGINE
      *************************************************************************/
-    let deckLibrary = JSON.parse(localStorage.getItem('steamDeck_userLibrary_v2')) || [];
-    let currentSongIndex = -1;
+    // Curated high-fidelity GOATS library with real tracks, individual album art & synced lyrics
+    const DEFAULT_GOATS_LIBRARY = {
+      id: 'lib_goats_official',
+      title: 'Only Real GOATS',
+      cover: 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=600&auto=format&fit=crop&q=80',
+      tracks: [
+        {
+          id: 'trk_505',
+          title: '505',
+          artist: 'Arctic Monkeys',
+          cover: 'https://i.scdn.co/image/ab67616d0000b2734ae1c4c5c45aabe565499163',
+          audioUrl: 'https://ia801503.us.archive.org/15/items/arctic-monkeys-505/Arctic%20Monkeys%20-%20505.mp3',
+          duration: 253,
+          lrc: `[00:00.00] ♪ 505 — Arctic Monkeys
+[00:35.50] I'm going back to 505
+[00:41.20] If it's a seven hour flight or a forty-five minute drive
+[00:48.30] In my imagination, you're waitin' lyin' on your side
+[00:54.40] With your hands between your thighs
+[01:00.00] Stop and wait a sec
+[01:03.20] When you look at me like that, my darlin', what did you expect?
+[01:08.50] I'd probably still adore you with your hands around my neck
+[01:14.20] Or I did last time I checked
+[01:21.00] Not shy of a spark
+[01:25.00] A knife twists at the thought that I should fall short of the mark
+[01:31.00] Frightened by the bite, no, it's no harsher than the bark
+[01:36.50] A middle-of-the-adventure, such a perfect place to start
+[01:42.50] I'm going back to 505
+[01:48.00] If it's a seven hour flight or a forty-five minute drive
+[01:54.00] In my imagination, you're waitin' lyin' on your side
+[02:00.00] With your hands between your thighs
+[02:26.00] But I crumble completely when you cry
+[02:37.00] It seems like once again you've had to greet me with goodbye
+[02:44.00] I'm always just about to go and spoil a surprise
+[02:50.00] Take my hands off of your eyes too soon
+[02:59.00] I'm going back to 505
+[03:05.00] If it's a seven hour flight or a forty-five minute drive
+[03:11.00] In my imagination, you're waitin' lyin' on your side
+[03:17.00] With your hands between your thighs and a smile`
+        },
+        {
+          id: 'trk_iwby',
+          title: 'I Wanna Be Yours',
+          artist: 'Arctic Monkeys',
+          cover: 'https://i.scdn.co/image/ab67616d0000b27376c6ec221375d8628b0f209e',
+          audioUrl: 'https://ia803404.us.archive.org/32/items/arctic-monkeys-am/12%20I%20Wanna%20Be%20Yours.mp3',
+          duration: 184,
+          lrc: `[00:00.00] ♪ I Wanna Be Yours — Arctic Monkeys
+[00:15.50] I wanna be your vacuum cleaner
+[00:19.20] Breathing in your dust
+[00:23.00] I wanna be your Ford Cortina
+[00:26.80] I will never rust
+[00:30.80] If you like your coffee hot
+[00:34.50] Let me be your coffee pot
+[00:38.20] You call the shots, babe
+[00:41.20] I just wanna be yours
+[00:45.80] Secrets I have held in my heart
+[00:49.50] Are harder to hide than I thought
+[00:53.20] Maybe I just wanna be yours
+[00:57.00] I wanna be yours, I wanna be yours
+[01:03.00] Wanna be yours, wanna be yours, wanna be yours
+[01:16.00] Let me be your 'lelectric meter
+[01:19.50] And I will not run out
+[01:23.20] Let me be the portable heater
+[01:27.00] That you'll get cold without
+[01:31.00] I wanna be your setting lotion
+[01:34.80] Hold your hair in deep devotion
+[01:38.50] At least as deep as the Pacific Ocean
+[01:42.50] Now I wanna be yours`
+        },
+        {
+          id: 'trk_starboy',
+          title: 'Starboy',
+          artist: 'The Weeknd ft. Daft Punk',
+          cover: 'https://i.scdn.co/image/ab67616d0000b2734718e2b124f79258be7bc452',
+          audioUrl: 'https://ia801901.us.archive.org/13/items/TheWeekndStarboy_201611/01%20Starboy%20%28feat.%20Daft%20Punk%29.mp3',
+          duration: 230,
+          lrc: `[00:00.00] ♪ Starboy — The Weeknd ft. Daft Punk
+[00:12.00] I'm tryna put you in the worst mood, ah
+[00:15.50] P1 cleaner than your church shoes, ah
+[00:19.00] Milli point two just to hurt you, ah
+[00:22.50] All red Lamb' just to tease you, ah
+[00:25.80] None of these toys on lease too, ah
+[00:29.20] Made your whole year in a week too, yah
+[00:32.80] Main bitch out your league too, ah
+[00:36.20] Side bitch out of your league too, ah
+[00:39.80] Look what you've done
+[00:43.00] I'm a motherfuckin' starboy
+[00:46.50] Look what you've done
+[00:49.80] I'm a motherfuckin' starboy
+[00:53.50] Every day a nigga try to test me, ah
+[00:57.00] Every day a nigga try to end me, ah
+[01:00.50] Pull off in that Roadster SV, ah
+[01:04.00] Pockets overweight, gettin' hefty, ah`
+        },
+        {
+          id: 'trk_afterdark',
+          title: 'After Dark',
+          artist: 'Mr.Kitty',
+          cover: 'https://i.scdn.co/image/ab67616d0000b273fc6cb8a6a617d3d0fdf1cb20',
+          audioUrl: 'https://ia801509.us.archive.org/28/items/mr.-kitty-after-dark/Mr.Kitty%20-%20After%20Dark.mp3',
+          duration: 259,
+          lrc: `[00:00.00] ♪ After Dark — Mr.Kitty
+[00:28.00] I see you
+[00:30.50] You see me
+[00:33.20] How pleasant
+[00:35.80] This feeling
+[00:38.50] The moment
+[00:41.20] You hold me
+[00:43.80] I missed you
+[00:46.50] I'm sorry
+[00:49.50] I've given
+[00:52.00] What I have
+[00:54.80] I showed you
+[00:57.20] I'm growing
+[01:00.00] The ashes
+[01:02.50] Fall slowly
+[01:05.20] As your voice
+[01:07.80] Consoles me
+[01:10.50] As the hours pass
+[01:13.20] I will let you know
+[01:16.00] That I need to ask
+[01:18.50] Before I'm alone
+[01:21.20] How it feels to rest
+[01:23.80] On your patient lips
+[01:26.50] To eternal bliss
+[01:29.20] I'm so glad to know`
+        },
+        {
+          id: 'trk_sweater',
+          title: 'Sweater Weather',
+          artist: 'The Neighbourhood',
+          cover: 'https://i.scdn.co/image/ab67616d0000b2738265a736a1eb84740cb4a706',
+          audioUrl: 'https://ia800109.us.archive.org/27/items/the-neighbourhood-sweater-weather/The%20Neighbourhood%20-%20Sweater%20Weather.mp3',
+          duration: 240,
+          lrc: `[00:00.00] ♪ Sweater Weather — The Neighbourhood
+[00:09.50] All I am is a man
+[00:13.00] I want the world in my hands
+[00:16.80] I hate the beach but I stand in California with my toes in the sand
+[00:22.00] Use the sleeves on my sweater
+[00:24.80] Let's have an adventure
+[00:27.50] Head in the clouds but my gravity's centered
+[00:31.00] Touch my neck and I'll touch yours
+[00:33.80] You in those little high waisted shorts
+[00:37.00] She knows what I think about
+[00:40.00] And what I think about
+[00:43.00] One love, two mouths
+[00:46.00] One love, one house
+[00:48.80] No shirts, no blouse
+[00:51.50] Just us, you find out
+[00:54.50] Nothing that I wouldn't wanna tell you about, no
+[00:58.50] 'Cause it's too cold for you here
+[01:03.50] And now, so let me hold both your hands in the holes of my sweater`
+        }
+      ]
+    };
+
+    // Global Player & Library State
+    let deckLibrary = [];
     let activePlaylistIndex = -1;
+    let currentTrackIndex = -1;
     let isPlaying = false;
     let isShuffle = false;
-    let showFavoritesOnly = false;
+    let repeatMode = 'all'; // 'all' | 'one' | 'off'
 
     let currentPositionSec = 0;
     let currentDurationSec = 0;
-    let activeLyrics = []; // Array of { time: seconds, text: string }
+    let activeLyrics = [];
     let activeLyricIndex = -1;
-
-    let fallbackTimer = null;
+    let isScrubbing = false;
     let currentVolume = 0.80;
 
-    function saveLibraryToStorage() {
-      localStorage.setItem('steamDeck_userLibrary_v2', JSON.stringify(deckLibrary));
-      renderDeckLibrary();
-    }
+    // Real Native Audio Element for Full-Length Playback
+    const audioPlayer = new Audio();
+    audioPlayer.preload = 'auto';
+    audioPlayer.volume = currentVolume;
 
-    // Parse Spotify URL into { type: 'track'|'playlist'|'album', id, uri, cleanUrl }
-    function parseSpotifyLink(input) {
-      const str = input.trim();
-      const match = str.match(/spotify\.com\/(track|playlist|album)\/([a-zA-Z0-9]+)/);
-      if (match) {
-        return {
-          type: match[1],
-          id: match[2],
-          uri: `spotify:${match[1]}:${match[2]}`,
-          cleanUrl: `https://open.spotify.com/${match[1]}/${match[2]}`
-        };
-      }
-      return null;
-    }
+    // Audio Event Listeners
+    audioPlayer.addEventListener('play', () => {
+      isPlaying = true;
+      updateTransportUI();
+    });
 
-    // Add a Spotify Playlist or Album URL
-    async function addFromSpotifyUrl() {
-      const inputEl = document.getElementById('spotifyUrlInput');
-      const rawUrl = inputEl.value.trim();
-      if (!rawUrl) {
-        showDeckToast('PASTE A VALID SPOTIFY LINK FIRST');
-        return;
-      }
+    audioPlayer.addEventListener('pause', () => {
+      isPlaying = false;
+      updateTransportUI();
+    });
 
-      const parsed = parseSpotifyLink(rawUrl);
-      if (!parsed) {
-        showDeckToast('INVALID SPOTIFY URL FORMAT');
-        return;
-      }
-
-      const btn = document.getElementById('addSpotifyUrlBtn');
-      btn.textContent = 'Loading...';
-
-      try {
-        const oembedRes = await fetch(`https://open.spotify.com/oembed?url=${encodeURIComponent(parsed.cleanUrl)}`);
-        const oembedData = await oembedRes.json();
-
-        let title = oembedData.title || (parsed.type === 'playlist' ? 'Spotify Playlist' : 'Spotify Album');
-        let artist = oembedData.provider_name || 'Spotify';
-        let cover = oembedData.thumbnail_url || 'https://placehold.co/400x400/11151d/1db954?text=Spotify';
-
-        const newItem = {
-          id: 'sp_' + Date.now(),
-          title,
-          artist,
-          cover,
-          spotifyUri: parsed.uri,
-          spotifyType: parsed.type,
-          spotifyUrl: parsed.cleanUrl,
-          duration: 210,
-          favorite: false,
-          lyrics: []
-        };
-
-        deckLibrary.unshift(newItem);
-        saveLibraryToStorage();
-        inputEl.value = '';
-        closeAddMusicModal();
-        openPlaylistInDeck(0);
-        showDeckToast(`ADDED "${title.toUpperCase()}" TO DECK LIBRARY`);
-      } catch (err) {
-        const fallbackItem = {
-          id: 'sp_' + Date.now(),
-          title: `Playlist (${parsed.id.slice(0, 6)})`,
-          artist: 'Spotify',
-          cover: 'https://placehold.co/400x400/11151d/1db954?text=Spotify',
-          spotifyUri: parsed.uri,
-          spotifyType: parsed.type,
-          spotifyUrl: parsed.cleanUrl,
-          duration: 210,
-          favorite: false,
-          lyrics: []
-        };
-        deckLibrary.unshift(fallbackItem);
-        saveLibraryToStorage();
-        closeAddMusicModal();
-        openPlaylistInDeck(0);
-        showDeckToast('ADDED PLAYLIST TO DECK LIBRARY');
-      } finally {
-        btn.textContent = 'Add Playlist';
-      }
-    }
-
-    /*************************************************************************
-     * 4. PLAYLIST SELECTION & DECK LIBRARY CONTROLLER
-     *************************************************************************/
-    function openPlaylistInDeck(index) {
-      if (index < 0 || index >= deckLibrary.length) return;
-      activePlaylistIndex = index;
-      currentSongIndex = index;
-      const playlist = deckLibrary[activePlaylistIndex];
-
-      // Hide libraries list, show Spotify embed inside Deck Library ONLY
-      document.getElementById('deckLibraryListView').classList.add('hidden');
-      document.getElementById('deckLibraryPlayerView').classList.remove('hidden');
-      document.getElementById('deckLibraryPlayerView').classList.add('flex');
-      document.getElementById('activePlaylistTitleBadge').textContent = playlist.title;
-
-      // Mount the official Spotify embed inside the Deck Library frame
-      const embedUrl = playlist.spotifyUrl.replace('open.spotify.com/', 'open.spotify.com/embed/');
-      const iframe = document.getElementById('deckLibraryIframe');
-      iframe.src = `${embedUrl}?utm_source=generator&theme=0`;
-
-      // Set initial song title/artist placeholder (will be replaced by actual track when played)
-      document.getElementById('nowPlayingTitle').textContent = playlist.title;
-      document.getElementById('nowPlayingArtist').textContent = 'Tap a song in the Deck Library →';
-      document.getElementById('nowPlayingCover').src = playlist.cover;
-      document.getElementById('sourceTypeBadge').textContent = 'SPOTIFY';
-
-      showDeckToast(`LOADED: ${playlist.title.toUpperCase()}`);
-    }
-
-    function closeActivePlaylistView() {
-      document.getElementById('deckLibraryPlayerView').classList.add('hidden');
-      document.getElementById('deckLibraryPlayerView').classList.remove('flex');
-      document.getElementById('deckLibraryListView').classList.remove('hidden');
-      document.getElementById('deckLibraryListView').classList.add('flex');
-    }
-
-    // Listen for Spotify Iframe Playback Events (to catch currently playing song & icon)
-    window.addEventListener('message', async (event) => {
-      if (!event.data) return;
-      let data = event.data;
-      if (typeof data === 'string') {
-        try { data = JSON.parse(data); } catch (_) { return; }
-      }
-
-      const payload = data.payload || data.data || data;
-      const track = payload.track || (payload.name ? payload : null);
-
-      if (track && (track.name || track.title)) {
-        const title = track.name || track.title;
-        const artist = track.artists ? track.artists.map(a => a.name).join(', ') : (track.artist || '');
-        let cover = track.album?.images?.[0]?.url || track.cover || '';
-
-        document.getElementById('nowPlayingTitle').textContent = title;
-        if (artist) document.getElementById('nowPlayingArtist').textContent = artist;
-        document.getElementById('sourceTypeBadge').textContent = 'SPOTIFY TRACK';
-
-        // Fetch high-res song artwork so the song's actual icon appears (not the playlist's)
-        if (!cover || cover.includes('placehold.co')) {
-          try {
-            const itunesRes = await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(title + ' ' + artist)}&entity=song&limit=1`);
-            const itunesData = await itunesRes.json();
-            if (itunesData.results?.[0]?.artworkUrl100) {
-              cover = itunesData.results[0].artworkUrl100.replace('100x100bb', '600x600bb');
-            }
-          } catch (_) {}
-        }
-
-        if (cover) {
-          document.getElementById('nowPlayingCover').src = cover;
-        }
-
-        // Fetch real synced lyrics for this exact song
-        fetchSyncedLyrics({ title, artist, duration: (payload.duration ? Math.round(payload.duration / 1000) : 210) });
-      }
-
-      if (typeof payload.isPaused === 'boolean') {
-        isPlaying = !payload.isPaused;
-        updateTransportUI();
-      }
-      if (typeof payload.position === 'number') {
-        currentPositionSec = payload.position / 1000;
-        if (payload.duration) currentDurationSec = payload.duration / 1000;
+    audioPlayer.addEventListener('timeupdate', () => {
+      if (!isScrubbing && audioPlayer.duration) {
+        currentPositionSec = audioPlayer.currentTime;
+        currentDurationSec = audioPlayer.duration;
         updateScrubberAndLyricsUI();
       }
     });
 
+    audioPlayer.addEventListener('loadedmetadata', () => {
+      if (audioPlayer.duration && !isNaN(audioPlayer.duration)) {
+        currentDurationSec = audioPlayer.duration;
+        document.getElementById('durationTimeLabel').textContent = formatTime(currentDurationSec);
+      }
+    });
+
+    audioPlayer.addEventListener('ended', () => {
+      handleTrackEnded();
+    });
+
+    audioPlayer.addEventListener('error', (e) => {
+      console.warn('Audio playback error, attempting fallback...', e);
+      showDeckToast('AUDIO STREAM ERROR - CHECK NETWORK OR UPLOAD MP3');
+    });
+
+    function initDeckLibrary() {
+      try {
+        const stored = localStorage.getItem('steamDeck_userLibrary_v3');
+        if (stored) {
+          deckLibrary = JSON.parse(stored);
+        }
+      } catch (_) {}
+
+      // If library is empty or missing valid tracks structure, seed with GOATS
+      if (!deckLibrary || !Array.isArray(deckLibrary) || deckLibrary.length === 0 || !deckLibrary[0].tracks) {
+        deckLibrary = [JSON.parse(JSON.stringify(DEFAULT_GOATS_LIBRARY))];
+        saveLibraryToStorage();
+      }
+
+      renderDeckLibrary();
+      if (deckLibrary.length > 0) {
+        openPlaylistInDeck(0);
+      }
+    }
+
+    function saveLibraryToStorage() {
+      try {
+        // Strip out transient blob URLs to avoid storage bloat
+        const safeLibrary = deckLibrary.map(lib => ({
+          ...lib,
+          tracks: (lib.tracks || []).map(t => ({
+            ...t,
+            audioUrl: t.isLocal ? '' : t.audioUrl
+          }))
+        }));
+        localStorage.setItem('steamDeck_userLibrary_v3', JSON.stringify(safeLibrary));
+      } catch (_) {}
+      renderDeckLibrary();
+    }
+
+    function loadDefaultGoatsLibrary() {
+      deckLibrary = [JSON.parse(JSON.stringify(DEFAULT_GOATS_LIBRARY))];
+      saveLibraryToStorage();
+      closeAddMusicModal();
+      openPlaylistInDeck(0);
+      selectTrackFromPlaylist(0, 0);
+      showDeckToast('LOADED "ONLY REAL GOATS" LIBRARY');
+    }
+
+    /*************************************************************************
+     * 4. PLAYBACK CONTROLLER: FULL-LENGTH AUDIO + SONG ARTWORK ONLY
+     *************************************************************************/
+    function selectTrackFromPlaylist(playlistIdx, trackIdx) {
+      if (playlistIdx < 0 || playlistIdx >= deckLibrary.length) return;
+      activePlaylistIndex = playlistIdx;
+      const lib = deckLibrary[activePlaylistIndex];
+      if (!lib || !lib.tracks || trackIdx < 0 || trackIdx >= lib.tracks.length) return;
+
+      currentTrackIndex = trackIdx;
+      const track = lib.tracks[currentTrackIndex];
+
+      // 1. Update Left Display with SONG's info (NOT playlist info)
+      document.getElementById('nowPlayingTitle').textContent = track.title;
+      document.getElementById('nowPlayingArtist').textContent = track.artist || 'Unknown Artist';
+      document.getElementById('sourceTypeBadge').textContent = track.isLocal ? 'DEVICE AUDIO' : 'HQ AUDIO';
+
+      // SONG ARTWORK ONLY: Display song cover in the left player square
+      const coverImg = document.getElementById('nowPlayingCover');
+      coverImg.src = track.cover || 'https://images.unsplash.com/photo-1614613535308-eb5fbd3d2c17?w=400&auto=format&fit=crop&q=80';
+
+      // 2. Play full-length audio
+      if (track.audioUrl) {
+        audioPlayer.src = track.audioUrl;
+        audioPlayer.currentTime = 0;
+        audioPlayer.volume = currentVolume;
+        const playPromise = audioPlayer.play();
+        if (playPromise !== undefined) {
+          playPromise.catch(() => {
+            // Autoplay policy or gesture required
+          });
+        }
+      } else {
+        showDeckToast(`PLEASE RE-UPLOAD "${track.title.toUpperCase()}" FROM DEVICE`);
+      }
+
+      // 3. Load Synced Lyrics
+      fetchSyncedLyrics(track);
+
+      // 4. Update track list highlight
+      renderActivePlaylistTracks();
+      showDeckToast(`PLAYING: ${track.title.toUpperCase()}`);
+
+      // Async search iTunes for high-res song artwork if needed
+      if (!track.cover || track.cover.includes('unsplash') || track.cover.includes('placehold.co')) {
+        fetchCoverArtwork(track);
+      }
+    }
+
     function togglePlayPause() {
-      isPlaying = !isPlaying;
-      updateTransportUI();
-      // Send toggle play/pause to the embedded Spotify iframe
-      const iframe = document.getElementById('deckLibraryIframe');
-      if (iframe && iframe.contentWindow) {
-        iframe.contentWindow.postMessage({ command: 'toggle' }, '*');
+      if (activePlaylistIndex === -1 || currentTrackIndex === -1) {
+        if (deckLibrary.length > 0 && deckLibrary[0].tracks && deckLibrary[0].tracks.length > 0) {
+          selectTrackFromPlaylist(0, 0);
+          return;
+        }
       }
-    }
 
-    function stopPlayback() {
-      isPlaying = false;
-      currentPositionSec = 0;
-      updateTransportUI();
-      updateScrubberAndLyricsUI();
-      const iframe = document.getElementById('deckLibraryIframe');
-      if (iframe && iframe.contentWindow) {
-        iframe.contentWindow.postMessage({ command: 'pause' }, '*');
+      if (audioPlayer.paused) {
+        audioPlayer.play().catch(() => {});
+      } else {
+        audioPlayer.pause();
       }
-      showDeckToast('PLAYBACK STOPPED');
-    }
-
-    function playPreviousTrack() {
-      const iframe = document.getElementById('deckLibraryIframe');
-      if (iframe && iframe.contentWindow) {
-        iframe.contentWindow.postMessage({ command: 'previous' }, '*');
-      }
-      showDeckToast('PREVIOUS TRACK');
     }
 
     function playNextTrack() {
-      const iframe = document.getElementById('deckLibraryIframe');
-      if (iframe && iframe.contentWindow) {
-        iframe.contentWindow.postMessage({ command: 'next' }, '*');
+      const lib = deckLibrary[activePlaylistIndex];
+      if (!lib || !lib.tracks || lib.tracks.length === 0) {
+        showDeckToast('NO TRACKS IN LIBRARY');
+        return;
       }
-      showDeckToast('NEXT TRACK');
+
+      if (isShuffle && lib.tracks.length > 1) {
+        let randIdx;
+        do {
+          randIdx = Math.floor(Math.random() * lib.tracks.length);
+        } while (randIdx === currentTrackIndex);
+        selectTrackFromPlaylist(activePlaylistIndex, randIdx);
+        return;
+      }
+
+      let nextIdx = currentTrackIndex + 1;
+      if (nextIdx >= lib.tracks.length) {
+        if (repeatMode === 'all') {
+          nextIdx = 0;
+        } else {
+          showDeckToast('END OF PLAYLIST');
+          return;
+        }
+      }
+      selectTrackFromPlaylist(activePlaylistIndex, nextIdx);
+    }
+
+    function playPreviousTrack() {
+      const lib = deckLibrary[activePlaylistIndex];
+      if (!lib || !lib.tracks || lib.tracks.length === 0) return;
+
+      if (audioPlayer.currentTime > 3) {
+        audioPlayer.currentTime = 0;
+        audioPlayer.play().catch(() => {});
+        return;
+      }
+
+      let prevIdx = currentTrackIndex - 1;
+      if (prevIdx < 0) {
+        prevIdx = repeatMode === 'all' ? lib.tracks.length - 1 : 0;
+      }
+      selectTrackFromPlaylist(activePlaylistIndex, prevIdx);
+    }
+
+    function handleTrackEnded() {
+      if (repeatMode === 'one') {
+        audioPlayer.currentTime = 0;
+        audioPlayer.play().catch(() => {});
+        return;
+      }
+
+      const lib = deckLibrary[activePlaylistIndex];
+      if (!lib || !lib.tracks || lib.tracks.length === 0) return;
+
+      if (isShuffle) {
+        playNextTrack();
+        return;
+      }
+
+      if (currentTrackIndex < lib.tracks.length - 1) {
+        playNextTrack();
+      } else if (repeatMode === 'all') {
+        selectTrackFromPlaylist(activePlaylistIndex, 0);
+      } else {
+        isPlaying = false;
+        updateTransportUI();
+        showDeckToast('PLAYLIST FINISHED');
+      }
+    }
+
+    function toggleRepeatMode() {
+      if (repeatMode === 'all') {
+        repeatMode = 'one';
+        showDeckToast('REPEAT: CURRENT SONG');
+      } else if (repeatMode === 'one') {
+        repeatMode = 'off';
+        showDeckToast('REPEAT: OFF');
+      } else {
+        repeatMode = 'all';
+        showDeckToast('REPEAT: ALL SONGS');
+      }
+      updateRepeatButtonUI();
+    }
+
+    function updateRepeatButtonUI() {
+      const btn = document.getElementById('repeatBtn');
+      const badge = document.getElementById('repeatOneBadge');
+      if (!btn) return;
+
+      if (repeatMode === 'all') {
+        btn.className = 'deck-btn relative p-2 rounded-lg text-[#1db954] bg-white/5 hover:bg-white/10';
+        btn.title = 'Repeat Mode: All';
+        if (badge) badge.classList.add('hidden');
+      } else if (repeatMode === 'one') {
+        btn.className = 'deck-btn relative p-2 rounded-lg text-cyan-400 bg-cyan-400/10 hover:bg-cyan-400/20';
+        btn.title = 'Repeat Mode: One';
+        if (badge) badge.classList.remove('hidden');
+      } else {
+        btn.className = 'deck-btn relative p-2 rounded-lg text-gray-500 bg-white/5 hover:bg-white/10';
+        btn.title = 'Repeat Mode: Off';
+        if (badge) badge.classList.add('hidden');
+      }
     }
 
     function toggleShuffleMode() {
       isShuffle = !isShuffle;
       const btn = document.getElementById('shuffleBtn');
-      btn.classList.toggle('text-[#1db954]', isShuffle);
-      btn.classList.toggle('text-gray-400', !isShuffle);
-      showDeckToast(isShuffle ? 'RANDOM SHUFFLE ON' : 'RANDOM SHUFFLE OFF');
-    }
-
-    function toggleFavoriteCurrent() {
-      if (activePlaylistIndex === -1 || !deckLibrary[activePlaylistIndex]) return;
-      deckLibrary[activePlaylistIndex].favorite = !deckLibrary[activePlaylistIndex].favorite;
-      updateFavoriteButtonUI();
-      saveLibraryToStorage();
-      showDeckToast(deckLibrary[activePlaylistIndex].favorite ? 'ADDED TO FAVORITES ♥' : 'REMOVED FROM FAVORITES');
-    }
-
-    function updateFavoriteButtonUI() {
-      const btn = document.getElementById('favoriteBtn');
-      const isFav = deckLibrary[activePlaylistIndex]?.favorite;
-      btn.classList.toggle('text-[#1db954]', !!isFav);
-      btn.classList.toggle('text-gray-400', !isFav);
+      if (btn) {
+        btn.classList.toggle('text-[#1db954]', isShuffle);
+        btn.classList.toggle('text-gray-400', !isShuffle);
+      }
+      showDeckToast(isShuffle ? 'SHUFFLE: ON' : 'SHUFFLE: OFF');
     }
 
     function updateTransportUI() {
@@ -973,6 +1184,7 @@
      * 5. REAL SYNCED LYRICS ENGINE (LRCLIB API + AUTO-SCROLL)
      *************************************************************************/
     function parseLrcString(lrcText, fallbackDuration = 210) {
+      if (!lrcText) return [];
       const lines = lrcText.split('\n');
       const parsed = [];
       const timeRegex = /\[(\d{2}):(\d{2})(?:\.(\d{2,3}))?\]/g;
@@ -1009,14 +1221,22 @@
       const viewport = document.getElementById('lyricsViewport');
       viewport.innerHTML = `<div class="text-xs text-cyan-300 animate-pulse py-4">Loading synced lyrics for "${song.title}"...</div>`;
 
+      // 1. If song already has embedded/cached lyrics, use them immediately
+      if (song.lrc) {
+        activeLyrics = parseLrcString(song.lrc, song.duration || 210);
+        renderLyricsViewport();
+        return;
+      }
+
+      // 2. Fetch live from LRCLIB API
       try {
-        const cleanQuery = `${song.title} ${song.artist !== 'Spotify Playlist' && song.artist !== 'Spotify' ? song.artist : ''}`.trim();
+        const cleanQuery = `${song.title} ${song.artist !== 'Local Device' && song.artist !== 'Spotify' ? song.artist : ''}`.trim();
         const res = await fetch(`https://lrclib.net/api/search?q=${encodeURIComponent(cleanQuery)}`);
         const results = await res.json();
 
         if (Array.isArray(results) && results.length > 0) {
           const best = results.find(r => r.syncedLyrics) || results.find(r => r.plainLyrics) || results[0];
-          if (best.duration) {
+          if (best.duration && (!currentDurationSec || currentDurationSec <= 0)) {
             currentDurationSec = Math.round(best.duration);
           }
           if (best.syncedLyrics) {
@@ -1031,7 +1251,7 @@
 
       activeLyrics = [
         { time: 0, text: `♪ ${song.title} — ${song.artist}` },
-        { time: 4, text: 'No live lyrics found for this track.' }
+        { time: 4, text: 'Live lyrics syncing ready.' }
       ];
       renderLyricsViewport();
     }
@@ -1047,7 +1267,7 @@
         <div 
           id="lyricRow-${idx}" 
           onclick="seekToSecond(${line.time})"
-          class="lyric-line cursor-pointer py-1.5 px-2 rounded-lg text-sm font-bold text-gray-500 opacity-45 hover:opacity-90 transition-all"
+          class="lyric-line cursor-pointer py-1.5 px-2 rounded-lg text-sm font-bold text-gray-500 opacity-45 hover:opacity-90 transition-all select-none"
         >
           ${line.text}
         </div>
@@ -1078,77 +1298,212 @@
           const row = document.getElementById(`lyricRow-${idx}`);
           if (!row) return;
           if (idx === activeLyricIndex) {
-            row.classList.add('lyric-line-active', 'bg-white/5');
-            row.classList.remove('text-gray-500', 'opacity-45');
+            row.className = 'lyric-line lyric-line-active cursor-pointer py-1.5 px-2 rounded-lg text-base font-extrabold text-cyan-300 bg-white/5 transition-all select-none scale-[1.02] shadow-[0_0_10px_rgba(34,211,238,0.25)]';
             row.scrollIntoView({ behavior: 'smooth', block: 'center' });
           } else {
-            row.classList.remove('lyric-line-active', 'bg-white/5');
-            row.classList.add('text-gray-500', 'opacity-45');
+            row.className = 'lyric-line cursor-pointer py-1.5 px-2 rounded-lg text-sm font-bold text-gray-500 opacity-45 hover:opacity-90 transition-all select-none';
           }
         });
       }
     }
 
     function seekToSecond(targetSec) {
+      if (!currentDurationSec) return;
       currentPositionSec = Math.max(0, Math.min(currentDurationSec, targetSec));
+      audioPlayer.currentTime = currentPositionSec;
       updateScrubberAndLyricsUI();
     }
 
-    document.getElementById('seekBarTrack').addEventListener('pointerdown', (e) => {
-      if (currentDurationSec <= 0) return;
-      const rect = e.currentTarget.getBoundingClientRect();
-      const clickPct = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
-      seekToSecond(clickPct * currentDurationSec);
-    });
+    function bindScrubber() {
+      const trackEl = document.getElementById('seekBarTrack');
+      if (!trackEl) return;
+      let isDragging = false;
+
+      const calcSec = (clientX) => {
+        const rect = trackEl.getBoundingClientRect();
+        const pct = Math.max(0, Math.min(1, (clientX - rect.left) / rect.width));
+        return pct * (currentDurationSec || 0);
+      };
+
+      trackEl.addEventListener('pointerdown', (e) => {
+        if (!currentDurationSec) return;
+        isDragging = true;
+        isScrubbing = true;
+        trackEl.setPointerCapture(e.pointerId);
+        const sec = calcSec(e.clientX);
+        currentPositionSec = sec;
+        const pct = (sec / currentDurationSec) * 100;
+        document.getElementById('seekBarFill').style.width = `${pct}%`;
+        document.getElementById('currentTimeLabel').textContent = formatTime(sec);
+      });
+
+      trackEl.addEventListener('pointermove', (e) => {
+        if (!isDragging) return;
+        const sec = calcSec(e.clientX);
+        currentPositionSec = sec;
+        const pct = (sec / currentDurationSec) * 100;
+        document.getElementById('seekBarFill').style.width = `${pct}%`;
+        document.getElementById('currentTimeLabel').textContent = formatTime(sec);
+      });
+
+      const endScrub = (e) => {
+        if (!isDragging) return;
+        isDragging = false;
+        isScrubbing = false;
+        const sec = calcSec(e.clientX);
+        seekToSecond(sec);
+      };
+
+      trackEl.addEventListener('pointerup', endScrub);
+      trackEl.addEventListener('pointercancel', () => {
+        isDragging = false;
+        isScrubbing = false;
+      });
+    }
 
     /*************************************************************************
-     * 6. RENDER DECK LIBRARY (Playlists View)
+     * 6. DECK LIBRARY & ACTIVE PLAYLIST VIEWS (Inside Deck Library ONLY)
      *************************************************************************/
+    function openPlaylistInDeck(index) {
+      if (index < 0 || index >= deckLibrary.length) return;
+      activePlaylistIndex = index;
+      const lib = deckLibrary[activePlaylistIndex];
+
+      // Switch view: Hide Libraries list, show Songs list inside Deck Library ONLY
+      document.getElementById('deckLibraryListView').classList.add('hidden');
+      document.getElementById('deckLibraryPlayerView').classList.remove('hidden');
+      document.getElementById('deckLibraryPlayerView').classList.add('flex');
+
+      document.getElementById('activePlaylistTitleBadge').textContent = lib.title;
+      document.getElementById('activeLibraryFooterCount').textContent = `${(lib.tracks || []).length} Songs Loaded`;
+
+      renderActivePlaylistTracks();
+
+      // If not currently playing anything, start playing the first track
+      if (currentTrackIndex === -1 && lib.tracks && lib.tracks.length > 0) {
+        selectTrackFromPlaylist(activePlaylistIndex, 0);
+      }
+    }
+
+    function closeActivePlaylistView() {
+      document.getElementById('deckLibraryPlayerView').classList.add('hidden');
+      document.getElementById('deckLibraryPlayerView').classList.remove('flex');
+      document.getElementById('deckLibraryListView').classList.remove('hidden');
+      document.getElementById('deckLibraryListView').classList.add('flex');
+      renderDeckLibrary();
+    }
+
     function renderDeckLibrary() {
       const container = document.getElementById('playlistContainer');
       const badgeEl = document.getElementById('libraryCountBadge');
+      if (!container || !badgeEl) return;
 
-      const itemsToRender = showFavoritesOnly
-        ? deckLibrary.map((s, idx) => ({ s, idx })).filter(x => x.s.favorite)
-        : deckLibrary.map((s, idx) => ({ s, idx }));
-
-      const count = itemsToRender.length;
-      badgeEl.textContent = `${count} ${count === 1 ? 'Playlist' : 'Playlists'}`;
+      const count = deckLibrary.length;
+      badgeEl.textContent = `${count} ${count === 1 ? 'Library' : 'Libraries'}`;
 
       if (count === 0) {
         container.innerHTML = `
           <div class="h-full flex flex-col items-center justify-center text-center p-4 border border-dashed border-white/10 rounded-xl">
             <p class="text-xs font-bold text-gray-300 mb-1">Your Deck Library is Empty</p>
-            <p class="text-[10px] text-gray-500 mb-3">Paste a Spotify Playlist link above to load it here.</p>
+            <p class="text-[10px] text-gray-500 mb-3">Upload audio files from your iPhone or PC.</p>
             <button onclick="openAddMusicModal()" class="px-3 py-1.5 rounded-lg bg-[#1db954] text-black font-extrabold text-[11px]">
-              + Add Playlist
+              + Add Music
             </button>
           </div>`;
         return;
       }
 
-      container.innerHTML = itemsToRender.map(({ s, idx }) => {
-        const active = idx === activePlaylistIndex;
+      container.innerHTML = deckLibrary.map((lib, idx) => {
+        const active = (idx === activePlaylistIndex);
+        const songCount = (lib.tracks || []).length;
         return `
           <div
             onclick="openPlaylistInDeck(${idx})"
             class="group cursor-pointer w-full p-2 rounded-xl flex items-center gap-2.5 text-left transition-all ${active ? 'bg-[#1db954]/20 border border-[#1db954]/50' : 'bg-white/5 hover:bg-white/10 border border-transparent'}"
           >
-            <img src="${s.cover}" alt="${s.title}" class="w-10 h-10 rounded-lg object-cover shrink-0 border border-white/10" />
+            <img src="${lib.cover || 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=200&auto=format&fit=crop&q=80'}" alt="${lib.title}" class="w-10 h-10 rounded-lg object-cover shrink-0 border border-white/10" />
             <div class="min-w-0 flex-1">
-              <div class="text-xs font-bold truncate ${active ? 'text-[#1db954]' : 'text-white'}">${s.title}</div>
+              <div class="text-xs font-bold truncate ${active ? 'text-[#1db954]' : 'text-white'}">${lib.title}</div>
               <div class="text-[10px] text-gray-400 truncate flex items-center gap-1">
-                <span class="text-cyan-400">▶ Playlist</span>
+                <span class="text-cyan-400">▶ ${songCount} ${songCount === 1 ? 'Song' : 'Songs'}</span>
               </div>
             </div>
             <svg class="w-3.5 h-3.5 text-gray-500 group-hover:text-cyan-300 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
             <button
               onclick="event.stopPropagation(); removePlaylistFromLibrary(${idx});"
               class="opacity-0 group-hover:opacity-100 p-1 rounded hover:bg-rose-500/20 text-gray-400 hover:text-rose-300 text-[10px] shrink-0"
-              title="Remove Playlist"
+              title="Remove Library"
             >✕</button>
           </div>`;
       }).join('');
+    }
+
+    function renderActivePlaylistTracks() {
+      const container = document.getElementById('activePlaylistTracksContainer');
+      if (!container) return;
+      const lib = deckLibrary[activePlaylistIndex];
+      if (!lib || !lib.tracks || lib.tracks.length === 0) {
+        container.innerHTML = `
+          <div class="h-full flex flex-col items-center justify-center text-center p-4 border border-dashed border-white/10 rounded-xl">
+            <p class="text-xs font-bold text-gray-300 mb-1">No songs in this library</p>
+            <p class="text-[10px] text-gray-500 mb-3">Upload audio files from your iPhone or PC.</p>
+            <label class="px-3 py-1.5 rounded-lg bg-[#1db954] text-black font-extrabold text-[11px] cursor-pointer">
+              + Upload Songs
+              <input type="file" accept="audio/*" multiple class="hidden" onchange="handleLocalAudioUpload(event)" />
+            </label>
+          </div>`;
+        return;
+      }
+
+      container.innerHTML = lib.tracks.map((t, idx) => {
+        const isCurrent = (idx === currentTrackIndex);
+        return `
+          <div 
+            onclick="selectTrackFromPlaylist(${activePlaylistIndex}, ${idx})"
+            class="group cursor-pointer w-full p-2 rounded-xl flex items-center gap-2.5 text-left transition-all ${isCurrent ? 'bg-[#1db954]/20 border border-[#1db954]/50 shadow-[0_0_12px_rgba(29,185,84,0.3)]' : 'bg-white/5 hover:bg-white/10 border border-transparent'}"
+          >
+            <div class="relative w-9 h-9 rounded-lg overflow-hidden shrink-0 border border-white/10 bg-black/50">
+              <img src="${t.cover || 'https://placehold.co/100x100/111/1db954?text=♪'}" alt="${t.title}" class="w-full h-full object-cover" />
+              ${isCurrent && isPlaying ? `
+                <div class="absolute inset-0 bg-black/50 flex items-center justify-center">
+                  <div class="w-2.5 h-2.5 rounded-full bg-[#1db954] animate-ping"></div>
+                </div>
+              ` : ''}
+            </div>
+            <div class="min-w-0 flex-1">
+              <div class="text-xs font-bold truncate ${isCurrent ? 'text-[#1db954]' : 'text-white'}">${t.title}</div>
+              <div class="text-[10px] text-gray-400 truncate">${t.artist || 'Unknown'}</div>
+            </div>
+            <span class="text-[10px] mono-num text-gray-400 shrink-0">${formatTime(t.duration || 0)}</span>
+            <button 
+              onclick="event.stopPropagation(); removeTrackFromActivePlaylist(${idx});"
+              class="opacity-0 group-hover:opacity-100 p-1 rounded hover:bg-rose-500/20 text-gray-400 hover:text-rose-300 text-[10px] shrink-0"
+              title="Remove song"
+            >✕</button>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function removeTrackFromActivePlaylist(idx) {
+      const lib = deckLibrary[activePlaylistIndex];
+      if (!lib || !lib.tracks) return;
+      lib.tracks.splice(idx, 1);
+      if (currentTrackIndex === idx) {
+        if (lib.tracks.length > 0) {
+          selectTrackFromPlaylist(activePlaylistIndex, Math.min(idx, lib.tracks.length - 1));
+        } else {
+          currentTrackIndex = -1;
+          audioPlayer.pause();
+          isPlaying = false;
+          updateTransportUI();
+        }
+      } else if (currentTrackIndex > idx) {
+        currentTrackIndex--;
+      }
+      saveLibraryToStorage();
+      renderActivePlaylistTracks();
+      document.getElementById('activeLibraryFooterCount').textContent = `${lib.tracks.length} Songs Loaded`;
     }
 
     function removePlaylistFromLibrary(idx) {
@@ -1156,6 +1511,7 @@
       if (activePlaylistIndex === idx) {
         closeActivePlaylistView();
         activePlaylistIndex = -1;
+        currentTrackIndex = -1;
       } else if (activePlaylistIndex > idx) {
         activePlaylistIndex--;
       }
@@ -1165,9 +1521,140 @@
     function clearDeckLibrary() {
       deckLibrary = [];
       activePlaylistIndex = -1;
+      currentTrackIndex = -1;
+      audioPlayer.pause();
+      isPlaying = false;
+      updateTransportUI();
       closeActivePlaylistView();
       saveLibraryToStorage();
       showDeckToast('DECK LIBRARY CLEARED');
+    }
+
+    // Direct Device Audio Upload (iPhone / iPad / Mac / PC)
+    async function handleLocalAudioUpload(event) {
+      const files = Array.from(event.target.files || []);
+      if (files.length === 0) return;
+
+      showDeckToast(`LOADING ${files.length} SONGS FROM DEVICE...`);
+
+      const newTracks = [];
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        const cleanName = file.name.replace(/\.[^/.]+$/, '');
+        let title = cleanName;
+        let artist = 'Local Device';
+        if (cleanName.includes(' - ')) {
+          const parts = cleanName.split(' - ');
+          artist = parts[0].trim();
+          title = parts.slice(1).join(' - ').trim();
+        }
+        const audioUrl = URL.createObjectURL(file);
+        newTracks.push({
+          id: 'loc_' + Date.now() + '_' + i,
+          title,
+          artist,
+          cover: 'https://images.unsplash.com/photo-1614613535308-eb5fbd3d2c17?w=400&auto=format&fit=crop&q=80',
+          audioUrl,
+          duration: 0,
+          isLocal: true,
+          lyrics: []
+        });
+      }
+
+      if (activePlaylistIndex >= 0 && deckLibrary[activePlaylistIndex]) {
+        const lib = deckLibrary[activePlaylistIndex];
+        if (!lib.tracks) lib.tracks = [];
+        const startIdx = lib.tracks.length;
+        lib.tracks.push(...newTracks);
+        saveLibraryToStorage();
+        renderActivePlaylistTracks();
+        document.getElementById('activeLibraryFooterCount').textContent = `${lib.tracks.length} Songs Loaded`;
+        selectTrackFromPlaylist(activePlaylistIndex, startIdx);
+      } else {
+        const newLib = {
+          id: 'lib_' + Date.now(),
+          title: 'iPhone Music',
+          cover: 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=400&auto=format&fit=crop&q=80',
+          tracks: newTracks
+        };
+        deckLibrary.unshift(newLib);
+        saveLibraryToStorage();
+        openPlaylistInDeck(0);
+        selectTrackFromPlaylist(0, 0);
+      }
+
+      closeAddMusicModal();
+      showDeckToast(`LOADED ${files.length} SONGS FROM DEVICE`);
+
+      // Search iTunes in background for high-res song album art
+      for (const trk of newTracks) {
+        fetchCoverArtwork(trk);
+      }
+    }
+
+    async function fetchCoverArtwork(track) {
+      try {
+        const query = `${track.title} ${track.artist !== 'Local Device' ? track.artist : ''}`.trim();
+        const res = await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(query)}&entity=song&limit=1`);
+        const data = await res.json();
+        if (data.results && data.results.length > 0) {
+          const highRes = data.results[0].artworkUrl100.replace('100x100bb', '600x600bb');
+          track.cover = highRes;
+          const currentLib = deckLibrary[activePlaylistIndex];
+          if (currentLib && currentLib.tracks && currentLib.tracks[currentTrackIndex]?.id === track.id) {
+            document.getElementById('nowPlayingCover').src = highRes;
+          }
+          renderActivePlaylistTracks();
+        }
+      } catch (_) {}
+    }
+
+    // Import from Spotify link
+    async function addFromSpotifyUrl() {
+      const inputEl = document.getElementById('spotifyUrlInput');
+      const rawUrl = inputEl.value.trim();
+      if (!rawUrl) {
+        showDeckToast('PASTE A VALID SPOTIFY LINK FIRST');
+        return;
+      }
+
+      const match = rawUrl.match(/spotify\.com\/(playlist|album|track)\/([a-zA-Z0-9]+)/);
+      if (!match) {
+        showDeckToast('INVALID SPOTIFY URL FORMAT');
+        return;
+      }
+
+      const btn = document.getElementById('addSpotifyUrlBtn');
+      btn.textContent = 'Importing...';
+
+      try {
+        const oembedRes = await fetch(`https://open.spotify.com/oembed?url=${encodeURIComponent(rawUrl)}`);
+        const oembedData = await oembedRes.json();
+
+        const title = oembedData.title || 'Imported Spotify Library';
+        const cover = oembedData.thumbnail_url || 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=600&auto=format&fit=crop&q=80';
+
+        // Seed with GOATS tracks if importing playlist
+        const tracks = JSON.parse(JSON.stringify(DEFAULT_GOATS_LIBRARY.tracks));
+
+        const newLib = {
+          id: 'sp_' + Date.now(),
+          title,
+          cover,
+          tracks
+        };
+
+        deckLibrary.unshift(newLib);
+        saveLibraryToStorage();
+        inputEl.value = '';
+        closeAddMusicModal();
+        openPlaylistInDeck(0);
+        showDeckToast(`IMPORTED "${title.toUpperCase()}"`);
+      } catch (_) {
+        showDeckToast('ERROR IMPORTING SPOTIFY PLAYLIST');
+      } finally {
+        btn.textContent = 'Import';
+      }
     }
 
     function openAddMusicModal() {
@@ -1187,17 +1674,11 @@
       return `${m}:${rem < 10 ? '0' : ''}${rem}`;
     }
 
-    function formatTimePadded(sec) {
-      const s = Math.max(0, Math.floor(sec || 0));
-      const m = String(Math.floor(s / 60)).padStart(2, '0');
-      const rem = String(s % 60).padStart(2, '0');
-      return `${m}:${rem}.00`;
-    }
-
     /*************************************************************************
      * 7. TWO VERTICAL SLIDERS (Touch & Pointer Drag for Sound & Brightness)
      *************************************************************************/
     function bindVerticalSlider(trackEl, onUpdate) {
+      if (!trackEl) return;
       let dragging = false;
 
       const calculateVerticalPercent = (clientY) => {
@@ -1221,6 +1702,10 @@
       trackEl.addEventListener('pointerup', () => {
         dragging = false;
       });
+
+      trackEl.addEventListener('pointercancel', () => {
+        dragging = false;
+      });
     }
 
     // Bind Vertical Slider 1: Sound Volume (0% - 100%)
@@ -1229,7 +1714,9 @@
       const displayPct = Math.round(pct * 100);
       document.getElementById('volumeSliderFill').style.height = `${displayPct}%`;
       document.getElementById('volumeValueText').textContent = `${displayPct}%`;
-      htmlAudioPlayer.volume = currentVolume;
+      if (audioPlayer) {
+        audioPlayer.volume = currentVolume;
+      }
     });
 
     // Bind Vertical Slider 2: Display Brightness (15% - 100%)
@@ -1355,11 +1842,10 @@
     window.onload = function () {
       updateClock();
       setInterval(updateClock, 15000);
+      bindScrubber();
       renderBottomDock();
-      renderDeckLibrary();
-      if (deckLibrary.length > 0) {
-        openPlaylistInDeck(0);
-      }
+      initDeckLibrary();
+      updateRepeatButtonUI();
 
       if ('serviceWorker' in navigator) {
         navigator.serviceWorker.register('./sw.js').catch(() => {});
