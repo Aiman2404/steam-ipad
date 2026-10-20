@@ -203,15 +203,15 @@
           </div>
         </header>
 
-        <!-- UNIFIED TWO-PANEL BODY: Left/Center Now Playing + Lyrics (65%) | Right Deck Library (35%) -->
+        <!-- UNIFIED SINGLE PLAYER BODY: Left Art+Name | Right Lyrics | Bottom Transport -->
         <div class="relative z-10 flex-1 flex gap-3.5 pt-3 min-h-0 overflow-hidden">
 
           <!-- =============================================================== -->
-          <!-- PANEL A: LEFT/CENTER NOW PLAYING + LIVE LYRICS (~65% WIDTH)     -->
+          <!-- PANEL A: UNIFIED NOW PLAYING + LYRICS (single rectangle, ~65%)  -->
           <!-- =============================================================== -->
-          <div class="w-[65%] h-full bg-black/40 border border-white/10 rounded-2xl p-3.5 flex gap-3.5 relative overflow-hidden min-w-0">
+          <div class="w-[65%] h-full bg-black/40 border border-white/10 rounded-2xl flex flex-col relative overflow-hidden min-w-0">
 
-            <!-- Collapsible Official Spotify IFrame Player Drawer (Drives Real Spotify Playback & Timestamps) -->
+            <!-- Hidden Official Spotify IFrame Engine (drives real playback silently) -->
             <div id="spotifyEngineDrawer" class="hidden absolute inset-x-3 top-3 z-30 bg-[#0d1118]/95 backdrop-blur-xl border border-[#1db954]/50 rounded-2xl p-3 shadow-2xl flex-col gap-2">
               <div class="flex items-center justify-between">
                 <div class="flex items-center gap-2">
@@ -226,117 +226,98 @@
               </div>
             </div>
 
-            <!-- LEFT HALF OF NOW PLAYING: Cover Art Icon, Track Metadata, Real Scrubber & Transport Controls -->
-            <div class="w-[48%] h-full flex flex-col justify-between items-center bg-white/[0.02] border border-white/5 rounded-xl p-3 shrink-0">
-              
-              <!-- Song Cover Art / Icon with Visualizer Ring -->
-              <div class="relative w-32 h-32 sm:w-36 sm:h-36 rounded-2xl overflow-hidden shadow-2xl border border-white/15 group shrink-0">
-                <img id="nowPlayingCover" src="https://placehold.co/400x400/0f172a/1db954?text=Add+Song" alt="Song Cover" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
-                <div class="absolute inset-0 bg-gradient-to-t from-black/75 via-transparent to-transparent"></div>
-                <div class="absolute bottom-2 left-2 right-2 flex items-center justify-between px-2 py-0.5 rounded-lg bg-black/70 backdrop-blur-md border border-white/10">
-                  <div class="flex items-center gap-1.5">
-                    <span id="playbackStatusDot" class="w-2 h-2 rounded-full bg-gray-400"></span>
-                    <span id="playbackStatusText" class="text-[9px] font-extrabold tracking-wider uppercase text-gray-200">READY</span>
+            <!-- TOP CONTENT AREA: Song Art (left) + Song Name & Live Lyrics (right) -->
+            <div class="flex-1 flex gap-0 min-h-0 overflow-hidden">
+
+              <!-- LEFT: Square Song Art + Status Badge -->
+              <div class="w-[42%] h-full flex flex-col items-center justify-center p-4 shrink-0 gap-3">
+                <!-- Song Cover Art -->
+                <div class="relative w-full max-w-[180px] aspect-square rounded-2xl overflow-hidden shadow-2xl border border-white/15 group">
+                  <img id="nowPlayingCover" src="https://placehold.co/400x400/0f172a/1db954?text=Add+Song" alt="Song Cover" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
+                  <div class="absolute inset-0 bg-gradient-to-t from-black/75 via-transparent to-transparent"></div>
+                  <div class="absolute bottom-2 left-2 right-2 flex items-center justify-between px-2 py-0.5 rounded-lg bg-black/70 backdrop-blur-md border border-white/10">
+                    <div class="flex items-center gap-1.5">
+                      <span id="playbackStatusDot" class="w-2 h-2 rounded-full bg-gray-400"></span>
+                      <span id="playbackStatusText" class="text-[9px] font-extrabold tracking-wider uppercase text-gray-200">READY</span>
+                    </div>
+                    <span id="sourceTypeBadge" class="text-[9px] font-bold text-[#1db954] uppercase">SPOTIFY</span>
                   </div>
-                  <span id="sourceTypeBadge" class="text-[9px] font-bold text-[#1db954] uppercase">SPOTIFY</span>
+                </div>
+
+                <!-- Song Title & Artist (below art) -->
+                <div class="w-full text-center px-1">
+                  <h1 id="nowPlayingTitle" class="text-sm font-extrabold text-white tracking-tight truncate leading-tight">No Song Selected</h1>
+                  <p id="nowPlayingArtist" class="text-[11px] font-medium text-gray-400 truncate mt-0.5">Pick a playlist from the Deck Library →</p>
                 </div>
               </div>
 
-              <!-- Active Song Title & Artist -->
-              <div class="w-full text-center px-1 my-1">
-                <h1 id="nowPlayingTitle" class="text-sm sm:text-base font-extrabold text-white tracking-tight truncate">No Song Selected</h1>
-                <p id="nowPlayingArtist" class="text-xs font-medium text-gray-400 truncate mt-0.5">Click "+ Add Spotify URL / Song" or pick from Deck Library</p>
+              <!-- RIGHT: Live Lyrics only (no Sync/Edit buttons) -->
+              <div class="flex-1 h-full flex flex-col bg-gradient-to-b from-[#131924]/90 to-[#0b0e14]/95 border-l border-white/10 relative overflow-hidden">
+                <!-- Lyrics Header (label only, no buttons) -->
+                <div class="flex items-center gap-1.5 px-4 pt-3 pb-2 border-b border-white/10 shrink-0">
+                  <span class="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></span>
+                  <span class="text-[11px] font-extrabold uppercase tracking-wider text-white">Live Lyrics</span>
+                </div>
+
+                <!-- Scrolling Lyrics Viewport -->
+                <div id="lyricsViewport" class="relative flex-1 overflow-y-auto custom-scroll py-4 px-4 space-y-3 text-left scroll-smooth">
+                  <div class="text-xs text-gray-400 italic">Select a playlist then tap a track to see live synced lyrics...</div>
+                </div>
+
+                <!-- Bottom Fade Mask -->
+                <div class="pointer-events-none absolute bottom-0 inset-x-0 h-8 bg-gradient-to-t from-[#0b0e14] to-transparent"></div>
               </div>
 
-              <!-- Real-Time Scrubber Bar (Driven by active song / Spotify IFrame playback_update) -->
-              <div class="w-full flex flex-col gap-1 px-1">
-                <div id="seekBarTrack" class="relative w-full h-2 bg-white/10 rounded-full cursor-pointer overflow-hidden">
+            </div>
+
+            <!-- BOTTOM TRANSPORT BAR: full width across both columns -->
+            <div class="shrink-0 border-t border-white/10 bg-black/50 px-4 py-2.5 flex flex-col gap-1.5">
+              <!-- Seek / Scrubber Bar -->
+              <div class="flex items-center gap-3">
+                <span id="currentTimeLabel" class="text-[11px] mono-num text-gray-400 w-9 text-right">0:00</span>
+                <div id="seekBarTrack" class="relative flex-1 h-2 bg-white/10 rounded-full cursor-pointer overflow-hidden">
                   <div id="seekBarFill" class="h-full bg-gradient-to-r from-[#1db954] to-cyan-400 rounded-full transition-all duration-150" style="width: 0%;"></div>
                 </div>
-                <div class="flex items-center justify-between text-[10px] mono-num text-gray-400">
-                  <span id="currentTimeLabel">0:00</span>
-                  <span id="durationTimeLabel">0:00</span>
-                </div>
+                <span id="durationTimeLabel" class="text-[11px] mono-num text-gray-400 w-9">0:00</span>
               </div>
 
-              <!-- Unified Spotify Transport Controls (Shuffle, Prev, Play/Pause, Stop, Next, Favorite) -->
-              <div class="w-full flex items-center justify-between px-1 pt-1 border-t border-white/10">
-                <!-- Shuffle / Random -->
-                <button onclick="toggleShuffleMode()" id="shuffleBtn" class="deck-btn p-1.5 rounded-lg text-gray-400 hover:text-white hover:bg-white/10" title="Random / Shuffle">
+              <!-- Transport Controls Row -->
+              <div class="flex items-center justify-between">
+                <!-- Shuffle -->
+                <button onclick="toggleShuffleMode()" id="shuffleBtn" class="deck-btn p-1.5 rounded-lg text-gray-400 hover:text-white hover:bg-white/10" title="Shuffle">
                   <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
-                    <polyline points="16 3 21 3 21 8"></polyline>
-                    <line x1="4" y1="20" x2="21" y2="3"></line>
-                    <polyline points="21 16 21 21 16 21"></polyline>
-                    <line x1="15" y1="15" x2="21" y2="21"></line>
+                    <polyline points="16 3 21 3 21 8"></polyline><line x1="4" y1="20" x2="21" y2="3"></line>
+                    <polyline points="21 16 21 21 16 21"></polyline><line x1="15" y1="15" x2="21" y2="21"></line>
                     <line x1="4" y1="4" x2="9" y2="9"></line>
                   </svg>
                 </button>
 
                 <!-- Previous -->
-                <button onclick="playPreviousTrack()" class="deck-btn p-1.5 rounded-lg text-gray-200 hover:text-white hover:bg-white/10" title="Previous Track">
-                  <svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/>
-                  </svg>
+                <button onclick="playPreviousTrack()" class="deck-btn p-1.5 rounded-lg text-gray-200 hover:text-white hover:bg-white/10" title="Previous">
+                  <svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor"><path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/></svg>
                 </button>
 
-                <!-- Play / Pause Main Button -->
-                <button onclick="togglePlayPause()" id="playPauseBtn" class="deck-btn w-10 h-10 rounded-full bg-[#1db954] hover:bg-[#1ed760] text-black flex items-center justify-center shadow-[0_0_18px_rgba(29,185,84,0.5)]" title="Play / Pause">
-                  <svg id="playIcon" class="w-5 h-5 ml-0.5" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M8 5v14l11-7z"/>
-                  </svg>
-                  <svg id="pauseIcon" class="w-5 h-5 hidden" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>
-                  </svg>
+                <!-- Play / Pause -->
+                <button onclick="togglePlayPause()" id="playPauseBtn" class="deck-btn w-11 h-11 rounded-full bg-[#1db954] hover:bg-[#1ed760] text-black flex items-center justify-center shadow-[0_0_18px_rgba(29,185,84,0.5)]" title="Play / Pause">
+                  <svg id="playIcon" class="w-5 h-5 ml-0.5" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+                  <svg id="pauseIcon" class="w-5 h-5 hidden" viewBox="0 0 24 24" fill="currentColor"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
                 </button>
 
-                <!-- Stop Button -->
+                <!-- Stop -->
                 <button onclick="stopPlayback()" class="deck-btn p-1.5 rounded-lg text-gray-300 hover:text-rose-400 hover:bg-white/10" title="Stop">
-                  <svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
-                    <rect x="6" y="6" width="12" height="12" rx="2"/>
-                  </svg>
+                  <svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="6" width="12" height="12" rx="2"/></svg>
                 </button>
 
                 <!-- Next -->
-                <button onclick="playNextTrack()" class="deck-btn p-1.5 rounded-lg text-gray-200 hover:text-white hover:bg-white/10" title="Next Track">
-                  <svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/>
-                  </svg>
+                <button onclick="playNextTrack()" class="deck-btn p-1.5 rounded-lg text-gray-200 hover:text-white hover:bg-white/10" title="Next">
+                  <svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg>
                 </button>
 
-                <!-- Favorite / Heart -->
-                <button onclick="toggleFavoriteCurrent()" id="favoriteBtn" class="deck-btn p-1.5 rounded-lg text-gray-400 hover:text-[#1db954] hover:bg-white/10" title="Favorite Song">
-                  <svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
-                  </svg>
+                <!-- Favorite -->
+                <button onclick="toggleFavoriteCurrent()" id="favoriteBtn" class="deck-btn p-1.5 rounded-lg text-gray-400 hover:text-[#1db954] hover:bg-white/10" title="Favorite">
+                  <svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
                 </button>
               </div>
-            </div>
-
-            <!-- RIGHT HALF OF NOW PLAYING: Spotify-Style Bottom-to-Top Auto-Scrolling Lyrics Box -->
-            <div class="flex-1 h-full flex flex-col justify-between bg-gradient-to-b from-[#131924]/90 to-[#0b0e14]/95 border border-white/10 rounded-xl p-3 relative overflow-hidden min-w-0">
-              <!-- Lyrics Box Header -->
-              <div class="flex items-center justify-between border-b border-white/10 pb-2 shrink-0 z-10">
-                <div class="flex items-center gap-1.5">
-                  <span class="w-2 h-2 rounded-full bg-cyan-400"></span>
-                  <span class="text-[11px] font-extrabold uppercase tracking-wider text-white">Live Lyrics</span>
-                </div>
-                <div class="flex items-center gap-1.5">
-                  <button onclick="refetchLyricsForCurrent()" class="px-2 py-0.5 rounded bg-white/5 hover:bg-white/10 text-[10px] font-semibold text-cyan-300" title="Fetch synced lyrics from LRCLIB">
-                    Sync
-                  </button>
-                  <button onclick="openCustomLyricsModal()" class="px-2 py-0.5 rounded bg-white/5 hover:bg-white/10 text-[10px] font-semibold text-gray-300" title="Paste or edit lyrics">
-                    Edit
-                  </button>
-                </div>
-              </div>
-
-              <!-- Bottom-to-Top Scrolling Viewport -->
-              <div id="lyricsViewport" class="relative flex-1 overflow-y-auto custom-scroll py-8 px-2 space-y-3 text-left scroll-smooth">
-                <div class="text-xs text-gray-400 italic">Select or add a song to load live scrolling lyrics...</div>
-              </div>
-
-              <!-- Subtle Bottom Fade Mask -->
-              <div class="pointer-events-none absolute bottom-0 inset-x-0 h-8 bg-gradient-to-t from-[#0b0e14] to-transparent"></div>
             </div>
 
           </div>
@@ -345,22 +326,20 @@
           <!-- PANEL B: RIGHT DECK LIBRARY (~35% WIDTH)                        -->
           <!-- =============================================================== -->
           <aside class="w-[35%] h-full bg-black/45 border border-white/10 rounded-2xl p-3 flex flex-col justify-between shrink-0 min-w-0">
-            <!-- Deck Library Header & Action Buttons -->
+
+            <!-- Library Header -->
             <div class="flex flex-col gap-2 border-b border-white/10 pb-2.5 shrink-0">
               <div class="flex items-center justify-between">
                 <div>
                   <h2 class="text-xs font-extrabold uppercase tracking-wider text-white">Deck Library</h2>
-                  <p id="librarySubtitle" class="text-[10px] text-gray-400">Your Added Spotify Songs & Links</p>
+                  <p id="librarySubtitle" class="text-[10px] text-gray-400">Your Spotify Playlists & Links</p>
                 </div>
-                <span id="libraryCountBadge" class="px-2 py-0.5 rounded-md bg-[#1db954]/20 text-[#1db954] text-[10px] font-bold mono-num">0 Songs</span>
+                <span id="libraryCountBadge" class="px-2 py-0.5 rounded-md bg-[#1db954]/20 text-[#1db954] text-[10px] font-bold mono-num">0 Playlists</span>
               </div>
 
-              <!-- Library Utility Buttons -->
+              <!-- Utility Buttons: Favs + Clear only (no Add URL here — use top bar button) -->
               <div class="flex items-center gap-1.5">
-                <button onclick="openAddMusicModal()" class="deck-btn flex-1 py-1.5 px-2 rounded-lg bg-[#1db954]/20 hover:bg-[#1db954]/30 border border-[#1db954]/40 text-[10px] font-extrabold text-[#1db954] truncate">
-                  + Add URL / Song
-                </button>
-                <button onclick="toggleFavoritesFilter()" id="favFilterBtn" class="deck-btn py-1.5 px-2.5 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-[10px] font-semibold text-gray-300" title="Show Favorites Only">
+                <button onclick="toggleFavoritesFilter()" id="favFilterBtn" class="deck-btn flex-1 py-1.5 px-2.5 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-[10px] font-semibold text-gray-300" title="Show Favorites Only">
                   ♥ Favs
                 </button>
                 <button onclick="clearDeckLibrary()" class="deck-btn py-1.5 px-2 rounded-lg bg-white/5 hover:bg-rose-500/20 border border-white/10 text-[10px] font-semibold text-gray-400 hover:text-rose-300" title="Clear Library">
@@ -369,15 +348,15 @@
               </div>
             </div>
 
-            <!-- Scrollable User Songs List -->
+            <!-- Scrollable List: either playlists OR tracks inside a playlist (with back button) -->
             <div id="playlistContainer" class="flex-1 overflow-y-auto custom-scroll my-2 space-y-1.5 pr-1">
-              <!-- Populated dynamically from user's saved Spotify URLs / searched songs -->
+              <!-- Populated dynamically -->
             </div>
 
-            <!-- Bottom Status Tip -->
+            <!-- Bottom Tip -->
             <div class="pt-2 border-t border-white/10 flex items-center justify-between text-[10px] text-gray-400">
-              <span class="truncate">Tap any song to load Icon + Lyrics</span>
-              <button onclick="toggleSpotifyEngineDrawer()" class="text-[#1db954] font-bold hover:underline shrink-0 ml-2">Embed Player</button>
+              <span id="libraryTip" class="truncate">Tap a playlist to browse its tracks</span>
+              <button onclick="toggleSpotifyEngineDrawer()" class="text-[#1db954] font-bold hover:underline shrink-0 ml-2">Spotify Engine</button>
             </div>
           </aside>
 
@@ -1006,11 +985,15 @@
       currentSongIndex = index;
       const song = deckLibrary[currentSongIndex];
 
-      // Update Left Now Playing Icon & Details
+      // Reset library view to playlist list (not track drill-down)
+      libraryViewMode = 'playlists';
+      activePlaylistIndex = -1;
+
+      // Update Now Playing Icon & Details — show the item's own cover art
       document.getElementById('nowPlayingCover').src = song.cover;
       document.getElementById('nowPlayingTitle').textContent = song.title;
       document.getElementById('nowPlayingArtist').textContent = song.artist;
-      document.getElementById('sourceTypeBadge').textContent = song.spotifyUri ? 'SPOTIFY LINK' : 'DECK AUDIO';
+      document.getElementById('sourceTypeBadge').textContent = song.spotifyUri ? 'SPOTIFY' : 'DECK AUDIO';
 
       currentPositionSec = 0;
       currentDurationSec = song.duration || 180;
@@ -1018,14 +1001,9 @@
       updateFavoriteButtonUI();
       renderDeckLibrary();
 
-      // Load into Official Spotify IFrame Controller if it has a Spotify URI
+      // Load into Official Spotify IFrame Controller silently (NO auto-opening the drawer)
       if (song.spotifyUri && spotifyController) {
-        spotifyController.loadUri(song.spotifyUri);
-        // If it's a playlist/album link, automatically show the Spotify Embed drawer so user can pick any track inside it
-        if (song.spotifyType === 'playlist' || song.spotifyType === 'album') {
-          document.getElementById('spotifyEngineDrawer').classList.remove('hidden');
-          document.getElementById('spotifyEngineDrawer').classList.add('flex');
-        }
+        try { spotifyController.loadUri(song.spotifyUri); } catch (_) {}
       }
 
       // Start playback
@@ -1243,7 +1221,7 @@
       // Fallback message if no lyrics found yet
       activeLyrics = [
         { time: 0, text: `♪ ${song.title} — ${song.artist}` },
-        { time: 4, text: 'Tap "Edit" above to paste custom lyrics or tap "Spotify Engine" for full playlist controls.' }
+        { time: 4, text: 'Lyrics not found. Try the Sync button or tap "Spotify Engine" to control via Spotify.' }
       ];
       renderLyricsViewport();
     }
@@ -1357,51 +1335,191 @@
     }
 
     /*************************************************************************
-     * 6. RENDER DECK LIBRARY (Right Panel)
+     * 6. RENDER DECK LIBRARY (Right Panel) — Two-state: Playlists → Tracks
+     *    Clicking a playlist shows its tracks inside the library panel only.
+     *    No pop-up to Spotify iframe. Back arrow returns to playlist list.
      *************************************************************************/
+
+    // Track whether we are viewing a playlist's track list inside the library
+    let libraryViewMode = 'playlists'; // 'playlists' | 'tracks'
+    let activePlaylistIndex = -1; // which library item is expanded to show tracks
+
     function renderDeckLibrary() {
       const container = document.getElementById('playlistContainer');
+      const badgeEl = document.getElementById('libraryCountBadge');
+      const tipEl = document.getElementById('libraryTip');
+
+      if (libraryViewMode === 'tracks' && activePlaylistIndex >= 0) {
+        // ── TRACK VIEW: show tracks of the selected playlist/album ──
+        const playlist = deckLibrary[activePlaylistIndex];
+        const tracks = playlist.tracks || [];
+
+        badgeEl.textContent = `${tracks.length} Track${tracks.length !== 1 ? 's' : ''}`;
+        if (tipEl) tipEl.textContent = 'Tap a track to play it';
+
+        if (tracks.length === 0) {
+          container.innerHTML = `
+            <div class="mb-2">
+              <button onclick="backToLibrary()" class="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-[10px] font-semibold text-cyan-300">
+                ← Back to Library
+              </button>
+            </div>
+            <div class="flex flex-col items-center justify-center text-center p-4 border border-dashed border-white/10 rounded-xl mt-2">
+              <p class="text-xs font-bold text-gray-300 mb-1">${playlist.title}</p>
+              <p class="text-[10px] text-gray-500">This is a Spotify Playlist.<br>Playback is controlled by Spotify. Hit play below to start it.</p>
+            </div>`;
+          return;
+        }
+
+        container.innerHTML = `
+          <div class="mb-2">
+            <button onclick="backToLibrary()" class="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-[10px] font-semibold text-cyan-300">
+              ← Back to Library
+            </button>
+          </div>
+          <div class="text-[10px] font-bold uppercase tracking-wider text-gray-400 px-1 mb-1">${playlist.title}</div>
+          ${tracks.map((t, tidx) => {
+            const active = currentSongIndex === activePlaylistIndex && (playlist._activeTrackIdx || 0) === tidx;
+            return `
+              <div
+                onclick="selectTrackFromPlaylist(${activePlaylistIndex}, ${tidx})"
+                class="group cursor-pointer w-full p-2 rounded-xl flex items-center gap-2.5 text-left transition-all ${active ? 'bg-[#1db954]/20 border border-[#1db954]/50' : 'bg-white/5 hover:bg-white/10 border border-transparent'}"
+              >
+                <img src="${t.cover || playlist.cover}" alt="${t.title}" class="w-9 h-9 rounded-lg object-cover shrink-0 border border-white/10" />
+                <div class="min-w-0 flex-1">
+                  <div class="text-xs font-bold truncate ${active ? 'text-[#1db954]' : 'text-white'}">${t.title}</div>
+                  <div class="text-[10px] text-gray-400 truncate">${t.artist || playlist.artist}</div>
+                </div>
+                ${active && isPlaying ? `<span class="w-2 h-2 rounded-full bg-[#1db954] animate-ping shrink-0"></span>` : ''}
+              </div>`;
+          }).join('')}`;
+        return;
+      }
+
+      // ── PLAYLIST VIEW: show the library items (playlists / songs) ──
       const itemsToRender = showFavoritesOnly
         ? deckLibrary.map((s, idx) => ({ s, idx })).filter(x => x.s.favorite)
         : deckLibrary.map((s, idx) => ({ s, idx }));
 
-      document.getElementById('libraryCountBadge').textContent = `${itemsToRender.length} ${itemsToRender.length === 1 ? 'Song' : 'Songs'}`;
+      const count = itemsToRender.length;
+      badgeEl.textContent = `${count} ${count === 1 ? 'Playlist' : 'Playlists'}`;
+      if (tipEl) tipEl.textContent = 'Tap a playlist to browse its tracks';
 
-      if (itemsToRender.length === 0) {
+      if (count === 0) {
         container.innerHTML = `
           <div class="h-full flex flex-col items-center justify-center text-center p-4 border border-dashed border-white/10 rounded-xl">
             <p class="text-xs font-bold text-gray-300 mb-1">Your Deck Library is Empty</p>
-            <p class="text-[10px] text-gray-500 mb-3">Paste any Spotify link or search a song to add it here.</p>
+            <p class="text-[10px] text-gray-500 mb-3">Use "+ Add Spotify URL" in the top bar to add a playlist or track.</p>
             <button onclick="openAddMusicModal()" class="px-3 py-1.5 rounded-lg bg-[#1db954] text-black font-extrabold text-[11px]">
-              + Add First Song / URL
+              + Add Playlist / URL
             </button>
-          </div>
-        `;
+          </div>`;
         return;
       }
 
       container.innerHTML = itemsToRender.map(({ s, idx }) => {
-        const active = idx === currentSongIndex;
+        const active = (libraryViewMode === 'tracks' && activePlaylistIndex === idx) || (currentSongIndex === idx && libraryViewMode === 'playlists');
+        const isPlaylist = s.spotifyType === 'playlist' || s.spotifyType === 'album';
         return `
-          <div 
-            onclick="selectSongFromLibrary(${idx})"
+          <div
+            onclick="${isPlaylist ? `openPlaylistTracks(${idx})` : `selectSongFromLibrary(${idx})`}"
             class="group cursor-pointer w-full p-2 rounded-xl flex items-center gap-2.5 text-left transition-all ${active ? 'bg-[#1db954]/20 border border-[#1db954]/50' : 'bg-white/5 hover:bg-white/10 border border-transparent'}"
           >
             <img src="${s.cover}" alt="${s.title}" class="w-10 h-10 rounded-lg object-cover shrink-0 border border-white/10" />
             <div class="min-w-0 flex-1">
               <div class="text-xs font-bold truncate ${active ? 'text-[#1db954]' : 'text-white'}">${s.title}</div>
-              <div class="text-[10px] text-gray-400 truncate">${s.artist}</div>
+              <div class="text-[10px] text-gray-400 truncate flex items-center gap-1">
+                ${isPlaylist ? '<span class="text-cyan-400">▶ Playlist</span>' : `<span>${s.artist}</span>`}
+              </div>
             </div>
-            <button 
-              onclick="event.stopPropagation(); removeSongFromLibrary(${idx});" 
-              class="opacity-60 group-hover:opacity-100 p-1 rounded hover:bg-rose-500/20 text-gray-400 hover:text-rose-300 text-[10px]"
-              title="Remove from Deck Library"
-            >
-              ✕
-            </button>
-          </div>
-        `;
+            ${isPlaylist ? `<svg class="w-3.5 h-3.5 text-gray-500 group-hover:text-cyan-300 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>` : ''}
+            <button
+              onclick="event.stopPropagation(); removeSongFromLibrary(${idx});"
+              class="opacity-0 group-hover:opacity-100 p-1 rounded hover:bg-rose-500/20 text-gray-400 hover:text-rose-300 text-[10px] shrink-0"
+              title="Remove"
+            >✕</button>
+          </div>`;
       }).join('');
+    }
+
+    // Open a playlist to show its tracks inside the library panel
+    function openPlaylistTracks(idx) {
+      const playlist = deckLibrary[idx];
+      if (!playlist) return;
+      activePlaylistIndex = idx;
+      libraryViewMode = 'tracks';
+
+      // Load the playlist into the Spotify controller (silently, no drawer popup)
+      if (playlist.spotifyUri && spotifyController) {
+        try { spotifyController.loadUri(playlist.spotifyUri); } catch (_) {}
+      }
+
+      // Update now playing cover/title to the playlist's art while browsing
+      document.getElementById('nowPlayingCover').src = playlist.cover;
+      document.getElementById('nowPlayingTitle').textContent = playlist.title;
+      document.getElementById('nowPlayingArtist').textContent = playlist.artist || 'Spotify Playlist';
+      document.getElementById('sourceTypeBadge').textContent = 'PLAYLIST';
+
+      renderDeckLibrary();
+    }
+
+    function backToLibrary() {
+      libraryViewMode = 'playlists';
+      activePlaylistIndex = -1;
+      renderDeckLibrary();
+    }
+
+    // Select a single track from within a playlist's track list (shown inside library)
+    function selectTrackFromPlaylist(playlistIdx, trackIdx) {
+      const playlist = deckLibrary[playlistIdx];
+      if (!playlist || !playlist.tracks || !playlist.tracks[trackIdx]) return;
+      const track = playlist.tracks[trackIdx];
+
+      playlist._activeTrackIdx = trackIdx;
+      currentSongIndex = playlistIdx;
+
+      // Show the specific track's art + details in the player (not the playlist art)
+      document.getElementById('nowPlayingCover').src = track.cover || playlist.cover;
+      document.getElementById('nowPlayingTitle').textContent = track.title;
+      document.getElementById('nowPlayingArtist').textContent = track.artist || playlist.artist;
+      document.getElementById('sourceTypeBadge').textContent = 'SPOTIFY TRACK';
+
+      currentPositionSec = 0;
+      currentDurationSec = track.duration || playlist.duration || 180;
+      updateScrubberAndLyricsUI();
+      updateFavoriteButtonUI();
+
+      // Play track via Spotify controller (no drawer popup)
+      if (track.spotifyUri && spotifyController) {
+        try {
+          spotifyController.loadUri(track.spotifyUri);
+          spotifyController.play();
+        } catch (_) {}
+      } else if (track.previewUrl) {
+        htmlAudioPlayer.src = track.previewUrl;
+        htmlAudioPlayer.volume = currentVolume;
+        htmlAudioPlayer.play().catch(() => {});
+      }
+
+      isPlaying = true;
+      updateTransportUI();
+      clearInterval(fallbackTimer);
+      fallbackTimer = setInterval(() => {
+        if (!isPlaying) return;
+        if (htmlAudioPlayer.src && !htmlAudioPlayer.paused) {
+          currentPositionSec = htmlAudioPlayer.currentTime;
+        } else {
+          currentPositionSec += 0.25;
+          if (currentDurationSec > 0 && currentPositionSec >= currentDurationSec) playNextTrack();
+        }
+        updateScrubberAndLyricsUI();
+      }, 250);
+
+      // Fetch lyrics for this specific track
+      fetchSyncedLyrics({ title: track.title, artist: track.artist || playlist.artist, duration: track.duration || 180, lyrics: track.lyrics || [] });
+
+      renderDeckLibrary();
+      showDeckToast(`PLAYING: ${track.title.toUpperCase()}`);
     }
 
     function removeSongFromLibrary(idx) {
