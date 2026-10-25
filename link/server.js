@@ -62,11 +62,16 @@ function requireAdmin(ctx) {
   return ctx.user;
 }
 
+// Real Wi-Fi/Ethernet addresses first; skip VirtualBox, Hyper-V/WSL, VMware
+// and Docker adapters that a phone on the home network can't reach.
+const VIRTUAL = /virtualbox|vmware|vethernet|wsl|hyper-v|docker|loopback|tailscale|zerotier|vbox/i;
+
 function lanUrls() {
   const urls = [];
-  for (const list of Object.values(networkInterfaces())) {
+  for (const [name, list] of Object.entries(networkInterfaces())) {
+    if (VIRTUAL.test(name)) continue;
     for (const a of list || []) {
-      if (a.family === 'IPv4' && !a.internal) urls.push(`http://${a.address}:${PORT}/`);
+      if (a.family === 'IPv4' && !a.internal && !a.address.startsWith('169.254.')) urls.push(`http://${a.address}:${PORT}/`);
     }
   }
   return urls;
@@ -85,6 +90,7 @@ router.add('GET', '/api/link/info', (ctx) => ({
   version: VERSION,
   name: store.data.settings.name,
   host: hostname(),
+  urls: lanUrls(),
   needsSetup: auth.needsSetup(),
   user: ctx.user ? publicUser(ctx.user) : null,
   spotify: { linked: spotifyLink.status().linked, account: spotifyLink.status().account },
