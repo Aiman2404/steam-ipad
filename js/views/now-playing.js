@@ -25,6 +25,7 @@ export class NowPlaying {
 
   setTrack(track) {
     this.track = track;
+    document.body.classList.toggle('has-track', !!track);
     $('#npTitle').textContent = track ? track.title : 'Nothing playing';
     $('#npArtist').textContent = track ? track.artist || 'Unknown artist' : 'Connect Spotify or add songs to start';
     $('#timeTotal').textContent = formatTime(track ? track.durationMs : 0);
