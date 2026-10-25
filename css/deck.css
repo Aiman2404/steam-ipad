@@ -1391,6 +1391,15 @@ svg {
   height: 22px;
 }
 
+.slider[data-kind='volume'] .slider-icon {
+  pointer-events: none;
+}
+
+.slider.is-muted .slider-icon {
+  color: #fb7185;
+  border-color: rgba(251, 113, 133, 0.45);
+}
+
 .slider.is-disabled {
   opacity: 0.55;
 }
