@@ -87,6 +87,7 @@ const PAGES = [
   { id: 'overview', title: 'Overview', ico: '◎' },
   { id: 'people', title: 'People', ico: '☺', admin: true },
   { id: 'apps', title: 'Laptop apps', ico: '▦', admin: true },
+  { id: 'dock', title: 'Dock buttons', ico: '▤', admin: true },
   { id: 'screen', title: 'Screen', ico: '▭', admin: true },
   { id: 'spotify', title: 'Spotify', ico: '♫', admin: true },
   { id: 'account', title: 'My account', ico: '⚙' }
@@ -115,7 +116,7 @@ function route() {
   $$('#nav a').forEach((a) => a.classList.toggle('is-active', a.dataset.page === id));
   $('#pageTitle').textContent = (PAGES.find((p) => p.id === id) || PAGES[0]).title;
   stopPreview();
-  ({ overview, people, apps, screen, spotify, account })[id]();
+  ({ overview, people, apps, dock, screen, spotify, account })[id]();
 }
 
 window.addEventListener('hashchange', route);
@@ -312,6 +313,43 @@ async function apps() {
       await api('/api/apps', { method: 'PUT', body: { apps: payload } });
       toast('Apps saved');
       apps();
+    } catch (err) {
+      toast(err.message, true);
+    }
+  };
+}
+
+// ------------------------------------------------------------------ dock
+
+async function dock() {
+  const page = $('#page');
+  const [{ apps: list }, { slots, views }] = await Promise.all([api('/api/apps'), api('/api/dock')]);
+  const options = (slot) =>
+    `<optgroup label="Open on the laptop">${list
+      .map((a) => `<option value="laptop:${esc(a.id)}" ${slot.kind === 'laptop' && slot.id === a.id ? 'selected' : ''}>${esc(a.name)}</option>`)
+      .join('')}</optgroup>
+     <optgroup label="Show on the deck">${Object.entries(views)
+       .map(([k, label]) => `<option value="view:${k}" ${slot.kind === 'view' && slot.view === k ? 'selected' : ''}>${esc(label)}</option>`)
+       .join('')}</optgroup>`;
+  page.innerHTML = `
+    <div class="card">
+      <h3>The five buttons at the bottom of the deck</h3>
+      <p class="muted">Pick what each hardware button does for everyone signed in to the deck: open a laptop app, or jump to a deck view. Add more apps under <a href="#apps" style="color:var(--accent)">Laptop apps</a>.</p>
+      <div class="grid-3" style="grid-template-columns:repeat(5,minmax(0,1fr))" id="dockSlots">
+        ${slots.map((s, i) => `<label class="field"><span>Button ${i + 1}</span><select data-slot="${i}">${options(s)}</select></label>`).join('')}
+      </div>
+      <div class="inline" style="justify-content:flex-end;margin-top:6px">
+        <button class="btn btn-primary" id="saveDock">Save dock</button>
+      </div>
+    </div>`;
+  $('#saveDock').onclick = async () => {
+    const payload = $$('#dockSlots select').map((sel) => {
+      const [kind, value] = sel.value.split(':');
+      return kind === 'laptop' ? { kind, appId: value } : { kind, view: value };
+    });
+    try {
+      await api('/api/dock', { method: 'PUT', body: { slots: payload } });
+      toast('Dock saved. The deck updates within a minute, or reopen it.');
     } catch (err) {
       toast(err.message, true);
     }
