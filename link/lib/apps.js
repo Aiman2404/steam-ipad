@@ -3,6 +3,7 @@
 
 import { spawn } from 'node:child_process';
 import { randomUUID } from 'node:crypto';
+import { homedir } from 'node:os';
 
 export const DEFAULT_APPS = [
   { name: 'GitHub', target: 'https://github.com/Aiman2404', icon: 'github' },
@@ -10,7 +11,7 @@ export const DEFAULT_APPS = [
   { name: 'Steam', target: 'steam://open/main', icon: 'steam' },
   { name: 'Discord', target: 'discord://', icon: 'discord' },
   { name: 'Spotify', target: 'spotify:', icon: 'spotify' },
-  { name: 'Files', target: process.platform === 'win32' ? 'explorer.exe' : '~', icon: 'folder' }
+  { name: 'Files', target: process.platform === 'win32' ? 'explorer.exe' : homedir(), icon: 'folder' }
 ];
 
 const ICONS = ['github', 'code', 'steam', 'discord', 'spotify', 'folder', 'browser', 'game', 'terminal', 'app'];
