@@ -1,128 +1,103 @@
-# SteamOS Cyber-Deck — iPad Air 2 Edition
+# DeckOS — Steam Deck–style dashboard for iPad Air 2
 
-[![Live Cyber-Deck App](https://img.shields.io/badge/Live%20Cyber--Deck-aiman2404.github.io%2Fsteam--ipad-00e5ff?style=for-the-badge&logo=github)](https://aiman2404.github.io/steam-ipad/)
-[![GitHub Actions CI/CD](https://img.shields.io/badge/Deploy-GitHub%20Pages-1db954?style=for-the-badge&logo=githubactions)](https://github.com/Aiman2404/steam-ipad/actions)
+[![Live](https://img.shields.io/badge/Live-aiman2404.github.io%2Fsteam--ipad-38bdf8?style=for-the-badge&logo=github)](https://aiman2404.github.io/steam-ipad/)
+[![Deploy](https://img.shields.io/badge/Deploy-GitHub%20Pages-a855f7?style=for-the-badge&logo=githubactions)](https://github.com/Aiman2404/steam-ipad/actions)
 
-A single-file, fully offline-capable **SteamOS / Steam Deck–inspired web dashboard** built for the **iPad Air 2** locked in landscape mode. Designed to sit inside a custom 3D-printed bezel that replicates the Steam Deck's hardware trench aesthetics on a 9.7-inch tablet.
+A landscape web app for an **iPad Air 2** mounted in a custom 3D-printed Steam Deck–style bezel. It's a music deck with synced lyrics, two hardware-style sliders and five launcher buttons, in an "Aurora Glass" design that re-tints itself to the album cover of whatever is playing.
 
-🌐 **Live URL (Always-On, no laptop needed):** [https://aiman2404.github.io/steam-ipad/](https://aiman2404.github.io/steam-ipad/)
+**Live:** https://aiman2404.github.io/steam-ipad/
 
 ---
 
-## 📐 3D-Printed iPad Air 2 Bezel Concept
+## What it does
 
-The UI is engineered around the **iPad Air 2 (9.7-inch, 4:3 aspect ratio)** locked at `100vw × 100vh` in landscape orientation.
+### 🎵 Music deck
+- **Spotify, full-length.** Spotify plays the music (in the Spotify app on the iPad, or any Spotify Connect speaker/PC) and DeckOS is the remote and display: play/pause, next/previous, seek, shuffle, repeat, volume, and picking the device.
+- **Your real library.** Your playlists, Liked Songs and Spotify search. Tap any song to play from there.
+- **Songs on this iPad.** Add MP3/M4A files from the Files app or iCloud Drive. They're stored on the iPad (IndexedDB), survive restarts, play in full offline, and show the title, artist and **embedded cover art** read from the file's tags.
+- **Synced lyrics.** Fetched from [LRCLIB](https://lrclib.net), matched on title, artist, album and the **exact track length**, so the timing fits the version you're hearing. The current line is tracked every frame, with a karaoke-style sweep (word by word when LRCLIB has word timing). Tap a line to jump there. Use the **− / +** nudge to shift timing for one song.
+- **Up next.** Shows Spotify's real queue, or the upcoming iPad songs.
+- **Living theme.** Accent colours, the aurora and the blurred backdrop all come from the current cover.
 
-The layout is divided into three hardware zones separated by **10 px deep trench gutters** — visually simulating the recessed moat between button banks on 3D-printed PLA/PETG enclosures:
+### 🎚️ Sliders
+- **SOUND:** the real output volume. That's the Spotify device volume, or the audio gain for iPad songs. (iOS ignores the usual web volume control, so this goes through Web Audio.)
+- **DISPLAY:** dims the screen with an overlay. Web pages can't change the iPad's real brightness.
+
+### 🕹️ Dock
+Five launcher buttons. Tap to open an app (`steamlink://`, `discord://`, `spotify://`, `moonlight://`, `youtube://`, any web link) or a deck view (`deck:lyrics`, `deck:library`, `deck:queue`). **Long-press** a button to change it.
+
+---
+
+## Spotify setup (one time, ~2 minutes)
+
+Spotify doesn't let websites stream full songs on iPad. DeckOS controls the official Spotify app instead, which needs a free Spotify developer app of your own:
+
+1. Go to **https://developer.spotify.com/dashboard** and log in. The account must have **Premium**: Spotify requires it for apps in Development Mode and for playback control.
+2. **Create app.** Use any name and description. Set the **Redirect URI** to exactly
+   `https://aiman2404.github.io/steam-ipad/`
+   (DeckOS → Settings shows the exact value for wherever you host it), tick **Web API**, and Save.
+3. Copy the **Client ID** from the app's settings.
+4. On the iPad, open DeckOS → ⚙️ **Settings**, paste the Client ID, then tap **Connect** and log in.
+5. Open the Spotify app on the iPad and play anything once so it appears as a device. After that, DeckOS can start, switch and control playback by itself.
+
+Development-mode apps allow up to 5 Spotify accounts. Add extra ones under *User Management* in the dashboard.
+
+---
+
+## iPad install
+
+1. Open the live URL in **Safari** → Share → **Add to Home Screen**. It launches full-screen and works offline.
+2. Settings → Display & Brightness → Auto-Lock → **Never**, so the deck stays on in the bezel.
+3. Optional: Settings → Accessibility → **Guided Access** to lock the iPad to DeckOS.
+4. iPad songs play through Web Audio. If they're silent, check that the iPad isn't muted (side switch / Control Center).
+
+---
+
+## Project structure
 
 ```
-┌─────────────────────────────────────────┬──────────┐
-│                                         │  SOUND   │
-│        MEDIA & SPOTIFY DECK (80%)       │ SLIDER 1 │  76% Height
-│   Visualizer · Lyrics · Embed Tabs      │────────  │
-│   Library Drawer · Transport Controls   │  BRIGHT  │
-│                                         │ SLIDER 2 │
-├──────────┬──────────┬──────────┬────────┴──────────┤
-│  BTN 1   │  BTN 2   │  BTN 3   │  BTN 4   │ BTN 5  │  24% Height
-│ SteamLnk │ Discord  │ Spotify  │  Lyrics  │ GitHub │
-└──────────┴──────────┴──────────┴──────────┴────────┘
+index.html                   markup for the three bezel zones
+css/deck.css                 Aurora Glass design (no framework, Safari 15-safe)
+js/main.js                   wiring + animation-frame loop
+js/player.js                 one controller over both sources
+js/sources/spotify-source.js Spotify Connect control + smooth position clock
+js/sources/local-source.js   on-iPad songs (IndexedDB, Web Audio gain, Media Session)
+js/spotify-auth.js           PKCE login (no secret, no server)
+js/spotify-api.js            Web API client (token refresh, rate-limit backoff)
+js/lyrics.js                 LRCLIB lookup + LRC / word-sync parser
+js/tags.js                   ID3 / MP4 tag + cover art reader
+js/palette.js                album-cover colour extraction
+js/views/*                   now playing, lyrics, library, queue, sliders, dock, settings
+sw.js                        network-first service worker (offline shell)
 ```
 
-### Print Notes
-- **Material:** PLA+ or PETG (matte black recommended for carbon-fiber look)
-- **Trench depth:** 10 mm recessed moats between button zones
-- **Button cutouts:** 5 × tactile mechanical-switch bays (24% height strip)
-- **Slider channels:** 2 × vertical capacitive-touch rails (right 20% strip)
-- **iPad mount:** Landscape-locked friction-fit recess with USB-C passthrough slot
-
----
-
-## ✨ Features
-
-### 🎵 Main Media & Spotify Deck (80% width, 76% height)
-- **SteamOS Status Bar** — DeckOS logo, live clock, 3D Print bezel grid toggle
-- **HTML5 Canvas Frequency Visualizer** — real Web Audio API FFT spectrum bars (cyan → green gradient)
-- **Album Art** with ambient radial glow that changes color per track
-- **Tab 1 — Visualizer Deck:** Transport controls (play/pause, prev, next, seek, shuffle, like)
-- **Tab 2 — Lyrics / Subtitles:** Synced scrolling lyric lines per track
-- **Tab 3 — Spotify Embed:** Official Spotify iframe playlist player (no API key needed) with preset switcher (RapCaviar, Mint Electronic) and custom URL loader
-- **Library Drawer:** 4 built-in procedural synth tracks playable fully offline
-
-### 🎚️ Vertical Sliders Zone (20% width, 76% height)
-- **Slider 1 — Sound:** Touch-drag bottom-to-top fill, controls real Web Audio API `GainNode` volume (0–100%)
-- **Slider 2 — Display:** Touch-drag bottom-to-top fill, controls full-viewport black overlay opacity (15–100% brightness simulation)
-
-### 🕹️ Bottom 5-Button Hardware Dock (100% width, 24% height)
-- 5 large tactile-style buttons with brand glow accents
-- **Right-click or tap B✎** on any button to open the **Assign 5 Buttons** modal
-- Type an app name (Discord, Steam Link, Spotify, Moonlight, YouTube, GitHub) → icon and iOS URL scheme auto-assigned
-- Configs saved to **localStorage** — persists across sessions
-- Dock buttons that target `deck:` views switch tabs in-app instead of navigating away
-
----
-
-## 🚀 Getting Started
-
-No build tools, no npm, no dependencies to install.
-
-1. Open `index.html` directly in Safari on iPad (or any modern browser)
-2. **Add to Home Screen** via Safari share menu → full-screen PWA-style app
-3. Enable **Guided Access** on iPad to lock to landscape and disable home button
+No build step. Any static host works; GitHub Pages deploys `main` automatically.
 
 ```bash
-# Or serve locally for development:
-npx serve .
-# Then open http://localhost:3000 in iPad Safari
+# local development (ES modules need http://, not file://)
+python -m http.server 8000
 ```
 
----
-
-## 🌐 Spotify Integration
-
-| Mode | Requirement |
-|------|-------------|
-| Embedded Playlist | None — paste any `open.spotify.com` link |
-| Live "Currently Playing" Sync | Spotify Developer OAuth Bearer Token (optional) |
+To run Spotify against a local server, add `http://127.0.0.1:8000/` as a second Redirect URI in your Spotify app.
 
 ---
 
-## 🗂️ Project Structure
+## Layout reference for the printed bezel
 
 ```
-steam-ipad/
-├── index.html     # Single-file app — all HTML, CSS, and JS inline
-└── README.md      # This file
+┌─────────────────────────────────────────┬────┬────┐
+│                                         │SND │DISP│
+│      MEDIA DECK (80% w)                 │    │    │  76% h
+│  cover · title · transport | lyrics /   │    │    │
+│  library / up next                      │    │    │
+├────────┬────────┬────────┬────────┬─────┴────┴────┤
+│  B1    │  B2    │  B3    │  B4    │      B5       │  24% h
+└────────┴────────┴────────┴────────┴───────────────┘
+            10px trench gutters between all zones
 ```
 
----
-
-## 🔧 Customization
-
-All CSS variables are at the top of `index.html`:
-
-```css
-:root {
-  --trench-size: 10px;       /* Bezel gutter width */
-  --steam-bg:   #080a0e;     /* Main background */
-  --panel-bg:   #11151d;     /* Panel surface */
-  --steam-cyan: #00e5ff;     /* Accent cyan */
-  --spotify-green: #1db954;  /* Spotify green */
-}
-```
+Settings → **3D-print bezel guides** outlines every zone for test-fitting the frame.
 
 ---
 
-## 📦 Tech Stack
-
-| Layer | Technology |
-|-------|-----------|
-| Layout | CSS Grid + Flexbox, Tailwind CDN |
-| Audio Engine | Web Audio API (`OscillatorNode`, `GainNode`, `AnalyserNode`) |
-| Visualizer | HTML5 Canvas 2D, `requestAnimationFrame` |
-| Typography | Inter + JetBrains Mono (Google Fonts) |
-| State | `localStorage` (dock button assignments) |
-| Streaming | Official Spotify Embed iframe |
-
----
-
-*Built for the [esp-oled-bot](https://github.com/Aiman2404/esp-oled-bot) project ecosystem — hardware meets software on a custom 3D-printed iPad Air 2 Steam Deck cyber-deck.*
+*Part of the [esp-oled-bot](https://github.com/Aiman2404/esp-oled-bot) hardware ecosystem.*
