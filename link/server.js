@@ -193,11 +193,19 @@ const viewers = new Set();
 let streaming = false;
 const stream = { width: 1280, quality: 55, fps: 10 };
 
+// Latest frame for clients that pull one JPEG at a time (/api/screen/frame).
+// iPad Safari doesn't reliably render multipart MJPEG in an <img>, so the
+// deck pulls frames instead; the dashboard can still use the MJPEG stream.
+let latest = { seq: 0, buf: null };
+let lastPollAt = 0;
+const frameWaiters = new Set();
+const wanted = () => viewers.size > 0 || Date.now() - lastPollAt < 3000;
+
 function pumpFrames() {
   if (streaming) return;
   streaming = true;
   const loop = async () => {
-    while (viewers.size) {
+    while (wanted()) {
       const started = Date.now();
       let frame;
       try {
@@ -206,7 +214,10 @@ function pumpFrames() {
         await new Promise((r) => setTimeout(r, 1000));
         continue;
       }
-      const head = Buffer.from(`--frame\r\nContent-Type: image/jpeg\r\nContent-Length: ${frame.length}\r\n\r\n`);
+      latest = { seq: latest.seq + 1, buf: frame };
+      frameWaiters.forEach((w) => w());
+      frameWaiters.clear();
+      const head = Buffer.from(`--frame\r\nContent-Type: image/jpeg\r\nContent-Length: ${frame.length}\r\n\r\n`);
       for (const v of viewers) {
         // Skip a slow viewer instead of buffering frames for it.
         if (v.busy) continue;
@@ -223,6 +234,35 @@ function pumpFrames() {
   };
   loop();
 }
+
+// Long-poll: returns the next frame newer than ?after=, waiting up to 3s.
+router.add('GET', '/api/screen/frame', async (ctx) => {
+  requireUser(ctx);
+  if (!features().screen) throw new HttpError(503, 'Screen sharing needs DeckOS Link running on Windows.');
+  lastPollAt = Date.now();
+  pumpFrames();
+  const after = Number(new URL(ctx.req.url, 'http://x').searchParams.get('after')) || 0;
+  if (!(latest.buf && latest.seq > after)) {
+    await new Promise((resolve) => {
+      const done = () => {
+        clearTimeout(timer);
+        frameWaiters.delete(done);
+        resolve();
+      };
+      const timer = setTimeout(done, 3000);
+      frameWaiters.add(done);
+    });
+  }
+  if (!latest.buf) throw new HttpError(504, 'The laptop screen is not ready yet.');
+  ctx.res.writeHead(200, {
+    'Content-Type': 'image/jpeg',
+    'Content-Length': latest.buf.length,
+    'Cache-Control': 'no-store',
+    'X-Frame-Seq': String(latest.seq)
+  });
+  ctx.res.end(latest.buf);
+  ctx.handled = true;
+});
 
 router.add('GET', '/api/screen/stream', (ctx) => {
   requireUser(ctx);
