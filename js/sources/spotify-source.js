@@ -245,7 +245,7 @@ export class SpotifySource extends Emitter {
 
   setVolume(pct) {
     if (!this.state.volumeSupported) {
-      this.emit('error', new Error('This Spotify device does not allow remote volume. Use the iPad buttons.'));
+      this.emit('error', new Error('This Spotify device does not allow remote volume. Use the volume buttons on the device instead.'));
       return Promise.resolve();
     }
     return this.run(() => spotify.volume(pct), { volume: pct });

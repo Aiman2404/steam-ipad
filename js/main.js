@@ -1,6 +1,6 @@
 // DeckOS entry point: wires the player to the views and runs the frame loop.
 
-import { $, $$, toast, store } from './util.js';
+import { $, $$, toast, store, DEVICE } from './util.js';
 import { handleRedirect, isLoggedIn } from './spotify-auth.js';
 import { Player } from './player.js';
 import { NowPlaying } from './views/now-playing.js';
@@ -71,7 +71,7 @@ function updateChip() {
   const s = player.state;
   if (s.source === 'local' && s.track) {
     chip.dataset.state = 'live';
-    text.textContent = 'On this iPad';
+    text.textContent = `On this ${DEVICE}`;
   } else if (!isLoggedIn()) {
     chip.dataset.state = '';
     text.textContent = 'Connect Spotify';
@@ -223,6 +223,7 @@ async function boot() {
 
   if (isLoggedIn()) player.spotify.start();
   else if (!player.local.tracks.length) showTab('library');
+  $('[data-lib="local"]').textContent = `On this ${DEVICE}`;
   updateChip();
   nowPlaying.setTrack(null);
   lyrics.setTrack(null);

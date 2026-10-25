@@ -1,7 +1,7 @@
 // Settings sheet: Spotify setup/connection, display options, dock, storage.
 // Also owns the "Play on…" Spotify device picker.
 
-import { $, $$, escapeHtml, store, toast } from '../util.js';
+import { $, $$, escapeHtml, store, toast, DEVICE } from '../util.js';
 import { openSheet, closeSheet } from './sheet.js';
 import { getClientId, setClientId, beginLogin, logout, isLoggedIn, redirectUri } from '../spotify-auth.js';
 import { spotify } from '../spotify-api.js';
@@ -91,10 +91,10 @@ export class Settings {
       </div>
       <div class="group">
         <h3>Dock &amp; storage</h3>
-        <p>${this.player.local.tracks.length} songs saved on this iPad.</p>
+        <p>${this.player.local.tracks.length} songs saved on this ${DEVICE}.</p>
         <div class="detail-actions">
           <button class="pill" data-act="dock">Edit dock buttons</button>
-          <button class="pill" data-act="clear-local">Remove all iPad songs</button>
+          <button class="pill" data-act="clear-local">Remove all saved songs</button>
         </div>
       </div>`;
 
@@ -138,7 +138,7 @@ export class Settings {
       for (const id of ids) await this.player.local.remove(id);
       await idb.clearTracks().catch(() => {});
       this.render();
-      toast('Removed all iPad songs');
+      toast('Removed all saved songs');
     });
   }
 
@@ -163,7 +163,7 @@ export class Settings {
       .join('');
     body.innerHTML = `
       ${rows || '<div class="note">No Spotify devices found.</div>'}
-      <div class="note">Don't see this iPad? Open the Spotify app here, play any song for a second, then come back.</div>
+      <div class="note">Don't see this ${DEVICE}? Open the Spotify app here, play any song for a second, then come back.</div>
       <div class="detail-actions" style="justify-content:flex-end">
         <button class="pill" data-act="refresh">Refresh</button>
         <button class="pill pill-spotify" data-act="open-spotify">Open Spotify</button>

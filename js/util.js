@@ -19,6 +19,16 @@ export function formatTime(ms) {
   return `${m}:${s < 10 ? '0' : ''}${s}`;
 }
 
+// "iPad", "iPhone" or a neutral word for Android / other devices.
+// iPadOS 13+ reports itself as a Mac, so check for touch too.
+export const DEVICE = (() => {
+  const ua = navigator.userAgent || '';
+  if (/iPad/.test(ua) || (/Macintosh/.test(ua) && navigator.maxTouchPoints > 1)) return 'iPad';
+  if (/iPhone|iPod/.test(ua)) return 'iPhone';
+  if (/Android/.test(ua)) return /Mobile/.test(ua) ? 'phone' : 'tablet';
+  return 'device';
+})();
+
 export const clamp = (v, lo, hi) => Math.min(hi, Math.max(lo, v));
 
 // localStorage that never throws (private mode, quota, disabled storage).

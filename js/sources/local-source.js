@@ -2,7 +2,7 @@
 // played through an <audio> element routed into Web Audio. iOS Safari ignores
 // audio.volume, so volume goes through a GainNode instead.
 
-import { Emitter } from '../util.js';
+import { Emitter, DEVICE } from '../util.js';
 import { idb } from '../idb.js';
 import { readTags, readDuration } from '../tags.js';
 
@@ -16,7 +16,7 @@ const BLANK = {
   repeat: 'context',
   volume: 80,
   volumeSupported: true,
-  device: { name: 'This iPad' }
+  device: { name: `This ${DEVICE}` }
 };
 
 async function lookupArtwork(title, artist) {

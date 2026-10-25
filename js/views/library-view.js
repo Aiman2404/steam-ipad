@@ -2,7 +2,7 @@
 // uploaded to this iPad. Replaces the old "import" that fetched a playlist's
 // name and then filled it with the same five hard-coded demo songs.
 
-import { $, $$, escapeHtml, formatTime, toast, store } from '../util.js';
+import { $, $$, escapeHtml, formatTime, toast, store, DEVICE } from '../util.js';
 import { spotify, unwrapItem } from '../spotify-api.js';
 import { isLoggedIn, getClientId, beginLogin } from '../spotify-auth.js';
 
@@ -276,7 +276,7 @@ export class LibraryView {
     this.refresh();
   }
 
-  // ---------------- On this iPad ----------------
+  // ---------------- On this device ----------------
 
   renderLocal() {
     const root = $('#libLocal');
@@ -284,8 +284,8 @@ export class LibraryView {
     if (!rows.length) {
       root.innerHTML = `
         <div class="empty">
-          <h3>Songs on this iPad</h3>
-          <p>Add MP3 or M4A files from the Files app or iCloud Drive. They're saved on this iPad, play in full and get synced lyrics and their real cover art.</p>
+          <h3>Songs on this ${DEVICE}</h3>
+          <p>Add MP3 or M4A files from your Files app or storage. They're saved on this ${DEVICE}, play in full and get synced lyrics and their real cover art.</p>
           <button class="pill pill-accent" data-act="add">Add songs</button>
         </div>`;
       root.querySelector('[data-act="add"]').addEventListener('click', () => $('#fileInput').click());
@@ -293,7 +293,7 @@ export class LibraryView {
     }
     root.innerHTML = `
       <div class="lib-head">
-        <span class="row-sub" style="flex:1">${rows.length} ${rows.length === 1 ? 'song' : 'songs'} saved on this iPad</span>
+        <span class="row-sub" style="flex:1">${rows.length} ${rows.length === 1 ? 'song' : 'songs'} saved on this ${DEVICE}</span>
         <button class="pill pill-accent" data-act="add">+ Add songs</button>
       </div>
       <div class="scroll" id="localList">

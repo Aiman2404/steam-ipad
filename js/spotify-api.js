@@ -15,9 +15,9 @@ export class SpotifyError extends Error {
 }
 
 const FRIENDLY = {
-  NO_ACTIVE_DEVICE: 'No active Spotify device. Open Spotify on the iPad and play anything once.',
+  NO_ACTIVE_DEVICE: 'No active Spotify device. Open the Spotify app on this device and play anything once.',
   PREMIUM_REQUIRED: 'Controlling playback needs Spotify Premium.',
-  VOLUME_CONTROL_DISALLOW: 'This device does not allow remote volume. Use the iPad volume buttons.',
+  VOLUME_CONTROL_DISALLOW: 'This device does not allow remote volume. Use the volume buttons on the device instead.',
   QUOTA_EXCEEDED: 'Spotify API quota reached for now. DeckOS will retry shortly.'
 };
 
