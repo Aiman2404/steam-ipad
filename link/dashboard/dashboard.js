@@ -321,11 +321,36 @@ async function apps() {
 // ---------------------------------------------------------------- screen
 
 let previewImg = null;
+let previewToken = null;
 function stopPreview() {
-  if (previewImg) {
-    previewImg.src = '';
-    previewImg = null;
+  previewToken = null;
+  previewImg = null;
+}
+
+// Pull JPEG frames one at a time; Safari can't show multipart MJPEG in <img>.
+async function runPreview(img) {
+  const token = {};
+  previewToken = token;
+  let seq = 0;
+  let shown = null;
+  while (previewToken === token) {
+    try {
+      const res = await fetch(`/api/screen/frame?after=${seq}`, { cache: 'no-store' });
+      if (!res.ok) throw new Error(`status ${res.status}`);
+      seq = Number(res.headers.get('X-Frame-Seq')) || seq + 1;
+      const url = URL.createObjectURL(await res.blob());
+      if (previewToken !== token) {
+        URL.revokeObjectURL(url);
+        break;
+      }
+      img.src = url;
+      if (shown) URL.revokeObjectURL(shown);
+      shown = url;
+    } catch (_) {
+      await new Promise((r) => setTimeout(r, 1500));
+    }
   }
+  if (shown) URL.revokeObjectURL(shown);
 }
 
 const QUALITY = {
@@ -365,7 +390,7 @@ async function screen() {
       </div>
     </div>`;
   previewImg = $('#preview');
-  previewImg.src = '/api/screen/stream';
+  runPreview(previewImg);
   $$('#screens [data-i]').forEach((b) =>
     b.addEventListener('click', async () => {
       await api('/api/screen/select', { method: 'POST', body: { index: Number(b.dataset.i) } });
