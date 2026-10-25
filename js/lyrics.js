@@ -5,7 +5,7 @@
 import { idb } from './idb.js';
 
 const LRCLIB = 'https://lrclib.net/api';
-const CACHE_VERSION = 2;
+const CACHE_VERSION = 3;
 
 function stripDecorations(title) {
   return title
@@ -52,7 +52,9 @@ export function parseLrc(lrc) {
         if (text.trim()) words.push({ t: toMs(parts[i], parts[i + 1], parts[i + 2]) - offset, text });
       }
     }
-    const text = body.replace(wordRe, '').replace(/\s+/g, ' ').trim();
+    let text = body.replace(wordRe, '').replace(/\s+/g, ' ').trim();
+    // LRCLIB marks instrumental breaks with a lone note; render those as a gap.
+    if (/^[♪♫♬♩\s.…-]*$/.test(text)) text = '';
     for (const t of stamps) lines.push({ t: Math.max(0, t - offset), text, words });
   }
   lines.sort((a, b) => a.t - b.t);
