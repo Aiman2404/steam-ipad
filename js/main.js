@@ -1,6 +1,6 @@
 // DeckOS entry point: wires the player to the views and runs the frame loop.
 
-import { $, $$, toast, store } from './util.js';
+import { $, $$, toast, store, DEVICE } from './util.js';
 import { handleRedirect, isLoggedIn } from './spotify-auth.js';
 import { Player } from './player.js';
 import { NowPlaying } from './views/now-playing.js';
@@ -14,6 +14,7 @@ import { getLyrics } from './lyrics.js';
 import { spotify } from './spotify-api.js';
 import { bindSheets } from './views/sheet.js';
 import { Ambient } from './views/ambient.js';
+import { startFitting } from './fit.js';
 
 const player = new Player();
 const nowPlaying = new NowPlaying(player);
@@ -70,7 +71,7 @@ function updateChip() {
   const s = player.state;
   if (s.source === 'local' && s.track) {
     chip.dataset.state = 'live';
-    text.textContent = 'On this iPad';
+    text.textContent = `On this ${DEVICE}`;
   } else if (!isLoggedIn()) {
     chip.dataset.state = '';
     text.textContent = 'Connect Spotify';
@@ -195,6 +196,7 @@ function tickClock() {
 // ---------------- boot ----------------
 
 async function boot() {
+  startFitting();
   tickClock();
   setInterval(tickClock, 10000);
   showTab(store.get('deckos.tab', 'lyrics'));
@@ -205,6 +207,10 @@ async function boot() {
     });
   }
   window.addEventListener('resize', moveInk);
+  window.addEventListener('deck:fit', () => {
+    moveInk();
+    lyrics.measure();
+  });
 
   const redirect = await handleRedirect();
   if (redirect.handled) {
@@ -217,6 +223,7 @@ async function boot() {
 
   if (isLoggedIn()) player.spotify.start();
   else if (!player.local.tracks.length) showTab('library');
+  $('[data-lib="local"]').textContent = `On this ${DEVICE}`;
   updateChip();
   nowPlaying.setTrack(null);
   lyrics.setTrack(null);

@@ -8,24 +8,26 @@ const K_BRIGHT = 'deckos.brightness';
 
 function bindVertical(el, { onInput, onCommit }) {
   let dragging = false;
-  const pct = (clientY) => {
+  // Vertical in landscape; horizontal bars in portrait (wider than tall).
+  const pct = (e) => {
     const r = el.getBoundingClientRect();
-    return clamp((r.bottom - clientY) / r.height, 0, 1);
+    if (r.width > r.height) return clamp((e.clientX - r.left) / r.width, 0, 1);
+    return clamp((r.bottom - e.clientY) / r.height, 0, 1);
   };
   el.addEventListener('pointerdown', (e) => {
     dragging = true;
     el.classList.add('is-dragging');
     el.setPointerCapture(e.pointerId);
-    onInput(pct(e.clientY));
+    onInput(pct(e));
   });
   el.addEventListener('pointermove', (e) => {
-    if (dragging) onInput(pct(e.clientY));
+    if (dragging) onInput(pct(e));
   });
   const end = (e) => {
     if (!dragging) return;
     dragging = false;
     el.classList.remove('is-dragging');
-    if (onCommit) onCommit(pct(e.clientY));
+    if (onCommit) onCommit(pct(e));
   };
   el.addEventListener('pointerup', end);
   el.addEventListener('pointercancel', () => {
@@ -36,7 +38,7 @@ function bindVertical(el, { onInput, onCommit }) {
 }
 
 function paint(el, ratio, label) {
-  el.querySelector('.slider-fill').style.transform = `scaleY(${ratio})`;
+  el.querySelector('.slider-fill').style.setProperty('--v', String(ratio));
   el.querySelector('.slider-value').textContent = label;
   el.setAttribute('aria-valuenow', String(Math.round(ratio * 100)));
 }

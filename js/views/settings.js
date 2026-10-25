@@ -1,11 +1,12 @@
 // Settings sheet: Spotify setup/connection, display options, dock, storage.
 // Also owns the "Play on…" Spotify device picker.
 
-import { $, $$, escapeHtml, store, toast } from '../util.js';
+import { $, $$, escapeHtml, store, toast, DEVICE } from '../util.js';
 import { openSheet, closeSheet } from './sheet.js';
 import { getClientId, setClientId, beginLogin, logout, isLoggedIn, redirectUri } from '../spotify-auth.js';
 import { spotify } from '../spotify-api.js';
 import { idb } from '../idb.js';
+import { getEdges, setEdges } from '../fit.js';
 
 const K_PREFS = 'deckos.prefs';
 
@@ -90,11 +91,27 @@ export class Settings {
         </div>
       </div>
       <div class="group">
+        <h3>Screen edges</h3>
+        <p>Add space if anything is hidden behind the status bar, a rounded corner or the printed bezel.</p>
+        ${['top', 'bottom', 'sides']
+          .map(
+            (edge) => `<div class="toggle-row">
+              <span style="text-transform:capitalize">${edge}</span>
+              <div class="nudge">
+                <button type="button" data-edge="${edge}" data-step="-4" aria-label="Less ${edge} space">−</button>
+                <span class="mono" data-edge-value="${edge}">${getEdges()[edge]}px</span>
+                <button type="button" data-edge="${edge}" data-step="4" aria-label="More ${edge} space">+</button>
+              </div>
+            </div>`
+          )
+          .join('')}
+      </div>
+      <div class="group">
         <h3>Dock &amp; storage</h3>
-        <p>${this.player.local.tracks.length} songs saved on this iPad.</p>
+        <p>${this.player.local.tracks.length} songs saved on this ${DEVICE}.</p>
         <div class="detail-actions">
           <button class="pill" data-act="dock">Edit dock buttons</button>
-          <button class="pill" data-act="clear-local">Remove all iPad songs</button>
+          <button class="pill" data-act="clear-local">Remove all saved songs</button>
         </div>
       </div>`;
 
@@ -103,6 +120,15 @@ export class Settings {
         const key = sw.dataset.pref;
         this.setPref(key, !this.prefs[key]);
         sw.setAttribute('aria-checked', String(!!this.prefs[key]));
+      })
+    );
+    $$('#settingsBody [data-edge]').forEach((btn) =>
+      btn.addEventListener('click', () => {
+        const edges = getEdges();
+        const key = btn.dataset.edge;
+        edges[key] = Math.max(0, Math.min(80, edges[key] + Number(btn.dataset.step)));
+        setEdges(edges);
+        $(`#settingsBody [data-edge-value="${key}"]`).textContent = `${edges[key]}px`;
       })
     );
     const on = (act, fn) => {
@@ -138,7 +164,7 @@ export class Settings {
       for (const id of ids) await this.player.local.remove(id);
       await idb.clearTracks().catch(() => {});
       this.render();
-      toast('Removed all iPad songs');
+      toast('Removed all saved songs');
     });
   }
 
@@ -163,7 +189,7 @@ export class Settings {
       .join('');
     body.innerHTML = `
       ${rows || '<div class="note">No Spotify devices found.</div>'}
-      <div class="note">Don't see this iPad? Open the Spotify app here, play any song for a second, then come back.</div>
+      <div class="note">Don't see this ${DEVICE}? Open the Spotify app here, play any song for a second, then come back.</div>
       <div class="detail-actions" style="justify-content:flex-end">
         <button class="pill" data-act="refresh">Refresh</button>
         <button class="pill pill-spotify" data-act="open-spotify">Open Spotify</button>
