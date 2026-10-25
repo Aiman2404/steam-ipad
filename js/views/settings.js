@@ -97,6 +97,14 @@ export class Settings {
 
     $('#settingsBody').innerHTML = `
       ${inLink() ? linkGroup : spotifyGroup}
+      ${inLink() ? '' : `<div class="group">
+          <h3>Use with my laptop (DeckOS Link)</h3>
+          <p>Accounts, the laptop screen, laptop apps and the dashboard live in the deck served by your laptop. Start <code>link\\start.cmd</code> on the laptop, then open its address here (same Wi-Fi). Add that page to your Home Screen too.</p>
+          <div class="field">
+            <input class="input mono" id="linkAddr" placeholder="192.168.1.25:7777" value="${escapeHtml(store.get('deckos.linkAddr', ''))}" autocapitalize="off" autocorrect="off" spellcheck="false" />
+            <button class="pill pill-accent" data-act="open-link" style="height:38px">Open</button>
+          </div>
+        </div>`}
       <div class="group">
         <h3>Display</h3>
         <div class="toggle-row">
@@ -172,6 +180,17 @@ export class Settings {
     on('devices', () => {
       closeSheet('settingsSheet');
       this.openDevices();
+    });
+    on('open-link', () => {
+      let addr = $('#linkAddr').value.trim().replace(/^https?:\/\//i, '').replace(/\/+$/, '');
+      if (!addr) {
+        toast('Type the address shown in the dashboard, e.g. 192.168.1.25:7777', 'error');
+        return;
+      }
+      if (!/:\d+$/.test(addr)) addr += ':7777';
+      store.set('deckos.linkAddr', addr);
+      // The laptop serves plain http on the home network.
+      window.location.href = `http://${addr}/`;
     });
     on('link-logout', async () => {
       await linkLogout();
