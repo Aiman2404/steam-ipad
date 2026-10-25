@@ -44,9 +44,14 @@ export const store = {
 };
 
 let toastTimer = null;
+let lastToast = { message: '', at: 0 };
 export function toast(message, tone = 'info') {
   const el = $('#toast');
   if (!el) return;
+  // A failing action retried quickly shouldn't strobe the same message.
+  const now = Date.now();
+  if (message === lastToast.message && now - lastToast.at < 4000) return;
+  lastToast = { message, at: now };
   $('#toastText').textContent = message;
   el.dataset.tone = tone;
   el.classList.add('is-visible');

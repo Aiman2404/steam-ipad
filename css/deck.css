@@ -886,6 +886,74 @@ svg {
   flex-shrink: 0;
 }
 
+.tools-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.icon-btn-sm {
+  width: 28px;
+  height: 28px;
+}
+
+.icon-btn-sm svg {
+  width: 13px;
+  height: 13px;
+}
+
+.icon-btn[aria-pressed='true'] {
+  color: #07080c;
+  background: var(--accent);
+  border-color: transparent;
+}
+
+/* Focus mode: lyrics take the whole deck, now-playing collapses */
+.np {
+  transition: width 0.55s var(--ease-out), opacity 0.35s, margin 0.55s var(--ease-out);
+}
+
+.focus .np {
+  width: 0;
+  opacity: 0;
+  margin-right: -16px;
+  pointer-events: none;
+}
+
+.mini-transport {
+  display: none;
+  align-items: center;
+  gap: 2px;
+}
+
+.focus .mini-transport {
+  display: flex;
+}
+
+.mini-transport .t-btn {
+  width: 36px;
+  height: 36px;
+  color: var(--ink);
+}
+
+.mini-play {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.mini-play .i-pause,
+.is-playing .mini-play .i-play {
+  display: none;
+}
+
+.is-playing .mini-play .i-pause {
+  display: block;
+}
+
+.focus .ly {
+  font-size: 31px;
+}
+
 .lyrics-badge {
   font-size: 10px;
   font-weight: 700;
@@ -1391,6 +1459,15 @@ svg {
   height: 22px;
 }
 
+.slider[data-kind='volume'] .slider-icon {
+  pointer-events: none;
+}
+
+.slider.is-muted .slider-icon {
+  color: #fb7185;
+  border-color: rgba(251, 113, 133, 0.45);
+}
+
 .slider.is-disabled {
   opacity: 0.55;
 }
@@ -1741,6 +1818,55 @@ svg {
   justify-content: space-between;
   gap: 8px;
   margin-top: 14px;
+}
+
+/* ---------------------------------------------------------------------
+   Ambient idle screen
+   --------------------------------------------------------------------- */
+
+.ambient {
+  position: fixed;
+  inset: 0;
+  z-index: 85;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  background: rgba(4, 5, 9, 0.55);
+  -webkit-backdrop-filter: blur(40px) saturate(150%);
+  backdrop-filter: blur(40px) saturate(150%);
+  opacity: 0;
+  transition: opacity 0.6s var(--ease-out);
+}
+
+.ambient.is-on {
+  opacity: 1;
+}
+
+.ambient-time {
+  font-size: 150px;
+  font-weight: 700;
+  letter-spacing: -0.04em;
+  line-height: 1;
+  color: #fff;
+  text-shadow: 0 0 60px rgba(var(--accent-rgb), 0.45);
+}
+
+.ambient-date {
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--ink-2);
+}
+
+.ambient-hint {
+  position: absolute;
+  bottom: 34px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ink-4);
 }
 
 /* ---------------------------------------------------------------------

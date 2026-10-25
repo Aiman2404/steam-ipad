@@ -48,6 +48,22 @@ export class Sliders {
     this.brightEl = $('#brightSlider');
 
     const sendVolume = throttle((v) => player.setVolume(v), 300);
+
+    // Tapping the speaker icon mutes / restores instead of dragging to the bottom.
+    this.volEl.addEventListener('pointerdown', (e) => {
+      const icon = this.volEl.querySelector('.slider-icon').getBoundingClientRect();
+      const hit = e.clientX >= icon.left - 6 && e.clientX <= icon.right + 6 && e.clientY >= icon.top - 6 && e.clientY <= icon.bottom + 6;
+      if (!hit) return;
+      e.stopImmediatePropagation();
+      const current = player.state.volume;
+      if (current == null) return;
+      if (current > 0) {
+        this.beforeMute = current;
+        player.setVolume(0);
+      } else {
+        player.setVolume(this.beforeMute || 50);
+      }
+    }, true);
     this.isDraggingVolume = bindVertical(this.volEl, {
       onInput: (r) => {
         const v = Math.round(r * 100);
@@ -80,6 +96,7 @@ export class Sliders {
     } else {
       sub.textContent = s.device ? s.device.name : '';
     }
+    this.volEl.classList.toggle('is-muted', s.volume === 0);
     this.volEl.classList.toggle('is-disabled', s.source === 'spotify' && !!s.device && !s.volumeSupported);
     if (this.isDraggingVolume()) return;
     if (s.volume == null) {

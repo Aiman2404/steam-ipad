@@ -1,6 +1,6 @@
 // DeckOS entry point: wires the player to the views and runs the frame loop.
 
-import { $, $$, toast } from './util.js';
+import { $, $$, toast, store } from './util.js';
 import { handleRedirect, isLoggedIn } from './spotify-auth.js';
 import { Player } from './player.js';
 import { NowPlaying } from './views/now-playing.js';
@@ -10,13 +10,17 @@ import { QueueView } from './views/queue-view.js';
 import { Sliders } from './views/sliders.js';
 import { Dock } from './views/dock.js';
 import { Settings } from './views/settings.js';
+import { getLyrics } from './lyrics.js';
+import { spotify } from './spotify-api.js';
 import { bindSheets } from './views/sheet.js';
+import { Ambient } from './views/ambient.js';
 
 const player = new Player();
 const nowPlaying = new NowPlaying(player);
 const lyrics = new LyricsView(player);
 const queue = new QueueView(player);
 const sliders = new Sliders(player);
+const ambient = new Ambient(player);
 let settings;
 const library = new LibraryView(player, { openSettings: (focus) => settings.open(focus) });
 const dock = new Dock({ onDeckView: (tab) => showTab(tab) });
@@ -46,6 +50,7 @@ function moveInk() {
 function showTab(tab) {
   if (!['lyrics', 'library', 'queue'].includes(tab)) return;
   currentTab = tab;
+  store.set('deckos.tab', tab);
   $$('.tab').forEach((t) => t.classList.toggle('is-active', t.dataset.tab === tab));
   $$('.pane').forEach((p) => p.classList.toggle('is-active', p.dataset.pane === tab));
   moveInk();
@@ -94,12 +99,42 @@ player.on('track', (track) => {
   lyrics.setTrack(track);
   library.setCurrent(track);
   queue.invalidate();
+  schedulePrefetch(track);
 });
+
+// Warm the lyrics cache for the next song so they appear the instant it starts.
+let prefetchTimer = null;
+function schedulePrefetch(track) {
+  clearTimeout(prefetchTimer);
+  if (!track) return;
+  prefetchTimer = setTimeout(async () => {
+    let next = null;
+    if (player.state.source === 'local') {
+      const local = player.local;
+      const pos = local.order.indexOf(local.index);
+      const row = local.tracks[local.order[pos + 1]];
+      if (row) next = { title: row.title, artist: row.artist, album: row.album, durationMs: row.durationMs };
+    } else {
+      const q = await spotify.queue().catch(() => null);
+      const t = q && q.queue && q.queue[0];
+      if (t && t.type !== 'episode') {
+        next = {
+          title: t.name,
+          artist: (t.artists || []).map((a) => a.name).join(', '),
+          album: (t.album && t.album.name) || '',
+          durationMs: t.duration_ms
+        };
+      }
+    }
+    if (next) getLyrics(next).catch(() => {});
+  }, 8000);
+}
 
 player.on('state', (s) => {
   nowPlaying.setState(s);
   if (s.track) nowPlaying.refreshCover(s.track);
   sliders.setState(s);
+  ambient.setState(s);
   updateChip();
 });
 
@@ -117,6 +152,26 @@ player.on('auth-lost', () => {
 player.on('status', (msg) => {
   spotifyStatus = msg ? 'Spotify · reconnecting' : '';
   updateChip();
+});
+
+// ---------------- keyboard ----------------
+
+window.addEventListener('keydown', (e) => {
+  if (e.target.closest('input, textarea') || e.metaKey || e.ctrlKey || e.altKey) return;
+  const key = e.key;
+  if (key === ' ') {
+    e.preventDefault();
+    player.togglePlay();
+  } else if (key === 'ArrowRight' && e.shiftKey) player.next();
+  else if (key === 'ArrowLeft' && e.shiftKey) player.previous();
+  else if (key === 'ArrowRight') player.seek(player.positionNow() + 10000);
+  else if (key === 'ArrowLeft') player.seek(Math.max(0, player.positionNow() - 10000));
+  else if (key === '1') showTab('lyrics');
+  else if (key === '2') showTab('library');
+  else if (key === '3') showTab('queue');
+  else if (key === 's') player.toggleShuffle();
+  else if (key === 'r') player.cycleRepeat();
+  else if (key === 'Escape') document.querySelectorAll('.sheet-backdrop').forEach((b) => (b.hidden = true));
 });
 
 // ---------------- frame loop ----------------
@@ -142,7 +197,7 @@ function tickClock() {
 async function boot() {
   tickClock();
   setInterval(tickClock, 10000);
-  showTab('lyrics');
+  showTab(store.get('deckos.tab', 'lyrics'));
   if (document.fonts && document.fonts.ready) {
     document.fonts.ready.then(() => {
       moveInk();

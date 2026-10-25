@@ -2,7 +2,7 @@
 // uploaded to this iPad. Replaces the old "import" that fetched a playlist's
 // name and then filled it with the same five hard-coded demo songs.
 
-import { $, $$, escapeHtml, formatTime, toast } from '../util.js';
+import { $, $$, escapeHtml, formatTime, toast, store } from '../util.js';
 import { spotify, unwrapItem } from '../spotify-api.js';
 import { isLoggedIn, getClientId, beginLogin } from '../spotify-auth.js';
 
@@ -20,7 +20,7 @@ export class LibraryView {
   constructor(player, { openSettings }) {
     this.player = player;
     this.openSettings = openSettings;
-    this.tab = 'spotify';
+    this.tab = store.get('deckos.libTab', 'spotify');
     this.playlists = null;
     this.detail = null; // { kind: 'playlist'|'liked', playlist, tracks, note }
     this.searchResults = null;
@@ -32,10 +32,12 @@ export class LibraryView {
     );
     $('#fileInput').addEventListener('change', (e) => this.upload(e.target.files));
     player.on('local-library', () => this.renderLocal());
+    this.switchTab(this.tab);
   }
 
   switchTab(tab) {
     this.tab = tab;
+    store.set('deckos.libTab', tab);
     $$('.lib-switch .seg').forEach((b) => b.classList.toggle('is-active', b.dataset.lib === tab));
     $('#libSpotify').hidden = tab !== 'spotify';
     $('#libLocal').hidden = tab !== 'local';

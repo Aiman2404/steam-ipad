@@ -28,6 +28,12 @@
     <div class="vignette"></div>
   </div>
 
+  <div id="ambient" class="ambient" hidden>
+    <div id="ambientTime" class="ambient-time mono">--:--</div>
+    <div id="ambientDate" class="ambient-date"></div>
+    <div class="ambient-hint">Tap anywhere</div>
+  </div>
+
   <div id="dimmer" class="dimmer" aria-hidden="true"></div>
 
   <div id="toast" class="toast" role="status" aria-live="polite">
@@ -118,7 +124,20 @@
                 <div class="lyrics-track" id="lyricsTrack"></div>
               </div>
               <div class="lyrics-tools">
-                <span id="lyricsBadge" class="lyrics-badge"></span>
+                <div class="tools-left">
+                  <button id="focusBtn" class="icon-btn icon-btn-sm" type="button" aria-label="Focus lyrics" aria-pressed="false">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg>
+                  </button>
+                  <span id="lyricsBadge" class="lyrics-badge"></span>
+                </div>
+                <div class="mini-transport">
+                  <button class="t-btn" data-mini="prev" type="button" aria-label="Previous"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 6h2.2v12H6zm3.6 6 8.4 6V6z"/></svg></button>
+                  <button class="t-btn mini-play" data-mini="play" type="button" aria-label="Play or pause">
+                    <svg class="i-play" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5.14v13.72a1 1 0 0 0 1.5.86l11-6.86a1 1 0 0 0 0-1.72l-11-6.86A1 1 0 0 0 8 5.14z"/></svg>
+                    <svg class="i-pause" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4.5" width="4.2" height="15" rx="1.3"/><rect x="13.8" y="4.5" width="4.2" height="15" rx="1.3"/></svg>
+                  </button>
+                  <button class="t-btn" data-mini="next" type="button" aria-label="Next"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 18l8.4-6L6 6zm9.8-12H18v12h-2.2z"/></svg></button>
+                </div>
                 <div class="nudge" title="Shift lyric timing if a song feels early or late">
                   <button type="button" data-nudge="-250" aria-label="Lyrics earlier">−</button>
                   <span id="nudgeValue" class="mono">0.00s</span>

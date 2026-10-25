@@ -20,7 +20,44 @@ export class NowPlaying {
     $('#prevBtn').addEventListener('click', () => player.previous());
     $('#shuffleBtn').addEventListener('click', () => player.toggleShuffle());
     $('#repeatBtn').addEventListener('click', () => player.cycleRepeat());
+    // Compact controls shown in lyrics focus mode.
+    document.querySelectorAll('[data-mini]').forEach((btn) =>
+      btn.addEventListener('click', () => {
+        const act = btn.dataset.mini;
+        if (act === 'play') player.togglePlay();
+        else if (act === 'next') player.next();
+        else player.previous();
+      })
+    );
     this.bindScrubber();
+    this.bindCoverSwipe();
+  }
+
+  // Swipe the cover left/right to skip, like a car stereo touch panel.
+  bindCoverSwipe() {
+    const el = $('#cover');
+    el.style.touchAction = 'pan-y';
+    let start = null;
+    el.addEventListener('pointerdown', (e) => {
+      start = { x: e.clientX, y: e.clientY, t: performance.now() };
+    });
+    el.addEventListener('pointerup', (e) => {
+      if (!start) return;
+      const dx = e.clientX - start.x;
+      const dy = e.clientY - start.y;
+      const quick = performance.now() - start.t < 700;
+      start = null;
+      if (!quick || Math.abs(dx) < 55 || Math.abs(dy) > Math.abs(dx) * 0.7) return;
+      el.animate(
+        [{ transform: `translate3d(${dx > 0 ? 24 : -24}px,0,0)` }, { transform: 'none' }],
+        { duration: 320, easing: 'cubic-bezier(0.22, 1, 0.36, 1)' }
+      );
+      if (dx < 0) this.player.next();
+      else this.player.previous();
+    });
+    el.addEventListener('pointercancel', () => {
+      start = null;
+    });
   }
 
   setTrack(track) {
