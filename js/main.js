@@ -1,6 +1,6 @@
 // DeckOS entry point: wires the player to the views and runs the frame loop.
 
-import { $, $$, toast } from './util.js';
+import { $, $$, toast, store } from './util.js';
 import { handleRedirect, isLoggedIn } from './spotify-auth.js';
 import { Player } from './player.js';
 import { NowPlaying } from './views/now-playing.js';
@@ -50,6 +50,7 @@ function moveInk() {
 function showTab(tab) {
   if (!['lyrics', 'library', 'queue'].includes(tab)) return;
   currentTab = tab;
+  store.set('deckos.tab', tab);
   $$('.tab').forEach((t) => t.classList.toggle('is-active', t.dataset.tab === tab));
   $$('.pane').forEach((p) => p.classList.toggle('is-active', p.dataset.pane === tab));
   moveInk();
@@ -196,7 +197,7 @@ function tickClock() {
 async function boot() {
   tickClock();
   setInterval(tickClock, 10000);
-  showTab('lyrics');
+  showTab(store.get('deckos.tab', 'lyrics'));
   if (document.fonts && document.fonts.ready) {
     document.fonts.ready.then(() => {
       moveInk();
