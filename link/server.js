@@ -14,7 +14,7 @@ import { Store } from './lib/store.js';
 import { Auth, AuthError, isAdmin, publicUser } from './lib/auth.js';
 import { Helper } from './lib/helper.js';
 import { SpotifyLink } from './lib/spotify.js';
-import { seedApps, sanitizeApps, launch } from './lib/apps.js';
+import { seedApps, sanitizeApps, launch, sanitizeDock, resolveDock, DECK_VIEWS } from './lib/apps.js';
 import { Router, HttpError, parseCookies, readJson, send, redirect, serveStatic } from './lib/http.js';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
@@ -176,6 +176,24 @@ router.add('PUT', '/api/apps', async (ctx) => {
   }
   store.save();
   return { apps: store.data.apps };
+});
+
+// The deck's five bottom buttons, managed by admins in the dashboard.
+router.add('GET', '/api/dock', (ctx) => {
+  requireUser(ctx);
+  return { slots: resolveDock(store), custom: Array.isArray(store.data.dock), views: DECK_VIEWS };
+});
+
+router.add('PUT', '/api/dock', async (ctx) => {
+  requireAdmin(ctx);
+  const body = await readJson(ctx.req);
+  try {
+    store.data.dock = sanitizeDock(body.slots, store.data.apps);
+  } catch (e) {
+    throw new HttpError(400, e.message);
+  }
+  store.save();
+  return { slots: resolveDock(store) };
 });
 
 router.add('POST', '/api/apps/:id/launch', (ctx) => {
