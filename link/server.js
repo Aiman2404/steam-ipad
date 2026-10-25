@@ -71,7 +71,9 @@ function lanUrls() {
   for (const [name, list] of Object.entries(networkInterfaces())) {
     if (VIRTUAL.test(name)) continue;
     for (const a of list || []) {
-      if (a.family === 'IPv4' && !a.internal && !a.address.startsWith('169.254.')) urls.push(`http://${a.address}:${PORT}/`);
+      // VirtualBox host-only adapters often have generic names; spot them by MAC.
+      const vbox = /^0a:00:27|^08:00:27/i.test(a.mac || '');
+      if (a.family === 'IPv4' && !a.internal && !vbox && !a.address.startsWith('169.254.')) urls.push(`http://${a.address}:${PORT}/`);
     }
   }
   return urls;
