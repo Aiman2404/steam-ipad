@@ -20,6 +20,15 @@ export class NowPlaying {
     $('#prevBtn').addEventListener('click', () => player.previous());
     $('#shuffleBtn').addEventListener('click', () => player.toggleShuffle());
     $('#repeatBtn').addEventListener('click', () => player.cycleRepeat());
+    // Compact controls shown in lyrics focus mode.
+    document.querySelectorAll('[data-mini]').forEach((btn) =>
+      btn.addEventListener('click', () => {
+        const act = btn.dataset.mini;
+        if (act === 'play') player.togglePlay();
+        else if (act === 'next') player.next();
+        else player.previous();
+      })
+    );
     this.bindScrubber();
     this.bindCoverSwipe();
   }

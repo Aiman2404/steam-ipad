@@ -921,6 +921,35 @@ svg {
   pointer-events: none;
 }
 
+.mini-transport {
+  display: none;
+  align-items: center;
+  gap: 2px;
+}
+
+.focus .mini-transport {
+  display: flex;
+}
+
+.mini-transport .t-btn {
+  width: 36px;
+  height: 36px;
+  color: var(--ink);
+}
+
+.mini-play {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.mini-play .i-pause,
+.is-playing .mini-play .i-play {
+  display: none;
+}
+
+.is-playing .mini-play .i-pause {
+  display: block;
+}
+
 .focus .ly {
   font-size: 31px;
 }
