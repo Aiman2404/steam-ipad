@@ -1,0 +1,10 @@
+{
+  "name": "deckos",
+  "private": true,
+  "type": "module",
+  "description": "No build step; this file only exists so Node treats js/ as ES modules for checks and tests.",
+  "scripts": {
+    "check": "node scripts/check-syntax.js",
+    "test": "node --test tests/*.test.js"
+  }
+}
