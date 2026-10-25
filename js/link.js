@@ -4,6 +4,8 @@
 let info = null;
 
 export async function detectLink() {
+  // GitHub Pages can never be the laptop; skip the probe and its 404.
+  if (/\.github\.io$/.test(location.hostname) || location.protocol === 'file:') return null;
   try {
     const res = await fetch('./api/link/info', { credentials: 'same-origin', cache: 'no-store' });
     if (!res.ok) return null;
