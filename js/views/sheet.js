@@ -15,6 +15,8 @@ export function closeSheet(id) {
 
 export function bindSheets() {
   document.querySelectorAll('.sheet-backdrop').forEach((backdrop) => {
+    // Locked sheets (the sign-in screen) can't be dismissed.
+    if (backdrop.hasAttribute('data-locked')) return;
     backdrop.addEventListener('click', (e) => {
       if (e.target === backdrop || e.target.closest('[data-close]')) backdrop.hidden = true;
     });

@@ -1,7 +1,7 @@
 // DeckOS service worker.
 // Network-first for the app shell so a new deploy shows up on the next launch;
 // the cache is only a fallback for when the iPad is offline.
-const CACHE_NAME = 'deckos-shell-v6';
+const CACHE_NAME = 'deckos-shell-v7';
 const SHELL = [
   './',
   './index.html',
@@ -29,7 +29,9 @@ const SHELL = [
   './js/views/dock.js',
   './js/views/settings.js',
   './js/views/sheet.js',
-  './js/views/ambient.js'
+  './js/views/ambient.js',
+  './js/views/laptop-view.js',
+  './js/link.js'
 ];
 
 self.addEventListener('install', (event) => {
