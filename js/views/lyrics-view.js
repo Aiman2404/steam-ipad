@@ -35,6 +35,23 @@ export class LyricsView {
       btn.addEventListener('click', () => this.adjustNudge(Number(btn.dataset.nudge)))
     );
     window.addEventListener('resize', () => this.measure());
+
+    this.focus = store.get('deckos.lyrics.focus', false);
+    const focusBtn = $('#focusBtn');
+    const applyFocus = () => {
+      document.body.classList.toggle('focus', this.focus);
+      focusBtn.setAttribute('aria-pressed', String(this.focus));
+    };
+    focusBtn.addEventListener('click', () => {
+      this.focus = !this.focus;
+      store.set('deckos.lyrics.focus', this.focus);
+      applyFocus();
+    });
+    // Line positions change when the column resizes; re-measure after it settles.
+    $('.np').addEventListener('transitionend', (e) => {
+      if (e.propertyName === 'width') this.measure();
+    });
+    applyFocus();
   }
 
   key() {

@@ -118,7 +118,12 @@
                 <div class="lyrics-track" id="lyricsTrack"></div>
               </div>
               <div class="lyrics-tools">
-                <span id="lyricsBadge" class="lyrics-badge"></span>
+                <div class="tools-left">
+                  <button id="focusBtn" class="icon-btn icon-btn-sm" type="button" aria-label="Focus lyrics" aria-pressed="false">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg>
+                  </button>
+                  <span id="lyricsBadge" class="lyrics-badge"></span>
+                </div>
                 <div class="nudge" title="Shift lyric timing if a song feels early or late">
                   <button type="button" data-nudge="-250" aria-label="Lyrics earlier">−</button>
                   <span id="nudgeValue" class="mono">0.00s</span>

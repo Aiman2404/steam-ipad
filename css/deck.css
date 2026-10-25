@@ -886,6 +886,45 @@ svg {
   flex-shrink: 0;
 }
 
+.tools-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.icon-btn-sm {
+  width: 28px;
+  height: 28px;
+}
+
+.icon-btn-sm svg {
+  width: 13px;
+  height: 13px;
+}
+
+.icon-btn[aria-pressed='true'] {
+  color: #07080c;
+  background: var(--accent);
+  border-color: transparent;
+}
+
+/* Focus mode: lyrics take the whole deck, now-playing collapses */
+.np {
+  transition: width 0.55s var(--ease-out), opacity 0.35s, margin 0.55s var(--ease-out);
+}
+
+.focus .np {
+  width: 0;
+  opacity: 0;
+  margin-right: -16px;
+  pointer-events: none;
+}
+
+.focus .ly {
+  font-size: 31px;
+}
+
 .lyrics-badge {
   font-size: 10px;
   font-weight: 700;
