@@ -13,12 +13,14 @@ import { Settings } from './views/settings.js';
 import { getLyrics } from './lyrics.js';
 import { spotify } from './spotify-api.js';
 import { bindSheets } from './views/sheet.js';
+import { Ambient } from './views/ambient.js';
 
 const player = new Player();
 const nowPlaying = new NowPlaying(player);
 const lyrics = new LyricsView(player);
 const queue = new QueueView(player);
 const sliders = new Sliders(player);
+const ambient = new Ambient(player);
 let settings;
 const library = new LibraryView(player, { openSettings: (focus) => settings.open(focus) });
 const dock = new Dock({ onDeckView: (tab) => showTab(tab) });
@@ -131,6 +133,7 @@ player.on('state', (s) => {
   nowPlaying.setState(s);
   if (s.track) nowPlaying.refreshCover(s.track);
   sliders.setState(s);
+  ambient.setState(s);
   updateChip();
 });
 
