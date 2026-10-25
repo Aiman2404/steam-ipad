@@ -45,7 +45,6 @@ export class LocalSource extends Emitter {
     this.audio.setAttribute('playsinline', '');
     this.ctx = null;
     this.gain = null;
-    this.analyser = null;
     this.objectUrl = null;
     this.bindAudio();
   }
@@ -69,12 +68,8 @@ export class LocalSource extends Emitter {
     this.ctx = new Ctx();
     const node = this.ctx.createMediaElementSource(this.audio);
     this.gain = this.ctx.createGain();
-    this.analyser = this.ctx.createAnalyser();
-    this.analyser.fftSize = 128;
-    this.analyser.smoothingTimeConstant = 0.82;
     node.connect(this.gain);
-    this.gain.connect(this.analyser);
-    this.analyser.connect(this.ctx.destination);
+    this.gain.connect(this.ctx.destination);
     this.applyVolume();
   }
 
