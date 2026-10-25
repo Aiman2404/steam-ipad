@@ -153,6 +153,26 @@ player.on('status', (msg) => {
   updateChip();
 });
 
+// ---------------- keyboard ----------------
+
+window.addEventListener('keydown', (e) => {
+  if (e.target.closest('input, textarea') || e.metaKey || e.ctrlKey || e.altKey) return;
+  const key = e.key;
+  if (key === ' ') {
+    e.preventDefault();
+    player.togglePlay();
+  } else if (key === 'ArrowRight' && e.shiftKey) player.next();
+  else if (key === 'ArrowLeft' && e.shiftKey) player.previous();
+  else if (key === 'ArrowRight') player.seek(player.positionNow() + 10000);
+  else if (key === 'ArrowLeft') player.seek(Math.max(0, player.positionNow() - 10000));
+  else if (key === '1') showTab('lyrics');
+  else if (key === '2') showTab('library');
+  else if (key === '3') showTab('queue');
+  else if (key === 's') player.toggleShuffle();
+  else if (key === 'r') player.cycleRepeat();
+  else if (key === 'Escape') document.querySelectorAll('.sheet-backdrop').forEach((b) => (b.hidden = true));
+});
+
 // ---------------- frame loop ----------------
 
 function frame() {
