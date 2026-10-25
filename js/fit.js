@@ -13,6 +13,9 @@ import { store } from './util.js';
 const K_EDGES = 'deckos.edges';
 const LANDSCAPE = { w: 1024, h: 768 };
 const PORTRAIT = { w: 768, h: 1024 };
+// Phones get a smaller canvas so text isn't shrunk to half size.
+const PHONE_LANDSCAPE = { w: 1000, h: 520 };
+const PHONE_PORTRAIT = { w: 520, h: 1000 };
 
 let probe = null;
 
@@ -61,17 +64,19 @@ export function fit() {
   const availH = Math.max(200, height - top - bottom);
 
   const portrait = availW < availH * 0.9;
-  const base = portrait ? PORTRAIT : LANDSCAPE;
+  const phone = Math.min(availW, availH) < 540;
+  const base = phone ? (portrait ? PHONE_PORTRAIT : PHONE_LANDSCAPE) : portrait ? PORTRAIT : LANDSCAPE;
   // Uniform scale so text stays readable; the canvas stretches to the aspect.
   const scale = Math.min(1.8, Math.max(0.5, Math.min(availW / base.w, availH / base.h)));
 
   root.classList.toggle('is-portrait', portrait);
+  root.classList.toggle('is-phone', phone);
   root.style.setProperty('--deck-w', `${availW / scale}px`);
   root.style.setProperty('--deck-h', `${availH / scale}px`);
   root.style.setProperty('--deck-x', `${left}px`);
   root.style.setProperty('--deck-y', `${top}px`);
   root.style.setProperty('--deck-s', String(scale));
-  window.dispatchEvent(new CustomEvent('deck:fit', { detail: { portrait, scale } }));
+  window.dispatchEvent(new CustomEvent('deck:fit', { detail: { portrait, phone, scale } }));
 }
 
 export function startFitting() {
