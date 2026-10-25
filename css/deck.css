@@ -41,6 +41,8 @@ body {
   width: 100%;
   height: 100%;
   overflow: hidden;
+  position: fixed;
+  inset: 0;
   background: var(--bg);
   color: var(--ink);
   font-family: var(--font);
@@ -219,14 +221,17 @@ svg {
    Hardware layout (matches the 3D-printed bezel: 80/20 x 76/24)
    --------------------------------------------------------------------- */
 
+/* Sized and scaled by js/fit.js from the real usable screen area */
 .deck {
-  position: relative;
+  position: absolute;
+  top: 0;
+  left: 0;
   z-index: 1;
-  width: 100vw;
-  height: 100vh;
+  width: var(--deck-w, 100vw);
+  height: var(--deck-h, 100vh);
+  transform: translate3d(var(--deck-x, 0px), var(--deck-y, 0px), 0) scale(var(--deck-s, 1));
+  transform-origin: 0 0;
   padding: var(--trench);
-  padding-left: max(var(--trench), env(safe-area-inset-left));
-  padding-right: max(var(--trench), env(safe-area-inset-right));
   display: flex;
   flex-direction: column;
   gap: var(--trench);
@@ -1845,7 +1850,7 @@ svg {
 }
 
 .ambient-time {
-  font-size: 150px;
+  font-size: min(150px, 24vw);
   font-weight: 700;
   letter-spacing: -0.04em;
   line-height: 1;

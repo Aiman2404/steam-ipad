@@ -14,6 +14,7 @@ import { getLyrics } from './lyrics.js';
 import { spotify } from './spotify-api.js';
 import { bindSheets } from './views/sheet.js';
 import { Ambient } from './views/ambient.js';
+import { startFitting } from './fit.js';
 
 const player = new Player();
 const nowPlaying = new NowPlaying(player);
@@ -195,6 +196,7 @@ function tickClock() {
 // ---------------- boot ----------------
 
 async function boot() {
+  startFitting();
   tickClock();
   setInterval(tickClock, 10000);
   showTab(store.get('deckos.tab', 'lyrics'));
@@ -205,6 +207,10 @@ async function boot() {
     });
   }
   window.addEventListener('resize', moveInk);
+  window.addEventListener('deck:fit', () => {
+    moveInk();
+    lyrics.measure();
+  });
 
   const redirect = await handleRedirect();
   if (redirect.handled) {

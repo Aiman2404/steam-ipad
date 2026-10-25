@@ -1,7 +1,7 @@
 // DeckOS service worker.
 // Network-first for the app shell so a new deploy shows up on the next launch;
 // the cache is only a fallback for when the iPad is offline.
-const CACHE_NAME = 'deckos-shell-v5';
+const CACHE_NAME = 'deckos-shell-v6';
 const SHELL = [
   './',
   './index.html',
@@ -11,6 +11,7 @@ const SHELL = [
   './icons/icon-180.png',
   './js/main.js',
   './js/util.js',
+  './js/fit.js',
   './js/idb.js',
   './js/tags.js',
   './js/lyrics.js',
