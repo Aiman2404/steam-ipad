@@ -3,6 +3,8 @@
 
 import { $, $$, escapeHtml, store, toast, onLongPress } from '../util.js';
 import { openSheet, closeSheet } from './sheet.js';
+import { linkApi, linkIsAdmin } from '../link.js';
+import { appIcon } from './laptop-view.js';
 
 const BRANDS = {
   discord: {
@@ -55,13 +57,22 @@ const BRANDS = {
   }
 };
 
+// Defaults that work on any device without extra apps installed. (The old
+// Steam Link / Moonlight shortcuts did nothing unless those apps were on the iPad.)
 const DEFAULT_SLOTS = [
-  { name: 'Steam Link', sub: 'Remote Play', url: 'steamlink://' },
-  { name: 'Discord', sub: 'Voice & Party', url: 'discord://' },
   { name: 'Spotify', sub: 'Open the app', url: 'spotify://' },
-  { name: 'Moonlight', sub: 'PC Host Stream', url: 'moonlight://' },
+  { name: 'Lyrics', sub: 'Deck view', url: 'deck:lyrics' },
+  { name: 'Library', sub: 'Deck view', url: 'deck:library' },
+  { name: 'Up next', sub: 'Deck view', url: 'deck:queue' },
   { name: 'GitHub', sub: 'Aiman2404', url: 'https://github.com/Aiman2404' }
 ];
+
+// Colours for dock buttons that come from DeckOS Link.
+const LINK_COLORS = {
+  github: '#e6edf3', code: '#3b9eff', steam: '#66c0f4', discord: '#5865F2', spotify: '#1ed760',
+  folder: '#fbbf24', browser: '#38bdf8', game: '#c084fc', terminal: '#a3e635', app: '#94a3b8',
+  lyrics: '#f472b6', library: '#a78bfa', queue: '#2dd4bf', laptop: '#38bdf8'
+};
 
 const K_DOCK = 'deckos.dock';
 
@@ -81,11 +92,6 @@ function brandFor(name, url) {
 function loadSlots() {
   const saved = store.get(K_DOCK, null);
   if (Array.isArray(saved) && saved.length === 5) return saved;
-  // Carry over buttons configured in the previous version.
-  const legacy = store.get('steamDeck_dockSlots_v2', null);
-  if (Array.isArray(legacy) && legacy.length === 5) {
-    return legacy.map((s) => ({ name: s.name || 'App', sub: s.sub || '', url: s.url || '' }));
-  }
   return DEFAULT_SLOTS.map((s) => ({ ...s }));
 }
 
@@ -94,16 +100,49 @@ export class Dock {
     this.onDeckView = onDeckView;
     this.slots = loadSlots();
     this.editing = 0;
+    this.linkMode = false;
     this.render();
+  }
+
+  // Served by DeckOS Link: the five buttons come from the dashboard.
+  async useLink() {
+    this.linkMode = true;
+    await this.refreshLink();
+    setInterval(() => this.refreshLink(), 60000);
+    document.addEventListener('visibilitychange', () => {
+      if (!document.hidden) this.refreshLink();
+    });
+  }
+
+  async refreshLink() {
+    try {
+      const { slots } = await linkApi('/api/dock');
+      this.slots = slots.map((s) => ({
+        name: s.name,
+        sub: s.sub,
+        icon: s.icon,
+        url: s.kind === 'laptop' ? `laptop:${s.id}` : `deck:${s.view}`
+      }));
+      this.render();
+    } catch (_) {}
+  }
+
+  iconFor(slot) {
+    if (slot.icon) {
+      const views = { lyrics: BRANDS.lyrics.svg, laptop: BRANDS.laptop.svg };
+      const svg = views[slot.icon] || appIcon(slot.icon in LINK_COLORS ? slot.icon : 'app');
+      return { color: LINK_COLORS[slot.icon] || LINK_COLORS.app, svg };
+    }
+    const brand = brandFor(slot.name, slot.url);
+    if (brand) return { color: brand.color, svg: brand.svg };
+    return { color: '#94a3b8', svg: `<span class="glyph">${escapeHtml((slot.name || '?').trim().charAt(0).toUpperCase())}</span>` };
   }
 
   render() {
     const root = $('#dock');
     root.innerHTML = this.slots
       .map((slot, i) => {
-        const brand = brandFor(slot.name, slot.url);
-        const color = brand ? brand.color : '#94a3b8';
-        const icon = brand ? brand.svg : `<span class="glyph">${escapeHtml((slot.name || '?').trim().charAt(0).toUpperCase())}</span>`;
+        const { color, svg: icon } = this.iconFor(slot);
         return `
           <button class="zone glass dock-btn" data-slot="${i}" style="--brand:${color}" type="button">
             <span class="halo"></span>
@@ -130,9 +169,29 @@ export class Dock {
       this.onDeckView(slot.url.slice(5));
       return;
     }
+    if (slot.url.startsWith('laptop:')) {
+      linkApi(`/api/apps/${encodeURIComponent(slot.url.slice(7))}/launch`, { method: 'POST' })
+        .then(() => toast(`Opening ${slot.name} on the laptop`, 'ok'))
+        .catch((e) => toast(e.message, 'error'));
+      return;
+    }
     toast(`Opening ${slot.name}…`);
-    if (/^https?:\/\//i.test(slot.url)) window.open(slot.url, '_blank', 'noopener');
-    else window.location.href = slot.url;
+    if (/^https?:\/\//i.test(slot.url)) {
+      window.open(slot.url, '_blank', 'noopener');
+      return;
+    }
+    // App links (spotify://, discord://…) silently do nothing when the app
+    // isn't installed, so say so if we're still here a moment later.
+    let left = false;
+    const away = () => (left = true);
+    window.addEventListener('blur', away, { once: true });
+    document.addEventListener('visibilitychange', away, { once: true });
+    window.location.href = slot.url;
+    setTimeout(() => {
+      window.removeEventListener('blur', away);
+      document.removeEventListener('visibilitychange', away);
+      if (!left && !document.hidden) toast(`Couldn't open ${slot.name}. Is the app installed on this device?`, 'error');
+    }, 1800);
   }
 
   save() {
@@ -141,6 +200,11 @@ export class Dock {
   }
 
   openEditor(i = 0) {
+    if (this.linkMode) {
+      if (linkIsAdmin()) window.open('./dashboard/#dock', '_blank', 'noopener');
+      else toast('Admins choose the dock buttons in DeckOS Link', 'info');
+      return;
+    }
     this.editing = i;
     this.renderEditor();
     openSheet('dockSheet');

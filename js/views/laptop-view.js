@@ -24,6 +24,7 @@ const APP_ICONS = {
 };
 
 const icon = (key) => `<svg viewBox="0 0 24 24" width="20" height="20">${APP_ICONS[key] || APP_ICONS.app}</svg>`;
+export const appIcon = icon;
 
 // Windows virtual-key codes
 const VK = { esc: 27, tab: 9, enter: 13, back: 8, win: 91, ctrl: 17, alt: 18, shift: 16, del: 46, left: 37, up: 38, right: 39, down: 40 };
