@@ -56,3 +56,25 @@ test('app targets reject shell metacharacters and blanks', () => {
   assert.equal(app.icon, 'app');
   assert.ok(app.id);
 });
+
+import { resolveDock, sanitizeDock } from '../link/lib/apps.js';
+
+test('dock defaults to the first five laptop apps, padded with deck views', () => {
+  const apps = sanitizeApps([
+    { name: 'GitHub', target: 'https://github.com' },
+    { name: 'Steam', target: 'steam://open/main' }
+  ]);
+  const slots = resolveDock({ data: { apps } });
+  assert.deepEqual(slots.map((s) => s.name), ['GitHub', 'Steam', 'Lyrics', 'Library', 'Up next']);
+  assert.equal(slots[0].kind, 'laptop');
+});
+
+test('custom dock is validated and survives a deleted app', () => {
+  const apps = sanitizeApps([{ name: 'GitHub', target: 'https://github.com' }]);
+  assert.throws(() => sanitizeDock([{ kind: 'view', view: 'lyrics' }], apps), /exactly five/);
+  assert.throws(() => sanitizeDock(Array(5).fill({ kind: 'laptop', appId: 'nope' }), apps), /laptop app or a deck view/);
+  const dock = sanitizeDock([{ kind: 'laptop', appId: apps[0].id }, ...Array(4).fill({ kind: 'view', view: 'laptop' })], apps);
+  const slots = resolveDock({ data: { apps: [], dock } });
+  assert.equal(slots[0].kind, 'view'); // GitHub was removed -> falls back
+  assert.equal(slots[1].name, 'Laptop screen');
+});
