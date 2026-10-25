@@ -24,6 +24,7 @@ const APP_ICONS = {
 };
 
 const icon = (key) => `<svg viewBox="0 0 24 24" width="20" height="20">${APP_ICONS[key] || APP_ICONS.app}</svg>`;
+export const appIcon = icon;
 
 // Windows virtual-key codes
 const VK = { esc: 27, tab: 9, enter: 13, back: 8, win: 91, ctrl: 17, alt: 18, shift: 16, del: 46, left: 37, up: 38, right: 39, down: 40 };
@@ -119,11 +120,60 @@ export class LaptopView {
   // Only pull frames while the tab is on screen, so the laptop isn't
   // capturing for nobody.
   syncStream() {
-    const img = $('#lapImg');
-    if (!img) return;
-    const want = this.visible && !document.hidden;
-    if (want && !img.getAttribute('src')) img.src = `./api/screen/stream?t=${Date.now()}`;
-    if (!want && img.getAttribute('src')) img.removeAttribute('src');
+    const want = this.visible && !document.hidden && !!$('#lapImg');
+    if (want && !this.pulling) this.pullFrames();
+    if (!want) this.pulling = null;
+  }
+
+  // Pull one JPEG at a time (long-poll). iPad Safari doesn't reliably show
+  // a multipart MJPEG stream in an <img>, but plain JPEGs work everywhere.
+  // Each frame is decoded off-screen first so the picture never flickers.
+  async pullFrames() {
+    const token = {};
+    this.pulling = token;
+    let seq = 0;
+    let shownUrl = null;
+    let failures = 0;
+    while (this.pulling === token) {
+      try {
+        const res = await fetch(`./api/screen/frame?after=${seq}`, { credentials: 'same-origin', cache: 'no-store' });
+        if (!res.ok) throw new Error((await res.json().catch(() => ({}))).error || `Screen error ${res.status}`);
+        seq = Number(res.headers.get('X-Frame-Seq')) || seq + 1;
+        const url = URL.createObjectURL(await res.blob());
+        const next = new Image();
+        next.src = url;
+        await next.decode().catch(() => {});
+        const img = $('#lapImg');
+        if (this.pulling !== token || !img) {
+          URL.revokeObjectURL(url);
+          break;
+        }
+        img.src = url;
+        if (shownUrl) URL.revokeObjectURL(shownUrl);
+        shownUrl = url;
+        if (failures) this.setHint(null);
+        failures = 0;
+      } catch (e) {
+        failures += 1;
+        if (failures === 2) this.setHint(`Can't get the laptop screen: ${e.message}`);
+        await new Promise((r) => setTimeout(r, Math.min(5000, 800 * failures)));
+      }
+    }
+    if (shownUrl) URL.revokeObjectURL(shownUrl);
+  }
+
+  setHint(message) {
+    const hint = $('#lapHint');
+    if (!hint) return;
+    if (message) {
+      hint.dataset.error = '1';
+      hint.textContent = message;
+    } else if (hint.dataset.error) {
+      delete hint.dataset.error;
+      hint.textContent = this.control
+        ? 'Tap to click · hold to right-click · drag · two fingers to scroll'
+        : linkIsAdmin() ? 'Turn on Control to use the mouse' : 'View only · admins can control';
+    }
   }
 
   bind() {

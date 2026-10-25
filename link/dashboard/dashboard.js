@@ -87,6 +87,7 @@ const PAGES = [
   { id: 'overview', title: 'Overview', ico: '◎' },
   { id: 'people', title: 'People', ico: '☺', admin: true },
   { id: 'apps', title: 'Laptop apps', ico: '▦', admin: true },
+  { id: 'dock', title: 'Dock buttons', ico: '▤', admin: true },
   { id: 'screen', title: 'Screen', ico: '▭', admin: true },
   { id: 'spotify', title: 'Spotify', ico: '♫', admin: true },
   { id: 'account', title: 'My account', ico: '⚙' }
@@ -115,7 +116,7 @@ function route() {
   $$('#nav a').forEach((a) => a.classList.toggle('is-active', a.dataset.page === id));
   $('#pageTitle').textContent = (PAGES.find((p) => p.id === id) || PAGES[0]).title;
   stopPreview();
-  ({ overview, people, apps, screen, spotify, account })[id]();
+  ({ overview, people, apps, dock, screen, spotify, account })[id]();
 }
 
 window.addEventListener('hashchange', route);
@@ -318,14 +319,76 @@ async function apps() {
   };
 }
 
+// ------------------------------------------------------------------ dock
+
+async function dock() {
+  const page = $('#page');
+  const [{ apps: list }, { slots, views }] = await Promise.all([api('/api/apps'), api('/api/dock')]);
+  const options = (slot) =>
+    `<optgroup label="Open on the laptop">${list
+      .map((a) => `<option value="laptop:${esc(a.id)}" ${slot.kind === 'laptop' && slot.id === a.id ? 'selected' : ''}>${esc(a.name)}</option>`)
+      .join('')}</optgroup>
+     <optgroup label="Show on the deck">${Object.entries(views)
+       .map(([k, label]) => `<option value="view:${k}" ${slot.kind === 'view' && slot.view === k ? 'selected' : ''}>${esc(label)}</option>`)
+       .join('')}</optgroup>`;
+  page.innerHTML = `
+    <div class="card">
+      <h3>The five buttons at the bottom of the deck</h3>
+      <p class="muted">Pick what each hardware button does for everyone signed in to the deck: open a laptop app, or jump to a deck view. Add more apps under <a href="#apps" style="color:var(--accent)">Laptop apps</a>.</p>
+      <div class="grid-3" style="grid-template-columns:repeat(5,minmax(0,1fr))" id="dockSlots">
+        ${slots.map((s, i) => `<label class="field"><span>Button ${i + 1}</span><select data-slot="${i}">${options(s)}</select></label>`).join('')}
+      </div>
+      <div class="inline" style="justify-content:flex-end;margin-top:6px">
+        <button class="btn btn-primary" id="saveDock">Save dock</button>
+      </div>
+    </div>`;
+  $('#saveDock').onclick = async () => {
+    const payload = $$('#dockSlots select').map((sel) => {
+      const [kind, value] = sel.value.split(':');
+      return kind === 'laptop' ? { kind, appId: value } : { kind, view: value };
+    });
+    try {
+      await api('/api/dock', { method: 'PUT', body: { slots: payload } });
+      toast('Dock saved. The deck updates within a minute, or reopen it.');
+    } catch (err) {
+      toast(err.message, true);
+    }
+  };
+}
+
 // ---------------------------------------------------------------- screen
 
 let previewImg = null;
+let previewToken = null;
 function stopPreview() {
-  if (previewImg) {
-    previewImg.src = '';
-    previewImg = null;
+  previewToken = null;
+  previewImg = null;
+}
+
+// Pull JPEG frames one at a time; Safari can't show multipart MJPEG in <img>.
+async function runPreview(img) {
+  const token = {};
+  previewToken = token;
+  let seq = 0;
+  let shown = null;
+  while (previewToken === token) {
+    try {
+      const res = await fetch(`/api/screen/frame?after=${seq}`, { cache: 'no-store' });
+      if (!res.ok) throw new Error(`status ${res.status}`);
+      seq = Number(res.headers.get('X-Frame-Seq')) || seq + 1;
+      const url = URL.createObjectURL(await res.blob());
+      if (previewToken !== token) {
+        URL.revokeObjectURL(url);
+        break;
+      }
+      img.src = url;
+      if (shown) URL.revokeObjectURL(shown);
+      shown = url;
+    } catch (_) {
+      await new Promise((r) => setTimeout(r, 1500));
+    }
   }
+  if (shown) URL.revokeObjectURL(shown);
 }
 
 const QUALITY = {
@@ -365,7 +428,7 @@ async function screen() {
       </div>
     </div>`;
   previewImg = $('#preview');
-  previewImg.src = '/api/screen/stream';
+  runPreview(previewImg);
   $$('#screens [data-i]').forEach((b) =>
     b.addEventListener('click', async () => {
       await api('/api/screen/select', { method: 'POST', body: { index: Number(b.dataset.i) } });
