@@ -15,8 +15,12 @@ export class Player extends Emitter {
     this.lastTrackKey = null;
 
     this.spotify.on('state', (s) => {
-      // Spotify started playing elsewhere while our local player is idle: follow it.
-      if (s.isPlaying && this.active !== this.spotify && !this.local.state.isPlaying) this.active = this.spotify;
+      // Follow Spotify when it starts playing elsewhere while local is idle, or
+      // when there's no local song at all (so a paused Spotify song still shows).
+      const localIdle = !this.local.state.isPlaying;
+      if (this.active !== this.spotify && localIdle && (s.isPlaying || !this.local.state.track)) {
+        this.active = this.spotify;
+      }
       if (this.active === this.spotify) this.publish();
     });
     this.local.on('state', (s) => {
