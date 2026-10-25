@@ -1,7 +1,7 @@
 // DeckOS entry point: wires the player to the views and runs the frame loop.
 
 import { $, $$, toast, store, DEVICE } from './util.js';
-import { handleRedirect, isLoggedIn } from './spotify-auth.js';
+import { handleRedirect, isLoggedIn, useLinkSpotify } from './spotify-auth.js';
 import { Player } from './player.js';
 import { NowPlaying } from './views/now-playing.js';
 import { LyricsView } from './views/lyrics-view.js';
@@ -15,6 +15,8 @@ import { spotify } from './spotify-api.js';
 import { bindSheets } from './views/sheet.js';
 import { Ambient } from './views/ambient.js';
 import { startFitting } from './fit.js';
+import { detectLink, linkLogin, linkUser, inLink } from './link.js';
+import { LaptopView } from './views/laptop-view.js';
 
 const player = new Player();
 const nowPlaying = new NowPlaying(player);
@@ -22,6 +24,7 @@ const lyrics = new LyricsView(player);
 const queue = new QueueView(player);
 const sliders = new Sliders(player);
 const ambient = new Ambient(player);
+const laptop = new LaptopView();
 let settings;
 const library = new LibraryView(player, { openSettings: (focus) => settings.open(focus) });
 const dock = new Dock({ onDeckView: (tab) => showTab(tab) });
@@ -49,7 +52,9 @@ function moveInk() {
 }
 
 function showTab(tab) {
-  if (!['lyrics', 'library', 'queue'].includes(tab)) return;
+  const allowed = ['lyrics', 'library', 'queue'];
+  if (linkUser()) allowed.push('laptop');
+  if (!allowed.includes(tab)) return;
   currentTab = tab;
   store.set('deckos.tab', tab);
   $$('.tab').forEach((t) => t.classList.toggle('is-active', t.dataset.tab === tab));
@@ -57,6 +62,7 @@ function showTab(tab) {
   moveInk();
   if (tab === 'library') library.refresh();
   queue.setVisible(tab === 'queue');
+  laptop.setVisible(tab === 'laptop');
 }
 
 $$('.tab').forEach((t) => t.addEventListener('click', () => showTab(t.dataset.tab)));
@@ -74,7 +80,7 @@ function updateChip() {
     text.textContent = `On this ${DEVICE}`;
   } else if (!isLoggedIn()) {
     chip.dataset.state = '';
-    text.textContent = 'Connect Spotify';
+    text.textContent = inLink() ? 'Spotify not linked' : 'Connect Spotify';
   } else if (spotifyStatus) {
     chip.dataset.state = 'warn';
     text.textContent = spotifyStatus;
@@ -172,7 +178,7 @@ window.addEventListener('keydown', (e) => {
   else if (key === '3') showTab('queue');
   else if (key === 's') player.toggleShuffle();
   else if (key === 'r') player.cycleRepeat();
-  else if (key === 'Escape') document.querySelectorAll('.sheet-backdrop').forEach((b) => (b.hidden = true));
+  else if (key === 'Escape') document.querySelectorAll('.sheet-backdrop:not([data-locked])').forEach((b) => (b.hidden = true));
 });
 
 // ---------------- frame loop ----------------
@@ -193,6 +199,33 @@ function tickClock() {
   $('#clock').textContent = `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
 }
 
+// ---------------- DeckOS Link sign-in ----------------
+
+function signInToLink(link) {
+  const gate = $('#linkGate');
+  const form = $('#linkGateForm');
+  if (link.needsSetup) {
+    $('#linkGateSub').textContent = 'No accounts yet. Create the owner account in the dashboard on the laptop first.';
+  }
+  gate.hidden = false;
+  setTimeout(() => form.username.focus(), 300);
+  return new Promise((resolve) => {
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      $('#linkGateError').textContent = '';
+      try {
+        const next = await linkLogin(form.username.value, form.password.value);
+        form.password.value = '';
+        gate.hidden = true;
+        toast(`Welcome, ${next.user.displayName}`, 'ok');
+        resolve(next);
+      } catch (err) {
+        $('#linkGateError').textContent = err.message;
+      }
+    });
+  });
+}
+
 // ---------------- boot ----------------
 
 async function boot() {
@@ -211,6 +244,17 @@ async function boot() {
     moveInk();
     lyrics.measure();
   });
+
+  // Served by DeckOS Link on the laptop: sign in, use its Spotify link and
+  // show the Laptop tab. On GitHub Pages this finds nothing and moves on.
+  let link = await detectLink();
+  if (link && !link.user) link = await signInToLink(link);
+  if (link) {
+    useLinkSpotify(link.spotify);
+    $('.tab[data-tab="laptop"]').hidden = false;
+    moveInk();
+    if (store.get('deckos.tab', 'lyrics') === 'laptop') showTab('laptop');
+  }
 
   const redirect = await handleRedirect();
   if (redirect.handled) {

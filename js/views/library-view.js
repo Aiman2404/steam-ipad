@@ -4,7 +4,7 @@
 
 import { $, $$, escapeHtml, formatTime, toast, store, DEVICE } from '../util.js';
 import { spotify, unwrapItem } from '../spotify-api.js';
-import { isLoggedIn, getClientId, beginLogin } from '../spotify-auth.js';
+import { isLoggedIn, getClientId, beginLogin, isLinkSpotify } from '../spotify-auth.js';
 
 const ICON_PLAY = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5.14v13.72a1 1 0 0 0 1.5.86l11-6.86a1 1 0 0 0 0-1.72l-11-6.86A1 1 0 0 0 8 5.14z"/></svg>';
 const ICON_SHUFFLE = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 3 21 3 21 8"/><line x1="4" y1="20" x2="21" y2="3"/><polyline points="21 16 21 21 16 21"/><line x1="15" y1="15" x2="21" y2="21"/><line x1="4" y1="4" x2="9" y2="9"/></svg>';
@@ -67,6 +67,14 @@ export class LibraryView {
 
   renderSpotify() {
     const root = $('#libSpotify');
+    if (!isLoggedIn() && isLinkSpotify()) {
+      root.innerHTML = `
+        <div class="empty">
+          <h3>Spotify isn't linked yet</h3>
+          <p>An admin links Spotify once in the DeckOS Link dashboard on the laptop, then everyone here can play it.</p>
+        </div>`;
+      return;
+    }
     if (!isLoggedIn()) {
       const configured = !!getClientId();
       root.innerHTML = `

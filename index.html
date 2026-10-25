@@ -57,6 +57,7 @@
             <button class="tab is-active" data-tab="lyrics" role="tab">Lyrics</button>
             <button class="tab" data-tab="library" role="tab">Library</button>
             <button class="tab" data-tab="queue" role="tab">Up next</button>
+            <button class="tab" data-tab="laptop" role="tab" hidden>Laptop</button>
             <span class="tab-ink" aria-hidden="true"></span>
           </nav>
           <div class="bar-right">
@@ -159,6 +160,10 @@
             <section class="pane" data-pane="queue">
               <div class="queue" id="queue"></div>
             </section>
+
+            <section class="pane" data-pane="laptop">
+              <div class="laptop" id="laptop"></div>
+            </section>
           </div>
         </div>
       </section>
@@ -225,6 +230,24 @@
       </header>
       <div class="sheet-body" id="deviceBody"></div>
     </div>
+  </div>
+
+  <!-- DeckOS Link sign-in (only when served by the laptop) -->
+  <div class="sheet-backdrop link-gate" id="linkGate" data-locked hidden>
+    <form class="sheet sheet-sm glass" id="linkGateForm" autocomplete="on">
+      <header class="sheet-head">
+        <h2>Sign in to the deck</h2>
+      </header>
+      <div class="sheet-body">
+        <p class="row-sub" id="linkGateSub" style="margin:0 0 12px">Use the account an admin made for you in DeckOS Link.</p>
+        <span class="label" style="margin-top:0">Username</span>
+        <input class="input" name="username" autocomplete="username" autocapitalize="off" autocorrect="off" style="width:100%" required />
+        <span class="label">Password</span>
+        <input class="input" name="password" type="password" autocomplete="current-password" style="width:100%" required />
+        <p class="row-sub" id="linkGateError" style="color:#fb7185;min-height:18px;margin:10px 0 4px"></p>
+        <button class="pill pill-accent" type="submit" style="width:100%;height:40px">Sign in</button>
+      </div>
+    </form>
   </div>
 
   <input type="file" id="fileInput" accept="audio/*,.mp3,.m4a,.aac,.wav,.flac" multiple hidden />

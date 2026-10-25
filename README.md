@@ -44,6 +44,36 @@ Development-mode apps allow up to 5 Spotify accounts. Add extra ones under *User
 
 ---
 
+## 💻 DeckOS Link: laptop dashboard, accounts and laptop screen
+
+DeckOS Link is a small server you run on your laptop. Nothing to install except [Node.js](https://nodejs.org) (LTS). It gives you:
+
+- **A login dashboard** with accounts. The first account is the **owner**. **Admins** control everything: people, laptop apps, the screen, remote mouse/keyboard and the Spotify link. **Members** use the deck: music, lyrics, opening laptop apps, watching the laptop screen and its media keys.
+- **The laptop screen on the deck** (Laptop tab). Admins can turn on **Control**: tap to click, hold to right-click, drag, two fingers to scroll, plus a keyboard, shortcut keys and copy/paste.
+- **Laptop apps on the deck:** one-tap GitHub, VS Code, Steam, Discord, Spotify, Files, or anything an admin adds.
+- **One shared Spotify link.** Link your Premium account once on the laptop and everyone signed in can use it.
+
+### Start it
+
+1. Install Node.js LTS on the laptop.
+2. Double-click **`link\start.cmd`** (or run `node link/server.js`). Allow it on **Private networks** when Windows Firewall asks.
+3. The dashboard opens at `http://127.0.0.1:7777/dashboard/`. Create the **owner** account.
+4. **People:** add family/friends as members or admins.
+5. **Spotify:** in your Spotify developer app add the Redirect URI `http://127.0.0.1:7777/api/spotify/callback`, paste the Client ID, press **Link Spotify**.
+6. **Overview** shows the deck address (like `http://192.168.1.25:7777/`) with a QR code. Open it on the iPad (same Wi-Fi), sign in, and **Add to Home Screen**.
+
+The iPad and laptop must be on the same Wi-Fi, and Link must be running for the Laptop tab. Screen sharing and remote control need Windows; accounts, apps and Spotify also work on macOS/Linux. Accounts and tokens are stored in `link/data/` on the laptop (never committed).
+
+> The GitHub Pages deck still works on its own with no laptop and no login. The Link deck is a second home-screen app that adds accounts and the laptop.
+
+---
+
+## Any screen
+
+The deck measures the real screen and scales itself to fit: iPad Air 2, iPad 9, iPad Pro, Samsung and other Android tablets, and phones. In portrait the player sits above the lyrics and the sliders turn horizontal. If something is still hidden behind a status bar or the printed bezel, nudge it in Settings → **Screen edges**.
+
+---
+
 ## iPad install
 
 1. Open the live URL in **Safari** → Share → **Add to Home Screen**. It launches full-screen and works offline.
@@ -67,8 +97,14 @@ js/spotify-api.js            Web API client (token refresh, rate-limit backoff)
 js/lyrics.js                 LRCLIB lookup + LRC / word-sync parser
 js/tags.js                   ID3 / MP4 tag + cover art reader
 js/palette.js                album-cover colour extraction
-js/views/*                   now playing, lyrics, library, queue, sliders, dock, settings
+js/fit.js                    fits the deck to any screen (safe areas, portrait, phones)
+js/link.js                   talks to DeckOS Link when served by the laptop
+js/views/*                   now playing, lyrics, library, queue, laptop, sliders, dock, settings
 sw.js                        network-first service worker (offline shell)
+link/server.js               DeckOS Link server (zero dependencies)
+link/lib/                    accounts, store, Spotify link, app launcher, Windows helper
+link/dashboard/              the Link dashboard
+tests/                       node --test suites (npm test)
 ```
 
 No build step. Any static host works; GitHub Pages deploys `main` automatically.

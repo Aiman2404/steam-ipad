@@ -16,6 +16,28 @@ export const SCOPES = [
   'user-library-read'
 ].join(' ');
 
+// When the deck is served by DeckOS Link, the laptop holds the Spotify
+// link and hands out access tokens; no Client ID or login on the device.
+let linkMode = null; // { linked: bool } or null
+let linkToken = null;
+
+export function useLinkSpotify(status) {
+  linkMode = status ? { linked: !!status.linked } : null;
+  linkToken = null;
+}
+
+async function linkAccessToken(force = false) {
+  if (!force && linkToken && Date.now() < linkToken.expiresAt - 30000) return linkToken.accessToken;
+  const res = await fetch('./api/spotify/token', { credentials: 'same-origin', cache: 'no-store' });
+  if (!res.ok) {
+    linkToken = null;
+    if (res.status === 401 || res.status === 404) return null;
+    throw new Error(`Laptop could not refresh Spotify (${res.status})`);
+  }
+  linkToken = await res.json();
+  return linkToken.accessToken;
+}
+
 const K_CLIENT = 'deckos.spotify.clientId';
 const K_TOKENS = 'deckos.spotify.tokens';
 const K_VERIFIER = 'deckos.spotify.verifier';
@@ -44,6 +66,7 @@ async function challengeFor(verifier) {
 }
 
 export async function beginLogin() {
+  if (linkMode) throw new Error('Spotify is linked on the laptop. Ask an admin to link it in the DeckOS Link dashboard.');
   const clientId = getClientId();
   if (!clientId) throw new Error('Add your Spotify Client ID in Settings first.');
   const verifier = randomString(64);
@@ -125,6 +148,7 @@ export async function handleRedirect() {
 let refreshing = null;
 
 export async function getAccessToken() {
+  if (linkMode) return linkAccessToken();
   const tokens = store.get(K_TOKENS, null);
   if (!tokens || !tokens.refreshToken) return null;
   if (tokens.accessToken && Date.now() < tokens.expiresAt) return tokens.accessToken;
@@ -132,6 +156,7 @@ export async function getAccessToken() {
 }
 
 export function refresh() {
+  if (linkMode) return linkAccessToken(true).then((accessToken) => ({ accessToken }));
   if (!refreshing) {
     const tokens = store.get(K_TOKENS, {});
     refreshing = tokenRequest({
@@ -151,8 +176,10 @@ export function refresh() {
   return refreshing;
 }
 
-export const isLoggedIn = () => !!(store.get(K_TOKENS, null) || {}).refreshToken;
+export const isLoggedIn = () => (linkMode ? linkMode.linked : !!(store.get(K_TOKENS, null) || {}).refreshToken);
+export const isLinkSpotify = () => !!linkMode;
 
 export function logout() {
+  if (linkMode) return;
   store.remove(K_TOKENS);
 }

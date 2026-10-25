@@ -7,6 +7,7 @@ import { getClientId, setClientId, beginLogin, logout, isLoggedIn, redirectUri }
 import { spotify } from '../spotify-api.js';
 import { idb } from '../idb.js';
 import { getEdges, setEdges } from '../fit.js';
+import { inLink, linkUser, linkIsAdmin, linkInfo, linkLogout } from '../link.js';
 
 const K_PREFS = 'deckos.prefs';
 
@@ -77,8 +78,25 @@ export class Settings {
           </div>
         </div>`;
 
+    const user = linkUser();
+    const linkGroup = user
+      ? `<div class="group">
+          <h3>DeckOS Link · ${escapeHtml(linkInfo().host || 'laptop')}</h3>
+          <p>Signed in as <b>${escapeHtml(user.displayName)}</b> (${escapeHtml(user.role)}). ${
+            linkInfo().spotify.linked
+              ? `Spotify comes from the laptop${linkInfo().spotify.account ? `, linked to <b>${escapeHtml(linkInfo().spotify.account)}</b>` : ''}.`
+              : 'Spotify is not linked on the laptop yet; an admin can link it in the dashboard.'
+          }</p>
+          <div class="detail-actions">
+            ${linkIsAdmin() ? '<a class="pill" href="./dashboard/" target="_blank" rel="noopener">Open dashboard</a>' : ''}
+            ${loggedIn ? '<button class="pill" data-act="devices">Choose device</button>' : ''}
+            <button class="pill" data-act="link-logout">Sign out</button>
+          </div>
+        </div>`
+      : '';
+
     $('#settingsBody').innerHTML = `
-      ${spotifyGroup}
+      ${inLink() ? linkGroup : spotifyGroup}
       <div class="group">
         <h3>Display</h3>
         <div class="toggle-row">
@@ -154,6 +172,10 @@ export class Settings {
     on('devices', () => {
       closeSheet('settingsSheet');
       this.openDevices();
+    });
+    on('link-logout', async () => {
+      await linkLogout();
+      window.location.reload();
     });
     on('dock', () => {
       closeSheet('settingsSheet');

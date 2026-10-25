@@ -13,3 +13,6 @@ Thumbs.db
 dist/
 build/
 node_modules/
+
+# DeckOS Link runtime data (accounts, sessions, Spotify tokens)
+link/data/

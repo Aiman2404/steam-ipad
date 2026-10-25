@@ -10,7 +10,7 @@ function walk(dir) {
   });
 }
 
-const files = [...walk('js'), 'sw.js'];
+const files = [...walk('js'), ...walk('link'), 'sw.js'];
 let failed = 0;
 for (const file of files) {
   try {
