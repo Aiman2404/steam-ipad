@@ -1,18 +1,16 @@
 {
-  "name": "SteamOS Cyber-Deck",
+  "name": "DeckOS",
   "short_name": "DeckOS",
-  "description": "SteamOS Cyber-Deck dashboard designed for iPad Air 2",
-  "start_url": "./index.html",
+  "description": "Steam Deck-style music and launcher dashboard for a 3D-printed iPad Air 2 bezel",
+  "start_url": "./",
+  "scope": "./",
   "display": "standalone",
   "orientation": "landscape",
-  "background_color": "#050608",
-  "theme_color": "#00e5ff",
+  "background_color": "#06070b",
+  "theme_color": "#06070b",
   "icons": [
-    {
-      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%23080a0e'/><path d='M50 15a35 35 0 0 0-34.8 31.6l18.6 7.7a9.8 9.8 0 0 1 9-1.6l8.5-12.3a13.2 13.2 0 1 1 13.2 13.2h-.3l-12.1 8.6a9.9 9.9 0 0 1-19.1-1.2L19.5 57.6A35 35 0 1 0 50 15z' fill='%2300e5ff'/></svg>",
-      "sizes": "192x192 512x512",
-      "type": "image/svg+xml",
-      "purpose": "any maskable"
-    }
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" },
+    { "src": "icons/icon.svg", "sizes": "any", "type": "image/svg+xml" }
   ]
 }

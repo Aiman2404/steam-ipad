@@ -1,1638 +1,214 @@
 <!DOCTYPE html>
-<html lang="en" class="dark">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <meta name="apple-mobile-web-app-title" content="SteamDeck OS" />
+  <meta name="apple-mobile-web-app-title" content="DeckOS" />
+  <meta name="theme-color" content="#06070b" />
   <link rel="manifest" href="manifest.json" />
-  <meta name="theme-color" content="#080a0e" />
-  <title>SteamOS Cyber-Deck | iPad Air 2 Edition</title>
-  <!-- Tailwind CSS CDN -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Google Fonts: Inter & JetBrains Mono -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
-  <!-- Official Spotify IFrame API for real programmatic playback & live timestamp events -->
-  <script src="https://open.spotify.com/embed/iframe-api/v1" async></script>
-
-  <style>
-    :root {
-      --trench-size: 10px;
-      --steam-bg: #080a0e;
-      --panel-bg: #11151d;
-      --steam-cyan: #00e5ff;
-      --spotify-green: #1db954;
-    }
-
-    * {
-      box-sizing: border-box;
-      -webkit-tap-highlight-color: transparent;
-      user-select: none;
-      -webkit-user-select: none;
-    }
-
-    html, body {
-      margin: 0;
-      padding: 0;
-      width: 100vw;
-      height: 100vh;
-      overflow: hidden;
-      background-color: #050608;
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-      color: #f3f4f6;
-      touch-action: none;
-    }
-
-    /* Carbon Fiber & Matte Glass Surface */
-    .carbon-surface {
-      background-color: #0c0f15;
-      background-image: 
-        radial-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 0),
-        radial-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 0);
-      background-size: 16px 16px;
-      background-position: 0 0, 8px 8px;
-    }
-
-    .steam-glass {
-      background: linear-gradient(145deg, rgba(22, 27, 36, 0.88) 0%, rgba(12, 15, 22, 0.95) 100%);
-      backdrop-filter: blur(24px);
-      -webkit-backdrop-filter: blur(24px);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      box-shadow: 
-        inset 0 1px 0 0 rgba(255, 255, 255, 0.09),
-        0 12px 32px -8px rgba(0, 0, 0, 0.75);
-    }
-
-    /* 3D Printed Hardware Bezel Trench Simulation */
-    .hardware-trench-frame {
-      padding: var(--trench-size);
-      gap: var(--trench-size);
-      background: repeating-linear-gradient(
-        45deg,
-        #040507,
-        #040507 6px,
-        #080a0f 6px,
-        #080a0f 12px
-      );
-    }
-
-    .bezel-guide-active .trench-highlight {
-      outline: 2px dashed rgba(0, 229, 255, 0.55);
-      outline-offset: -3px;
-    }
-
-    /* Smooth Spring Button Press */
-    .deck-btn {
-      transition: transform 0.18s cubic-bezier(0.34, 1.56, 0.64, 1), 
-                  border-color 0.2s ease, 
-                  box-shadow 0.25s ease,
-                  background 0.25s ease;
-    }
-    .deck-btn:active {
-      transform: scale(0.95);
-    }
-
-    /* Custom Scrollbar for Library & Lyrics */
-    .custom-scroll::-webkit-scrollbar {
-      width: 5px;
-    }
-    .custom-scroll::-webkit-scrollbar-track {
-      background: rgba(255, 255, 255, 0.02);
-      border-radius: 9999px;
-    }
-    .custom-scroll::-webkit-scrollbar-thumb {
-      background: rgba(255, 255, 255, 0.16);
-      border-radius: 9999px;
-    }
-
-    /* Ambient Glowing Backdrop */
-    @keyframes pulseSlow {
-      0%, 100% { transform: scale(1) rotate(0deg); opacity: 0.32; }
-      50% { transform: scale(1.08) rotate(4deg); opacity: 0.48; }
-    }
-    .ambient-glow {
-      animation: pulseSlow 9s ease-in-out infinite;
-    }
-
-    /* Smooth bottom-to-top Spotify-style lyrics line transitions */
-    .lyric-line {
-      transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1),
-                  color 0.3s ease,
-                  opacity 0.3s ease,
-                  filter 0.3s ease;
-    }
-    .lyric-line-active {
-      color: #ffffff;
-      opacity: 1 !important;
-      transform: scale(1.03);
-      text-shadow: 0 0 18px rgba(0, 229, 255, 0.45);
-    }
-
-    .mono-num {
-      font-family: 'JetBrains Mono', monospace;
-    }
-  </style>
+  <link rel="icon" type="image/svg+xml" href="icons/icon.svg" />
+  <link rel="apple-touch-icon" href="icons/icon-180.png" />
+  <title>DeckOS</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/deck.css" />
 </head>
-<body class="relative select-none">
-
-  <!-- GLOBAL HARDWARE BRIGHTNESS OVERLAY (Controlled by Vertical Slider 2) -->
-  <div id="brightnessOverlay" class="pointer-events-none fixed inset-0 z-50 bg-black transition-opacity duration-75" style="opacity: 0.05;"></div>
-
-  <!-- TOAST / LAUNCH NOTIFICATION BANNER -->
-  <div id="deckToast" class="pointer-events-none fixed top-4 left-1/2 -translate-x-1/2 z-50 flex items-center gap-3 px-5 py-2.5 rounded-full bg-[#141923]/95 border border-cyan-400/40 shadow-2xl opacity-0 -translate-y-4 transition-all duration-300">
-    <span class="w-2.5 h-2.5 rounded-full bg-cyan-400 animate-ping"></span>
-    <span id="deckToastText" class="text-xs font-semibold tracking-wide text-cyan-50">STEAM DECK OS READY</span>
+<body>
+  <!-- Living backdrop: blurred cover art + aurora tinted from the cover palette -->
+  <div class="backdrop" aria-hidden="true">
+    <div class="backdrop-art" id="artLayerA"></div>
+    <div class="backdrop-art" id="artLayerB"></div>
+    <div class="aurora aurora-1"></div>
+    <div class="aurora aurora-2"></div>
+    <div class="aurora aurora-3"></div>
+    <div class="grain"></div>
+    <div class="vignette"></div>
   </div>
 
-  <!-- MAIN 3-ZONE HARDWARE GRID CONTAINER (Proportioned for Landscape iPad Air 2) -->
-  <main id="hardwareGrid" class="hardware-trench-frame w-screen h-screen flex flex-col justify-between overflow-hidden">
+  <div id="dimmer" class="dimmer" aria-hidden="true"></div>
 
-    <!-- TOP ROW: ~76% Height -> Left/Center Unified Spotify Deck (80%) + Right 2 Vertical Sliders (20%) -->
-    <div class="w-full h-[76%] flex gap-[10px] min-h-0">
+  <div id="toast" class="toast" role="status" aria-live="polite">
+    <span class="toast-dot"></span><span id="toastText"></span>
+  </div>
 
-      <!-- =================================================================== -->
-      <!-- ZONE 1: UNIFIED SPOTIFY NOW PLAYING, LYRICS & DECK LIBRARY (80%)   -->
-      <!-- =================================================================== -->
-      <section class="trench-highlight steam-glass carbon-surface relative w-[80%] h-full rounded-2xl flex flex-col justify-between overflow-hidden p-3.5">
-        
-        <!-- Dynamic Ambient Album Color Glow -->
-        <div id="ambientBackdrop" class="ambient-glow pointer-events-none absolute -top-24 -left-24 w-96 h-96 rounded-full blur-3xl opacity-35" style="background: radial-gradient(circle, #1db954 0%, #00e5ff 60%, transparent 100%);"></div>
-
-        <!-- TOP BAR: SteamOS Brand + "+ Add Spotify URL / Song" Action + Status -->
-        <header class="relative z-10 flex items-center justify-between border-b border-white/10 pb-2.5 shrink-0">
-          <!-- Left: SteamOS Badge + Quick Add Spotify URL / Search Bar Trigger -->
-          <div class="flex items-center gap-2.5">
-            <div class="flex items-center gap-2 bg-white/5 border border-white/10 px-3 py-1.5 rounded-xl">
-              <svg class="w-4 h-4 text-cyan-400" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M12 2a10 10 0 0 0-9.95 9.03l5.33 2.2a2.82 2.82 0 0 1 2.57-.47l2.43-3.52a3.77 3.77 0 1 1 3.77 3.77h-.09l-3.46 2.47c0 .19-.02.38-.07.57a2.83 2.83 0 0 1-5.46-.35L3.3 14.18A10 10 0 1 0 12 2zm4.15 7.24a2.51 2.51 0 1 0 0 5.02 2.51 2.51 0 0 0 0-5.02zm-6.4 6.53a1.88 1.88 0 1 0 0 3.76 1.88 1.88 0 0 0 0-3.76z"/>
-              </svg>
-              <span class="text-xs font-extrabold tracking-wider uppercase text-white">DECK<span class="text-cyan-400">OS</span></span>
-            </div>
-
-            <button onclick="openAddMusicModal()" class="deck-btn flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-[#1db954] hover:bg-[#1ed760] text-black font-extrabold text-xs shadow-[0_0_16px_rgba(29,185,84,0.35)]">
-              <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6">
-                <line x1="12" y1="5" x2="12" y2="19"></line>
-                <line x1="5" y1="12" x2="19" y2="12"></line>
-              </svg>
-              <span>+ Add Spotify URL / Song</span>
-            </button>
-
-            <button onclick="toggleSpotifyEngineDrawer()" id="engineToggleBtn" class="deck-btn flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-[11px] font-semibold text-gray-300" title="Show/Hide Official Spotify Embedded Controller">
-              <span class="w-2 h-2 rounded-full bg-[#1db954]"></span>
-              <span id="engineStatusText">Spotify Engine</span>
-            </button>
+  <main id="deck" class="deck">
+    <div class="deck-top">
+      <!-- ZONE 1: media deck -->
+      <section class="zone glass media" aria-label="Now playing">
+        <header class="media-bar">
+          <div class="brand">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 2a10 10 0 0 0-9.95 9.03l5.33 2.2a2.82 2.82 0 0 1 2.57-.47l2.43-3.52a3.77 3.77 0 1 1 3.77 3.77h-.09l-3.46 2.47c0 .19-.02.38-.07.57a2.83 2.83 0 0 1-5.46-.35L3.3 14.18A10 10 0 1 0 12 2zm4.15 7.24a2.51 2.51 0 1 0 0 5.02 2.51 2.51 0 0 0 0-5.02zm-6.4 6.53a1.88 1.88 0 1 0 0 3.76 1.88 1.88 0 0 0 0-3.76z"/></svg>
+            <span>DECK<b>OS</b></span>
           </div>
-
-          <!-- Right: Assign 5 Dock Buttons, 3D Grid Guide, Clock -->
-          <div class="flex items-center gap-2">
-            <button onclick="openDockConfigModal(0)" class="deck-btn flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-[11px] font-semibold text-cyan-300">
-              <span>5 Dock Buttons</span>
+          <button id="sourceChip" class="chip" type="button">
+            <span class="chip-dot"></span><span id="sourceChipText">Connect Spotify</span>
+          </button>
+          <nav class="tabs" role="tablist">
+            <button class="tab is-active" data-tab="lyrics" role="tab">Lyrics</button>
+            <button class="tab" data-tab="library" role="tab">Library</button>
+            <button class="tab" data-tab="queue" role="tab">Up next</button>
+            <span class="tab-ink" aria-hidden="true"></span>
+          </nav>
+          <div class="bar-right">
+            <span id="clock" class="clock mono">--:--</span>
+            <button id="settingsBtn" class="icon-btn" type="button" aria-label="Settings">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
             </button>
-
-            <button onclick="toggleBezelGuide()" id="bezelGuideBtn" title="Toggle 3D Print Grid Alignment Lines" class="deck-btn px-2.5 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-[11px] font-medium text-gray-300">
-              3D Grid
-            </button>
-
-            <div class="flex items-center gap-2 bg-black/40 px-3 py-1.5 rounded-xl border border-white/10 text-xs">
-              <span id="liveClock" class="mono-num font-bold text-gray-100">12:00</span>
-              <span class="text-emerald-400 font-bold text-[10px] mono-num">100%</span>
-            </div>
           </div>
         </header>
 
-        <!-- UNIFIED TWO-PANEL BODY: Left/Center Now Playing + Lyrics (65%) | Right Deck Library (35%) -->
-        <div class="relative z-10 flex-1 flex gap-3.5 pt-3 min-h-0 overflow-hidden">
-
-          <!-- =============================================================== -->
-          <!-- PANEL A: LEFT/CENTER NOW PLAYING + LIVE LYRICS (~65% WIDTH)     -->
-          <!-- =============================================================== -->
-          <div class="w-[65%] h-full bg-black/40 border border-white/10 rounded-2xl p-3.5 flex gap-3.5 relative overflow-hidden min-w-0">
-
-            <!-- Collapsible Official Spotify IFrame Player Drawer (Drives Real Spotify Playback & Timestamps) -->
-            <div id="spotifyEngineDrawer" class="hidden absolute inset-x-3 top-3 z-30 bg-[#0d1118]/95 backdrop-blur-xl border border-[#1db954]/50 rounded-2xl p-3 shadow-2xl flex-col gap-2">
-              <div class="flex items-center justify-between">
-                <div class="flex items-center gap-2">
-                  <span class="w-2.5 h-2.5 rounded-full bg-[#1db954] animate-pulse"></span>
-                  <span class="text-xs font-extrabold uppercase tracking-wider text-white">Official Spotify IFrame Engine</span>
-                  <span class="text-[10px] text-gray-400">(Sign into Spotify in Safari or tap inside if prompted)</span>
+        <div class="media-body">
+          <!-- Now playing column -->
+          <div class="np">
+            <div class="cover-wrap">
+              <div class="cover-glow" aria-hidden="true"></div>
+              <div class="cover" id="cover">
+                <img id="coverImgA" alt="" />
+                <img id="coverImgB" alt="" />
+                <div class="cover-empty" id="coverEmpty">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
                 </div>
-                <button onclick="toggleSpotifyEngineDrawer()" class="px-2.5 py-1 rounded-lg bg-white/10 hover:bg-white/20 text-xs font-bold text-white">Hide</button>
-              </div>
-              <div class="w-full h-40 rounded-xl overflow-hidden bg-black border border-white/10">
-                <div id="spotifyEmbedMount"></div>
               </div>
             </div>
 
-            <!-- LEFT HALF OF NOW PLAYING: Cover Art Icon, Track Metadata, Real Scrubber & Transport Controls -->
-            <div class="w-[48%] h-full flex flex-col justify-between items-center bg-white/[0.02] border border-white/5 rounded-xl p-3 shrink-0">
-              
-              <!-- Song Cover Art / Icon with Visualizer Ring -->
-              <div class="relative w-32 h-32 sm:w-36 sm:h-36 rounded-2xl overflow-hidden shadow-2xl border border-white/15 group shrink-0">
-                <img id="nowPlayingCover" src="https://placehold.co/400x400/0f172a/1db954?text=Add+Song" alt="Song Cover" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
-                <div class="absolute inset-0 bg-gradient-to-t from-black/75 via-transparent to-transparent"></div>
-                <div class="absolute bottom-2 left-2 right-2 flex items-center justify-between px-2 py-0.5 rounded-lg bg-black/70 backdrop-blur-md border border-white/10">
-                  <div class="flex items-center gap-1.5">
-                    <span id="playbackStatusDot" class="w-2 h-2 rounded-full bg-gray-400"></span>
-                    <span id="playbackStatusText" class="text-[9px] font-extrabold tracking-wider uppercase text-gray-200">READY</span>
-                  </div>
-                  <span id="sourceTypeBadge" class="text-[9px] font-bold text-[#1db954] uppercase">SPOTIFY</span>
-                </div>
+            <div class="np-meta">
+              <h1 id="npTitle" class="np-title">Nothing playing</h1>
+              <p id="npArtist" class="np-artist">Connect Spotify or add songs to start</p>
+            </div>
+
+            <div class="scrub" id="scrub">
+              <div class="scrub-track">
+                <div class="scrub-fill" id="scrubFill"></div>
+                <div class="scrub-knob" id="scrubKnob"></div>
               </div>
-
-              <!-- Active Song Title & Artist -->
-              <div class="w-full text-center px-1 my-1">
-                <h1 id="nowPlayingTitle" class="text-sm sm:text-base font-extrabold text-white tracking-tight truncate">No Song Selected</h1>
-                <p id="nowPlayingArtist" class="text-xs font-medium text-gray-400 truncate mt-0.5">Click "+ Add Spotify URL / Song" or pick from Deck Library</p>
-              </div>
-
-              <!-- Real-Time Scrubber Bar (Driven by active song / Spotify IFrame playback_update) -->
-              <div class="w-full flex flex-col gap-1 px-1">
-                <div id="seekBarTrack" class="relative w-full h-2 bg-white/10 rounded-full cursor-pointer overflow-hidden">
-                  <div id="seekBarFill" class="h-full bg-gradient-to-r from-[#1db954] to-cyan-400 rounded-full transition-all duration-150" style="width: 0%;"></div>
-                </div>
-                <div class="flex items-center justify-between text-[10px] mono-num text-gray-400">
-                  <span id="currentTimeLabel">0:00</span>
-                  <span id="durationTimeLabel">0:00</span>
-                </div>
-              </div>
-
-              <!-- Unified Spotify Transport Controls (Shuffle, Prev, Play/Pause, Stop, Next, Favorite) -->
-              <div class="w-full flex items-center justify-between px-1 pt-1 border-t border-white/10">
-                <!-- Shuffle / Random -->
-                <button onclick="toggleShuffleMode()" id="shuffleBtn" class="deck-btn p-1.5 rounded-lg text-gray-400 hover:text-white hover:bg-white/10" title="Random / Shuffle">
-                  <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
-                    <polyline points="16 3 21 3 21 8"></polyline>
-                    <line x1="4" y1="20" x2="21" y2="3"></line>
-                    <polyline points="21 16 21 21 16 21"></polyline>
-                    <line x1="15" y1="15" x2="21" y2="21"></line>
-                    <line x1="4" y1="4" x2="9" y2="9"></line>
-                  </svg>
-                </button>
-
-                <!-- Previous -->
-                <button onclick="playPreviousTrack()" class="deck-btn p-1.5 rounded-lg text-gray-200 hover:text-white hover:bg-white/10" title="Previous Track">
-                  <svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/>
-                  </svg>
-                </button>
-
-                <!-- Play / Pause Main Button -->
-                <button onclick="togglePlayPause()" id="playPauseBtn" class="deck-btn w-10 h-10 rounded-full bg-[#1db954] hover:bg-[#1ed760] text-black flex items-center justify-center shadow-[0_0_18px_rgba(29,185,84,0.5)]" title="Play / Pause">
-                  <svg id="playIcon" class="w-5 h-5 ml-0.5" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M8 5v14l11-7z"/>
-                  </svg>
-                  <svg id="pauseIcon" class="w-5 h-5 hidden" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>
-                  </svg>
-                </button>
-
-                <!-- Stop Button -->
-                <button onclick="stopPlayback()" class="deck-btn p-1.5 rounded-lg text-gray-300 hover:text-rose-400 hover:bg-white/10" title="Stop">
-                  <svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
-                    <rect x="6" y="6" width="12" height="12" rx="2"/>
-                  </svg>
-                </button>
-
-                <!-- Next -->
-                <button onclick="playNextTrack()" class="deck-btn p-1.5 rounded-lg text-gray-200 hover:text-white hover:bg-white/10" title="Next Track">
-                  <svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/>
-                  </svg>
-                </button>
-
-                <!-- Favorite / Heart -->
-                <button onclick="toggleFavoriteCurrent()" id="favoriteBtn" class="deck-btn p-1.5 rounded-lg text-gray-400 hover:text-[#1db954] hover:bg-white/10" title="Favorite Song">
-                  <svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
-                  </svg>
-                </button>
+              <div class="scrub-times mono">
+                <span id="timeNow">0:00</span>
+                <span id="timeTotal">0:00</span>
               </div>
             </div>
 
-            <!-- RIGHT HALF OF NOW PLAYING: Spotify-Style Bottom-to-Top Auto-Scrolling Lyrics Box -->
-            <div class="flex-1 h-full flex flex-col justify-between bg-gradient-to-b from-[#131924]/90 to-[#0b0e14]/95 border border-white/10 rounded-xl p-3 relative overflow-hidden min-w-0">
-              <!-- Lyrics Box Header -->
-              <div class="flex items-center justify-between border-b border-white/10 pb-2 shrink-0 z-10">
-                <div class="flex items-center gap-1.5">
-                  <span class="w-2 h-2 rounded-full bg-cyan-400"></span>
-                  <span class="text-[11px] font-extrabold uppercase tracking-wider text-white">Live Lyrics</span>
-                </div>
-                <div class="flex items-center gap-1.5">
-                  <button onclick="refetchLyricsForCurrent()" class="px-2 py-0.5 rounded bg-white/5 hover:bg-white/10 text-[10px] font-semibold text-cyan-300" title="Fetch synced lyrics from LRCLIB">
-                    Sync
-                  </button>
-                  <button onclick="openCustomLyricsModal()" class="px-2 py-0.5 rounded bg-white/5 hover:bg-white/10 text-[10px] font-semibold text-gray-300" title="Paste or edit lyrics">
-                    Edit
-                  </button>
-                </div>
-              </div>
-
-              <!-- Bottom-to-Top Scrolling Viewport -->
-              <div id="lyricsViewport" class="relative flex-1 overflow-y-auto custom-scroll py-8 px-2 space-y-3 text-left scroll-smooth">
-                <div class="text-xs text-gray-400 italic">Select or add a song to load live scrolling lyrics...</div>
-              </div>
-
-              <!-- Subtle Bottom Fade Mask -->
-              <div class="pointer-events-none absolute bottom-0 inset-x-0 h-8 bg-gradient-to-t from-[#0b0e14] to-transparent"></div>
+            <div class="transport">
+              <button class="t-btn" id="shuffleBtn" type="button" aria-label="Shuffle">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 3 21 3 21 8"/><line x1="4" y1="20" x2="21" y2="3"/><polyline points="21 16 21 21 16 21"/><line x1="15" y1="15" x2="21" y2="21"/><line x1="4" y1="4" x2="9" y2="9"/></svg>
+              </button>
+              <button class="t-btn t-skip" id="prevBtn" type="button" aria-label="Previous">
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 6h2.2v12H6zm3.6 6 8.4 6V6z"/></svg>
+              </button>
+              <button class="t-play" id="playBtn" type="button" aria-label="Play">
+                <svg class="i-play" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5.14v13.72a1 1 0 0 0 1.5.86l11-6.86a1 1 0 0 0 0-1.72l-11-6.86A1 1 0 0 0 8 5.14z"/></svg>
+                <svg class="i-pause" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4.5" width="4.2" height="15" rx="1.3"/><rect x="13.8" y="4.5" width="4.2" height="15" rx="1.3"/></svg>
+              </button>
+              <button class="t-btn t-skip" id="nextBtn" type="button" aria-label="Next">
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 18l8.4-6L6 6zm9.8-12H18v12h-2.2z"/></svg>
+              </button>
+              <button class="t-btn" id="repeatBtn" type="button" aria-label="Repeat">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>
+                <span class="repeat-one">1</span>
+              </button>
             </div>
-
           </div>
 
-          <!-- =============================================================== -->
-          <!-- PANEL B: RIGHT DECK LIBRARY (~35% WIDTH)                        -->
-          <!-- =============================================================== -->
-          <aside class="w-[35%] h-full bg-black/45 border border-white/10 rounded-2xl p-3 flex flex-col justify-between shrink-0 min-w-0">
-            <!-- Deck Library Header & Action Buttons -->
-            <div class="flex flex-col gap-2 border-b border-white/10 pb-2.5 shrink-0">
-              <div class="flex items-center justify-between">
-                <div>
-                  <h2 class="text-xs font-extrabold uppercase tracking-wider text-white">Deck Library</h2>
-                  <p id="librarySubtitle" class="text-[10px] text-gray-400">Your Added Spotify Songs & Links</p>
+          <!-- Right panel: Lyrics / Library / Up next -->
+          <div class="panel">
+            <section class="pane is-active" data-pane="lyrics">
+              <div class="lyrics" id="lyrics">
+                <div class="lyrics-track" id="lyricsTrack"></div>
+              </div>
+              <div class="lyrics-tools">
+                <span id="lyricsBadge" class="lyrics-badge"></span>
+                <div class="nudge" title="Shift lyric timing if a song feels early or late">
+                  <button type="button" data-nudge="-250" aria-label="Lyrics earlier">−</button>
+                  <span id="nudgeValue" class="mono">0.00s</span>
+                  <button type="button" data-nudge="250" aria-label="Lyrics later">+</button>
                 </div>
-                <span id="libraryCountBadge" class="px-2 py-0.5 rounded-md bg-[#1db954]/20 text-[#1db954] text-[10px] font-bold mono-num">0 Songs</span>
               </div>
+            </section>
 
-              <!-- Library Utility Buttons -->
-              <div class="flex items-center gap-1.5">
-                <button onclick="openAddMusicModal()" class="deck-btn flex-1 py-1.5 px-2 rounded-lg bg-[#1db954]/20 hover:bg-[#1db954]/30 border border-[#1db954]/40 text-[10px] font-extrabold text-[#1db954] truncate">
-                  + Add URL / Song
-                </button>
-                <button onclick="toggleFavoritesFilter()" id="favFilterBtn" class="deck-btn py-1.5 px-2.5 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-[10px] font-semibold text-gray-300" title="Show Favorites Only">
-                  ♥ Favs
-                </button>
-                <button onclick="clearDeckLibrary()" class="deck-btn py-1.5 px-2 rounded-lg bg-white/5 hover:bg-rose-500/20 border border-white/10 text-[10px] font-semibold text-gray-400 hover:text-rose-300" title="Clear Library">
-                  Clear
-                </button>
+            <section class="pane" data-pane="library">
+              <div class="lib-switch">
+                <button class="seg is-active" data-lib="spotify" type="button">Spotify</button>
+                <button class="seg" data-lib="local" type="button">On this iPad</button>
               </div>
-            </div>
+              <div class="lib-view" id="libSpotify"></div>
+              <div class="lib-view" id="libLocal" hidden></div>
+            </section>
 
-            <!-- Scrollable User Songs List -->
-            <div id="playlistContainer" class="flex-1 overflow-y-auto custom-scroll my-2 space-y-1.5 pr-1">
-              <!-- Populated dynamically from user's saved Spotify URLs / searched songs -->
-            </div>
-
-            <!-- Bottom Status Tip -->
-            <div class="pt-2 border-t border-white/10 flex items-center justify-between text-[10px] text-gray-400">
-              <span class="truncate">Tap any song to load Icon + Lyrics</span>
-              <button onclick="toggleSpotifyEngineDrawer()" class="text-[#1db954] font-bold hover:underline shrink-0 ml-2">Embed Player</button>
-            </div>
-          </aside>
-
+            <section class="pane" data-pane="queue">
+              <div class="queue" id="queue"></div>
+            </section>
+          </div>
         </div>
       </section>
 
-      <!-- =================================================================== -->
-      <!-- ZONE 2: RIGHT SIDEBAR -> TWO TALL VERTICAL SLIDERS (~20% WIDTH)     -->
-      <!-- =================================================================== -->
-      <aside class="w-[20%] h-full flex gap-[10px]">
-
-        <!-- VERTICAL SLIDER 1: SOUND / VOLUME -->
-        <div id="volumeSliderTrack" class="trench-highlight steam-glass carbon-surface relative flex-1 h-full rounded-2xl overflow-hidden flex flex-col justify-between items-center py-4 cursor-ns-resize select-none">
-          <!-- Bottom-Up Animated Fill Bar -->
-          <div id="volumeSliderFill" class="pointer-events-none absolute bottom-0 left-0 right-0 bg-gradient-to-t from-[#1db954]/50 via-cyan-500/35 to-cyan-400/20 border-t-2 border-cyan-300 transition-all duration-75" style="height: 78%;"></div>
-
-          <!-- Top Readout -->
-          <div class="relative z-10 flex flex-col items-center">
-            <span class="text-[10px] font-extrabold uppercase tracking-widest text-cyan-300">SOUND</span>
-            <span id="volumeValueText" class="mono-num text-lg font-extrabold text-white mt-0.5">78%</span>
+      <!-- ZONE 2: sliders -->
+      <aside class="sliders">
+        <div class="zone glass slider" id="volumeSlider" data-kind="volume" role="slider" aria-label="Volume" aria-valuemin="0" aria-valuemax="100">
+          <div class="slider-fill"></div>
+          <div class="slider-head">
+            <span class="slider-label">Sound</span>
+            <span class="slider-value mono">--</span>
+            <span class="slider-sub"></span>
           </div>
-
-          <!-- Vertical Tick Marks for 3D Tactile Slot Feel -->
-          <div class="relative z-10 flex flex-col items-center justify-between flex-1 py-6 w-full px-3 pointer-events-none opacity-45">
-            <div class="w-4 h-0.5 bg-white rounded"></div>
-            <div class="w-2.5 h-0.5 bg-white/60 rounded"></div>
-            <div class="w-4 h-0.5 bg-white rounded"></div>
-            <div class="w-2.5 h-0.5 bg-white/60 rounded"></div>
-            <div class="w-5 h-0.5 bg-cyan-300 rounded"></div>
-            <div class="w-2.5 h-0.5 bg-white/60 rounded"></div>
-            <div class="w-4 h-0.5 bg-white rounded"></div>
-            <div class="w-2.5 h-0.5 bg-white/60 rounded"></div>
-            <div class="w-4 h-0.5 bg-white rounded"></div>
-          </div>
-
-          <!-- Bottom Speaker Icon -->
-          <div class="relative z-10 p-2.5 rounded-xl bg-black/50 border border-white/10 text-cyan-300">
-            <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
-              <path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path>
-              <path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path>
-            </svg>
+          <div class="slider-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>
           </div>
         </div>
-
-        <!-- VERTICAL SLIDER 2: DISPLAY BRIGHTNESS -->
-        <div id="brightnessSliderTrack" class="trench-highlight steam-glass carbon-surface relative flex-1 h-full rounded-2xl overflow-hidden flex flex-col justify-between items-center py-4 cursor-ns-resize select-none">
-          <!-- Bottom-Up Animated Fill Bar -->
-          <div id="brightnessSliderFill" class="pointer-events-none absolute bottom-0 left-0 right-0 bg-gradient-to-t from-amber-500/45 via-amber-300/30 to-white/25 border-t-2 border-amber-200 transition-all duration-75" style="height: 95%;"></div>
-
-          <!-- Top Readout -->
-          <div class="relative z-10 flex flex-col items-center">
-            <span class="text-[10px] font-extrabold uppercase tracking-widest text-amber-300">DISPLAY</span>
-            <span id="brightnessValueText" class="mono-num text-lg font-extrabold text-white mt-0.5">95%</span>
+        <div class="zone glass slider" id="brightSlider" data-kind="bright" role="slider" aria-label="Brightness" aria-valuemin="15" aria-valuemax="100">
+          <div class="slider-fill"></div>
+          <div class="slider-head">
+            <span class="slider-label">Display</span>
+            <span class="slider-value mono">--</span>
+            <span class="slider-sub"></span>
           </div>
-
-          <!-- Vertical Tick Marks -->
-          <div class="relative z-10 flex flex-col items-center justify-between flex-1 py-6 w-full px-3 pointer-events-none opacity-45">
-            <div class="w-4 h-0.5 bg-white rounded"></div>
-            <div class="w-2.5 h-0.5 bg-white/60 rounded"></div>
-            <div class="w-4 h-0.5 bg-white rounded"></div>
-            <div class="w-2.5 h-0.5 bg-white/60 rounded"></div>
-            <div class="w-5 h-0.5 bg-amber-300 rounded"></div>
-            <div class="w-2.5 h-0.5 bg-white/60 rounded"></div>
-            <div class="w-4 h-0.5 bg-white rounded"></div>
-            <div class="w-2.5 h-0.5 bg-white/60 rounded"></div>
-            <div class="w-4 h-0.5 bg-white rounded"></div>
-          </div>
-
-          <!-- Bottom Sun Icon -->
-          <div class="relative z-10 p-2.5 rounded-xl bg-black/50 border border-white/10 text-amber-300">
-            <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <circle cx="12" cy="12" r="5"></circle>
-              <line x1="12" y1="1" x2="12" y2="3"></line>
-              <line x1="12" y1="21" x2="12" y2="23"></line>
-              <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
-              <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
-              <line x1="1" y1="12" x2="3" y2="12"></line>
-              <line x1="21" y1="12" x2="23" y2="12"></line>
-              <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
-              <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
-            </svg>
+          <div class="slider-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4.5"/><path d="M12 1.5v2.5M12 20v2.5M4.6 4.6l1.8 1.8M17.6 17.6l1.8 1.8M1.5 12H4M20 12h2.5M4.6 19.4l1.8-1.8M17.6 6.4l1.8-1.8"/></svg>
           </div>
         </div>
-
       </aside>
     </div>
 
-    <!-- =================================================================== -->
-    <!-- ZONE 3: BOTTOM 5-BUTTON HARDWARE DOCK (~24% HEIGHT, 100% WIDTH)     -->
-    <!-- =================================================================== -->
-    <nav id="bottomDockContainer" class="w-full h-[24%] grid grid-cols-5 gap-[10px]">
-      <!-- Rendered dynamically by JS so each of the 5 buttons can be reassigned to Discord, Steam Link, Spotify, etc. -->
-    </nav>
-
+    <!-- ZONE 3: five hardware dock buttons -->
+    <nav class="dock" id="dock" aria-label="Dock"></nav>
   </main>
 
-  <!-- =================================================================== -->
-  <!-- MODAL 1: CUSTOMIZE 5 HARDWARE BUTTONS (Auto-Icon Recognition)       -->
-  <!-- =================================================================== -->
-  <div id="dockConfigModal" class="fixed inset-0 z-40 bg-black/80 backdrop-blur-md hidden items-center justify-center p-6">
-    <div class="steam-glass carbon-surface w-full max-w-xl rounded-2xl border border-white/15 p-5 shadow-2xl">
-      <div class="flex items-center justify-between border-b border-white/10 pb-3">
-        <div>
-          <h3 class="text-base font-extrabold uppercase tracking-wider text-white">Assign 5 Hardware Dock Buttons</h3>
-          <p class="text-xs text-gray-400">Type an app name (like "Discord", "Steam Link", "Spotify", "YouTube") and the icon updates automatically.</p>
-        </div>
-        <button onclick="closeDockConfigModal()" class="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-gray-300">✕</button>
-      </div>
-
-      <!-- Slot Selector Tabs (Slot 1 to 5) -->
-      <div id="slotSelectorTabs" class="grid grid-cols-5 gap-2 my-4">
-        <!-- Populated by JS -->
-      </div>
-
-      <!-- Editor Fields for Active Slot -->
-      <div class="space-y-3 bg-black/40 p-4 rounded-xl border border-white/10">
-        <div>
-          <label class="block text-[11px] font-bold uppercase tracking-wider text-gray-400 mb-1">Quick Preset Picker</label>
-          <div id="presetPillsContainer" class="flex flex-wrap gap-1.5">
-            <!-- Populated by JS -->
-          </div>
-        </div>
-
-        <div class="grid grid-cols-2 gap-3 pt-1">
-          <div>
-            <label class="block text-[11px] font-bold uppercase tracking-wider text-gray-400 mb-1">Button Name (Auto-detects Icon)</label>
-            <input id="slotNameInput" type="text" placeholder="e.g. Discord" class="w-full px-3 py-2 rounded-lg bg-black/70 border border-white/15 text-sm text-white focus:outline-none focus:border-cyan-400" oninput="handleSlotNameInput(this.value)" />
-          </div>
-          <div>
-            <label class="block text-[11px] font-bold uppercase tracking-wider text-gray-400 mb-1">Subtitle / Status Label</label>
-            <input id="slotSubInput" type="text" placeholder="e.g. Voice Chat" class="w-full px-3 py-2 rounded-lg bg-black/70 border border-white/15 text-sm text-white focus:outline-none focus:border-cyan-400" />
-          </div>
-        </div>
-
-        <div>
-          <label class="block text-[11px] font-bold uppercase tracking-wider text-gray-400 mb-1">Launch Action / iOS URL Scheme or Deck View</label>
-          <input id="slotUrlInput" type="text" placeholder="e.g. discord:// or steamlink:// or deck:lyrics" class="w-full px-3 py-2 rounded-lg bg-black/70 border border-white/15 text-xs mono-num text-cyan-300 focus:outline-none focus:border-cyan-400" />
-        </div>
-      </div>
-
-      <div class="flex items-center justify-between mt-4 pt-2 border-t border-white/10">
-        <button onclick="resetDockDefaults()" class="px-3 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-xs font-semibold text-gray-400">
-          Reset to Defaults
-        </button>
-        <div class="flex gap-2">
-          <button onclick="closeDockConfigModal()" class="px-4 py-2 rounded-xl bg-white/10 hover:bg-white/15 text-xs font-semibold text-white">
-            Cancel
-          </button>
-          <button onclick="saveCurrentSlotConfig()" class="px-5 py-2 rounded-xl bg-cyan-400 hover:bg-cyan-300 text-xs font-extrabold text-black shadow-lg">
-            Save Button Slot
-          </button>
-        </div>
-      </div>
+  <!-- Settings sheet -->
+  <div class="sheet-backdrop" id="settingsSheet" hidden>
+    <div class="sheet glass" role="dialog" aria-modal="true" aria-labelledby="settingsTitle">
+      <header class="sheet-head">
+        <h2 id="settingsTitle">Settings</h2>
+        <button class="icon-btn" data-close type="button" aria-label="Close">✕</button>
+      </header>
+      <div class="sheet-body" id="settingsBody"></div>
     </div>
   </div>
 
-  <!-- =================================================================== -->
-  <!-- MODAL 2: SPOTIFY PLAYLIST & WEB API CONNECTION HUB                  -->
-  <!-- =================================================================== -->
-  <div id="spotifyModal" class="fixed inset-0 z-40 bg-black/80 backdrop-blur-md hidden items-center justify-center p-6">
-    <div class="steam-glass carbon-surface w-full max-w-lg rounded-2xl border border-[#1db954]/40 p-5 shadow-2xl">
-      <div class="flex items-center justify-between border-b border-white/10 pb-3">
-        <div class="flex items-center gap-2">
-          <span class="w-3 h-3 rounded-full bg-[#1db954]"></span>
-          <h3 class="text-base font-extrabold uppercase tracking-wider text-white">Spotify Deck Integration</h3>
-        </div>
-        <button onclick="closeSpotifyModal()" class="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-gray-300">✕</button>
-      </div>
-
-      <div class="space-y-4 my-4 text-xs text-gray-300">
-        <div class="p-3 rounded-xl bg-black/45 border border-white/10">
-          <p class="font-bold text-white mb-1">1. Load Any Spotify Playlist or Album Link (Zero API Key Needed)</p>
-          <p class="text-[11px] text-gray-400 mb-2">Paste any Spotify Playlist, Album, or Track link below to load it directly into the Deck's Spotify Embed screen:</p>
-          <div class="flex gap-2">
-            <input id="spotifyUriInput" type="text" placeholder="https://open.spotify.com/playlist/37i9dQZF1DXcBWIGoYBM5M" class="flex-1 px-3 py-2 rounded-lg bg-black/70 border border-white/15 text-xs text-white focus:outline-none focus:border-[#1db954]" />
-            <button onclick="applyCustomSpotifyEmbed()" class="px-4 py-2 rounded-lg bg-[#1db954] text-black font-bold">Load</button>
-          </div>
-        </div>
-
-        <div class="p-3 rounded-xl bg-black/45 border border-white/10">
-          <p class="font-bold text-white mb-1">2. Optional: Spotify Web API Access Token (Live Account Sync)</p>
-          <p class="text-[11px] text-gray-400 mb-2">If you have a Spotify Developer OAuth Bearer Token, paste it here to pull your live "Currently Playing" metadata onto the main Visualizer screen:</p>
-          <div class="flex gap-2">
-            <input id="spotifyTokenInput" type="password" placeholder="Paste Spotify Bearer Token (optional)..." class="flex-1 px-3 py-2 rounded-lg bg-black/70 border border-white/15 text-xs text-white focus:outline-none focus:border-[#1db954]" />
-            <button onclick="connectSpotifyToken()" class="px-4 py-2 rounded-lg bg-white/10 hover:bg-white/20 text-white font-bold">Connect</button>
-          </div>
-        </div>
-      </div>
-
-      <div class="flex justify-end">
-        <button onclick="closeSpotifyModal()" class="px-4 py-2 rounded-xl bg-white/10 text-xs font-bold text-white">Done</button>
-      </div>
+  <!-- Dock button editor -->
+  <div class="sheet-backdrop" id="dockSheet" hidden>
+    <div class="sheet glass" role="dialog" aria-modal="true" aria-labelledby="dockTitle">
+      <header class="sheet-head">
+        <h2 id="dockTitle">Dock buttons</h2>
+        <button class="icon-btn" data-close type="button" aria-label="Close">✕</button>
+      </header>
+      <div class="sheet-body" id="dockBody"></div>
     </div>
   </div>
 
-  <!-- =================================================================== -->
-  <!-- APPLICATION LOGIC (Web Audio Synth + Visualizer + Sliders + Dock)   -->
-  <!-- =================================================================== -->
-  <!-- MODAL 2: ADD SPOTIFY URL OR SEARCH REAL SONG FOR DECK LIBRARY       -->
-  <!-- =================================================================== -->
-  <div id="addMusicModal" class="fixed inset-0 z-40 bg-black/80 backdrop-blur-md hidden items-center justify-center p-6">
-    <div class="steam-glass carbon-surface w-full max-w-xl rounded-2xl border border-[#1db954]/40 p-5 shadow-2xl">
-      <div class="flex items-center justify-between border-b border-white/10 pb-3">
-        <div class="flex items-center gap-2">
-          <span class="w-3 h-3 rounded-full bg-[#1db954]"></span>
-          <div>
-            <h3 class="text-base font-extrabold uppercase tracking-wider text-white">Add to Deck Library</h3>
-            <p class="text-[11px] text-gray-400">Paste any Spotify Track/Playlist/Album link OR search any song to add with real cover & synced lyrics.</p>
-          </div>
-        </div>
-        <button onclick="closeAddMusicModal()" class="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-gray-300">✕</button>
-      </div>
-
-      <div class="space-y-4 my-4 text-xs text-gray-300">
-        <!-- Option A: Paste Spotify URL -->
-        <div class="p-3.5 rounded-xl bg-black/50 border border-white/10">
-          <label class="block font-bold text-white mb-1">Option 1: Paste a Spotify Link (Track, Playlist, or Album URL)</label>
-          <p class="text-[11px] text-gray-400 mb-2">Automatically fetches the official cover icon, title, Spotify embedded player, and synced lyrics:</p>
-          <div class="flex gap-2">
-            <input id="spotifyUrlInput" type="text" placeholder="https://open.spotify.com/track/... or /playlist/..." class="flex-1 px-3 py-2 rounded-lg bg-black/80 border border-white/15 text-xs text-white focus:outline-none focus:border-[#1db954]" />
-            <button onclick="addFromSpotifyUrl()" id="addSpotifyUrlBtn" class="px-4 py-2 rounded-lg bg-[#1db954] hover:bg-[#1ed760] text-black font-extrabold shrink-0">
-              Add Link
-            </button>
-          </div>
-        </div>
-
-        <!-- Option B: Direct Song Search (Fetches real Cover Art + Audio Preview + Real Synced Lyrics) -->
-        <div class="p-3.5 rounded-xl bg-black/50 border border-white/10">
-          <label class="block font-bold text-white mb-1">Option 2: Search Any Song by Title or Artist</label>
-          <p class="text-[11px] text-gray-400 mb-2">Adds the song directly to your Deck Library with high-res album art and live bottom-to-top scrolling lyrics:</p>
-          <div class="flex gap-2">
-            <input id="songSearchInput" type="text" placeholder="e.g. Blinding Lights The Weeknd, Starboy, After Dark..." class="flex-1 px-3 py-2 rounded-lg bg-black/80 border border-white/15 text-xs text-white focus:outline-none focus:border-cyan-400" onkeydown="if(event.key==='Enter') searchRealSongs()" />
-            <button onclick="searchRealSongs()" id="searchSongBtn" class="px-4 py-2 rounded-lg bg-cyan-400 hover:bg-cyan-300 text-black font-extrabold shrink-0">
-              Search
-            </button>
-          </div>
-          <!-- Search Results List -->
-          <div id="songSearchResults" class="mt-2.5 max-h-40 overflow-y-auto custom-scroll space-y-1.5"></div>
-        </div>
-      </div>
-
-      <div class="flex justify-end">
-        <button onclick="closeAddMusicModal()" class="px-4 py-2 rounded-xl bg-white/10 text-xs font-bold text-white">Close</button>
-      </div>
+  <!-- Spotify device picker -->
+  <div class="sheet-backdrop" id="deviceSheet" hidden>
+    <div class="sheet sheet-sm glass" role="dialog" aria-modal="true" aria-labelledby="deviceTitle">
+      <header class="sheet-head">
+        <h2 id="deviceTitle">Play on…</h2>
+        <button class="icon-btn" data-close type="button" aria-label="Close">✕</button>
+      </header>
+      <div class="sheet-body" id="deviceBody"></div>
     </div>
   </div>
 
-  <!-- =================================================================== -->
-  <!-- MODAL 3: PASTE / EDIT CUSTOM SYNCED OR PLAIN LYRICS                 -->
-  <!-- =================================================================== -->
-  <div id="customLyricsModal" class="fixed inset-0 z-40 bg-black/80 backdrop-blur-md hidden items-center justify-center p-6">
-    <div class="steam-glass carbon-surface w-full max-w-lg rounded-2xl border border-cyan-400/40 p-5 shadow-2xl">
-      <div class="flex items-center justify-between border-b border-white/10 pb-3">
-        <h3 class="text-sm font-extrabold uppercase tracking-wider text-white">Edit / Paste Song Lyrics</h3>
-        <button onclick="closeCustomLyricsModal()" class="p-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-gray-300">✕</button>
-      </div>
-      <p class="text-[11px] text-gray-400 my-2">Supports `[mm:ss.xx] Lyric line` LRC format or plain text lines (auto-timed across the song duration):</p>
-      <textarea id="customLyricsTextarea" rows="8" class="w-full p-3 rounded-xl bg-black/70 border border-white/15 text-xs text-white font-mono focus:outline-none focus:border-cyan-400" placeholder="[00:12.00] First line of lyrics..."></textarea>
-      <div class="flex justify-end gap-2 mt-3">
-        <button onclick="closeCustomLyricsModal()" class="px-4 py-2 rounded-xl bg-white/10 text-xs font-semibold text-white">Cancel</button>
-        <button onclick="saveCustomLyrics()" class="px-4 py-2 rounded-xl bg-cyan-400 text-xs font-extrabold text-black">Save Lyrics</button>
-      </div>
-    </div>
-  </div>
+  <input type="file" id="fileInput" accept="audio/*,.mp3,.m4a,.aac,.wav,.flac" multiple hidden />
 
-  <!-- =================================================================== -->
-  <!-- APPLICATION LOGIC (Spotify IFrame API + LRCLIB Synced Lyrics + Dock)-->
-  <!-- =================================================================== -->
-  <script>
-    /*************************************************************************
-     * 1. BRAND SVG ICON LIBRARY (Automatically recognizes "Discord", etc.)
-     *************************************************************************/
-    const BRAND_ICONS = {
-      discord: {
-        color: '#5865F2',
-        defaultSub: 'Voice & Comms',
-        defaultUrl: 'discord://',
-        svg: `<svg class="w-7 h-7" viewBox="0 0 24 24" fill="currentColor"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028c.462-.63.874-1.295 1.226-1.994a.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z"/></svg>`
-      },
-      steam: {
-        color: '#00e5ff',
-        defaultSub: 'Game Stream',
-        defaultUrl: 'steamlink://',
-        svg: `<svg class="w-7 h-7" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 0-9.95 9.03l5.33 2.2a2.82 2.82 0 0 1 2.57-.47l2.43-3.52a3.77 3.77 0 1 1 3.77 3.77h-.09l-3.46 2.47c0 .19-.02.38-.07.57a2.83 2.83 0 0 1-5.46-.35L3.3 14.18A10 10 0 1 0 12 2zm4.15 7.24a2.51 2.51 0 1 0 0 5.02 2.51 2.51 0 0 0 0-5.02zm-6.4 6.53a1.88 1.88 0 1 0 0 3.76 1.88 1.88 0 0 0 0-3.76z"/></svg>`
-      },
-      spotify: {
-        color: '#1db954',
-        defaultSub: 'Open Spotify App',
-        defaultUrl: 'spotify://',
-        svg: `<svg class="w-7 h-7" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"/></svg>`
-      },
-      moonlight: {
-        color: '#a855f7',
-        defaultSub: 'PC Host Stream',
-        defaultUrl: 'moonlight://',
-        svg: `<svg class="w-7 h-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>`
-      },
-      youtube: {
-        color: '#ef4444',
-        defaultSub: 'Video Deck',
-        defaultUrl: 'youtube://',
-        svg: `<svg class="w-7 h-7" viewBox="0 0 24 24" fill="currentColor"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>`
-      },
-      github: {
-        color: '#f3f4f6',
-        defaultSub: 'Aiman2404 Repos',
-        defaultUrl: 'https://github.com/Aiman2404',
-        svg: `<svg class="w-7 h-7" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg>`
-      }
-    };
-
-    function detectIconKeyFromName(name = '') {
-      const clean = name.toLowerCase().trim();
-      if (clean.includes('discord')) return 'discord';
-      if (clean.includes('steam')) return 'steam';
-      if (clean.includes('spotify') || clean.includes('music')) return 'spotify';
-      if (clean.includes('moonlight') || clean.includes('stream')) return 'moonlight';
-      if (clean.includes('youtube') || clean.includes('video')) return 'youtube';
-      if (clean.includes('git')) return 'github';
-      return 'steam';
-    }
-
-    /*************************************************************************
-     * 2. BOTTOM 5 HARDWARE BUTTON SLOTS
-     *************************************************************************/
-    const DEFAULT_DOCK_SLOTS = [
-      { name: 'Steam Link', sub: 'Remote Play', iconKey: 'steam', url: 'steamlink://' },
-      { name: 'Discord', sub: 'Voice & Party', iconKey: 'discord', url: 'discord://' },
-      { name: 'Spotify App', sub: 'Native iOS App', iconKey: 'spotify', url: 'spotify://' },
-      { name: 'Moonlight', sub: 'PC Host Stream', iconKey: 'moonlight', url: 'moonlight://' },
-      { name: 'GitHub', sub: 'Aiman2404', iconKey: 'github', url: 'https://github.com/Aiman2404' }
-    ];
-
-    let dockSlots = JSON.parse(localStorage.getItem('steamDeck_dockSlots_v2')) || DEFAULT_DOCK_SLOTS;
-    let activeEditSlotIndex = 0;
-
-    function renderBottomDock() {
-      const container = document.getElementById('bottomDockContainer');
-      container.innerHTML = dockSlots.map((slot, idx) => {
-        const brand = BRAND_ICONS[slot.iconKey] || BRAND_ICONS.steam;
-        return `
-          <button 
-            onclick="triggerDockButton(${idx})"
-            oncontextmenu="event.preventDefault(); openDockConfigModal(${idx});"
-            class="trench-highlight deck-btn steam-glass carbon-surface relative h-full rounded-2xl p-3.5 flex flex-col justify-between items-start text-left group overflow-hidden"
-          >
-            <div class="pointer-events-none absolute -top-10 -right-10 w-24 h-24 rounded-full blur-2xl opacity-30 transition-opacity group-hover:opacity-60" style="background: ${brand.color};"></div>
-            <div class="w-full flex items-center justify-between relative z-10">
-              <div class="p-2.5 rounded-xl bg-black/50 border border-white/10 transition-transform group-hover:scale-105" style="color: ${brand.color};">
-                ${brand.svg}
-              </div>
-              <span 
-                onclick="event.stopPropagation(); openDockConfigModal(${idx});"
-                class="px-2 py-1 rounded-lg bg-white/5 hover:bg-white/15 text-[10px] mono-num font-bold text-gray-400 hover:text-white"
-                title="Customize Button ${idx + 1}"
-              >
-                B${idx + 1} ✎
-              </span>
-            </div>
-            <div class="w-full relative z-10 mt-1">
-              <div class="text-sm sm:text-base font-extrabold text-white tracking-tight truncate">${slot.name}</div>
-              <div class="text-[11px] font-medium text-gray-400 truncate flex items-center gap-1.5">
-                <span class="w-1.5 h-1.5 rounded-full" style="background: ${brand.color};"></span>
-                <span>${slot.sub}</span>
-              </div>
-            </div>
-          </button>
-        `;
-      }).join('');
-    }
-
-    function triggerDockButton(idx) {
-      const slot = dockSlots[idx];
-      if (!slot) return;
-      showDeckToast(`LAUNCHING ${slot.name.toUpperCase()}...`);
-      if (slot.url.startsWith('http://') || slot.url.startsWith('https://')) {
-        window.open(slot.url, '_blank');
-      } else {
-        window.location.href = slot.url;
-      }
-    }
-
-    /*************************************************************************
-     * 3. REAL SPOTIFY DECK LIBRARY + OFFICIAL SPOTIFY IFRAME CONTROLLER
-     *    + HTML5 AUDIO PREVIEW FALLBACK + LRCLIB REAL SYNCED LYRICS
-     *************************************************************************/
-    let deckLibrary = JSON.parse(localStorage.getItem('steamDeck_userLibrary_v2')) || [];
-    let currentSongIndex = -1;
-    let isPlaying = false;
-    let isShuffle = false;
-    let showFavoritesOnly = false;
-
-    let currentPositionSec = 0;
-    let currentDurationSec = 0;
-    let activeLyrics = []; // Array of { time: seconds, text: string }
-    let activeLyricIndex = -1;
-
-    // Official Spotify IFrame API Controller
-    let spotifyController = null;
-    // HTML5 Audio Element (plays real song preview if user adds via search or isn't logged into Spotify web)
-    const htmlAudioPlayer = new Audio();
-    htmlAudioPlayer.crossOrigin = 'anonymous';
-    let fallbackTimer = null;
-
-    let currentVolume = 0.80;
-
-    window.onSpotifyIframeApiReady = (IFrameAPI) => {
-      const element = document.getElementById('spotifyEmbedMount');
-      const defaultUri = deckLibrary[0]?.spotifyUri || 'spotify:track:0VjIjW4GlUZAMYd2vXMi3b';
-      const options = {
-        width: '100%',
-        height: '152',
-        uri: defaultUri
-      };
-      const callback = (EmbedController) => {
-        spotifyController = EmbedController;
-        spotifyController.addListener('playback_update', (e) => {
-          if (!e || !e.data) return;
-          const { position, duration, isPaused } = e.data;
-          if (duration > 0) {
-            currentPositionSec = position / 1000;
-            currentDurationSec = duration / 1000;
-            isPlaying = !isPaused;
-            updateTransportUI();
-            updateScrubberAndLyricsUI();
-          }
-        });
-      };
-      IFrameAPI.createController(element, options, callback);
-    };
-
-    // HTML5 Audio Events for direct track playback & real volume slider control
-    htmlAudioPlayer.addEventListener('timeupdate', () => {
-      if (!htmlAudioPlayer.paused && htmlAudioPlayer.duration) {
-        currentPositionSec = htmlAudioPlayer.currentTime;
-        // If full song duration is stored from metadata, scale or show real time
-        if (!currentDurationSec) currentDurationSec = htmlAudioPlayer.duration;
-        updateScrubberAndLyricsUI();
-      }
-    });
-
-    htmlAudioPlayer.addEventListener('ended', () => {
-      playNextTrack();
-    });
-
-    function saveLibraryToStorage() {
-      localStorage.setItem('steamDeck_userLibrary_v2', JSON.stringify(deckLibrary));
-      renderDeckLibrary();
-    }
-
-    // Parse Spotify URL into { type: 'track'|'playlist'|'album', id, uri, cleanUrl }
-    function parseSpotifyLink(input) {
-      const str = input.trim();
-      const match = str.match(/spotify\.com\/(track|playlist|album)\/([a-zA-Z0-9]+)/);
-      if (match) {
-        return {
-          type: match[1],
-          id: match[2],
-          uri: `spotify:${match[1]}:${match[2]}`,
-          cleanUrl: `https://open.spotify.com/${match[1]}/${match[2]}`
-        };
-      }
-      return null;
-    }
-
-    // Add a Spotify Track, Playlist, or Album URL via Spotify's official oEmbed endpoint + iTunes/LRCLIB enrichment
-    async function addFromSpotifyUrl() {
-      const inputEl = document.getElementById('spotifyUrlInput');
-      const rawUrl = inputEl.value.trim();
-      if (!rawUrl) {
-        showDeckToast('PASTE A VALID SPOTIFY LINK FIRST');
-        return;
-      }
-
-      const parsed = parseSpotifyLink(rawUrl);
-      if (!parsed) {
-        showDeckToast('INVALID SPOTIFY URL FORMAT');
-        return;
-      }
-
-      const btn = document.getElementById('addSpotifyUrlBtn');
-      btn.textContent = 'Loading...';
-
-      try {
-        // 1. Fetch official title & high-res cover art from Spotify oEmbed API (CORS-enabled)
-        const oembedRes = await fetch(`https://open.spotify.com/oembed?url=${encodeURIComponent(parsed.cleanUrl)}`);
-        const oembedData = await oembedRes.json();
-
-        let title = oembedData.title || 'Spotify Track';
-        let artist = parsed.type === 'playlist' ? 'Spotify Playlist' : 'Spotify Artist';
-        let cover = oembedData.thumbnail_url || 'https://placehold.co/400x400/11151d/1db954?text=Spotify';
-        let previewUrl = '';
-        let durationSec = 195;
-
-        // Enrich via iTunes Search API to get artist name, exact track duration, and audio stream preview
-        if (parsed.type === 'track' && title) {
-          try {
-            const itunesRes = await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(title)}&entity=song&limit=1`);
-            const itunesData = await itunesRes.json();
-            if (itunesData.results && itunesData.results.length > 0) {
-              const hit = itunesData.results[0];
-              artist = hit.artistName || artist;
-              durationSec = hit.trackTimeMillis ? Math.round(hit.trackTimeMillis / 1000) : durationSec;
-              previewUrl = hit.previewUrl || '';
-            }
-          } catch (_) {}
-        }
-
-        const newItem = {
-          id: 'sp_' + Date.now(),
-          title,
-          artist,
-          cover,
-          spotifyUri: parsed.uri,
-          spotifyType: parsed.type,
-          spotifyUrl: parsed.cleanUrl,
-          previewUrl,
-          duration: durationSec,
-          favorite: false,
-          lyrics: []
-        };
-
-        deckLibrary.unshift(newItem);
-        saveLibraryToStorage();
-        inputEl.value = '';
-        closeAddMusicModal();
-        selectSongFromLibrary(0);
-        showDeckToast(`ADDED "${title.toUpperCase()}" TO DECK LIBRARY`);
-      } catch (err) {
-        showDeckToast('ADDED SPOTIFY LINK TO DECK LIBRARY');
-        const fallbackItem = {
-          id: 'sp_' + Date.now(),
-          title: `Spotify ${parsed.type.toUpperCase()} (${parsed.id.slice(0, 6)})`,
-          artist: 'Spotify Link',
-          cover: 'https://placehold.co/400x400/11151d/1db954?text=Spotify',
-          spotifyUri: parsed.uri,
-          spotifyType: parsed.type,
-          spotifyUrl: parsed.cleanUrl,
-          previewUrl: '',
-          duration: 180,
-          favorite: false,
-          lyrics: []
-        };
-        deckLibrary.unshift(fallbackItem);
-        saveLibraryToStorage();
-        closeAddMusicModal();
-        selectSongFromLibrary(0);
-      } finally {
-        btn.textContent = 'Add Link';
-      }
-    }
-
-    // Option 2: Search any real song by name/artist (Fetches real cover, duration, audio, and synced lyrics)
-    async function searchRealSongs() {
-      const query = document.getElementById('songSearchInput').value.trim();
-      if (!query) return;
-      const resultsContainer = document.getElementById('songSearchResults');
-      resultsContainer.innerHTML = `<div class="text-xs text-cyan-300 py-2">Searching songs...</div>`;
-
-      try {
-        const res = await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(query)}&entity=song&limit=6`);
-        const data = await res.json();
-        if (!data.results || data.results.length === 0) {
-          resultsContainer.innerHTML = `<div class="text-xs text-gray-400 py-2">No songs found. Try another search.</div>`;
-          return;
-        }
-
-        window._lastSearchResults = data.results;
-        resultsContainer.innerHTML = data.results.map((item, idx) => {
-          const hiResArt = (item.artworkUrl100 || '').replace('100x100bb', '400x400bb');
-          const dur = item.trackTimeMillis ? formatTime(Math.round(item.trackTimeMillis / 1000)) : '3:00';
-          return `
-            <div class="flex items-center justify-between p-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10">
-              <div class="flex items-center gap-2.5 min-w-0">
-                <img src="${hiResArt}" class="w-9 h-9 rounded-lg object-cover shrink-0" />
-                <div class="min-w-0">
-                  <div class="text-xs font-bold text-white truncate">${item.trackName}</div>
-                  <div class="text-[10px] text-gray-400 truncate">${item.artistName} • ${dur}</div>
-                </div>
-              </div>
-              <button onclick="addSearchedSongToLibrary(${idx})" class="px-3 py-1.5 rounded-lg bg-[#1db954] hover:bg-[#1ed760] text-black font-extrabold text-[10px] shrink-0 ml-2">
-                + Add to Library
-              </button>
-            </div>
-          `;
-        }).join('');
-      } catch (e) {
-        resultsContainer.innerHTML = `<div class="text-xs text-rose-400 py-2">Search error. Check connection.</div>`;
-      }
-    }
-
-    function addSearchedSongToLibrary(resultIdx) {
-      const hit = window._lastSearchResults?.[resultIdx];
-      if (!hit) return;
-
-      const hiResArt = (hit.artworkUrl100 || '').replace('100x100bb', '600x600bb');
-      const durationSec = hit.trackTimeMillis ? Math.round(hit.trackTimeMillis / 1000) : 180;
-
-      const newSong = {
-        id: 'song_' + Date.now() + '_' + resultIdx,
-        title: hit.trackName,
-        artist: hit.artistName,
-        cover: hiResArt,
-        spotifyUri: '',
-        spotifyType: 'track',
-        spotifyUrl: '',
-        previewUrl: hit.previewUrl || '',
-        duration: durationSec,
-        favorite: false,
-        lyrics: []
-      };
-
-      deckLibrary.unshift(newSong);
-      saveLibraryToStorage();
-      closeAddMusicModal();
-      selectSongFromLibrary(0);
-      showDeckToast(`ADDED "${newSong.title.toUpperCase()}" TO LIBRARY`);
-    }
-
-    /*************************************************************************
-     * 4. SELECTING A SONG -> LOADS ICON, PLAYER, AND REAL SYNCED LYRICS
-     *************************************************************************/
-    async function selectSongFromLibrary(index) {
-      if (index < 0 || index >= deckLibrary.length) return;
-      currentSongIndex = index;
-      const song = deckLibrary[currentSongIndex];
-
-      // Update Left Now Playing Icon & Details
-      document.getElementById('nowPlayingCover').src = song.cover;
-      document.getElementById('nowPlayingTitle').textContent = song.title;
-      document.getElementById('nowPlayingArtist').textContent = song.artist;
-      document.getElementById('sourceTypeBadge').textContent = song.spotifyUri ? 'SPOTIFY LINK' : 'DECK AUDIO';
-
-      currentPositionSec = 0;
-      currentDurationSec = song.duration || 180;
-      updateScrubberAndLyricsUI();
-      updateFavoriteButtonUI();
-      renderDeckLibrary();
-
-      // Load into Official Spotify IFrame Controller if it has a Spotify URI
-      if (song.spotifyUri && spotifyController) {
-        spotifyController.loadUri(song.spotifyUri);
-        // If it's a playlist/album link, automatically show the Spotify Embed drawer so user can pick any track inside it
-        if (song.spotifyType === 'playlist' || song.spotifyType === 'album') {
-          document.getElementById('spotifyEngineDrawer').classList.remove('hidden');
-          document.getElementById('spotifyEngineDrawer').classList.add('flex');
-        }
-      }
-
-      // Start playback
-      startPlaybackForCurrentSong();
-
-      // Load or fetch real synced LRC lyrics from LRCLIB
-      if (song.lyrics && song.lyrics.length > 0) {
-        activeLyrics = song.lyrics;
-        renderLyricsViewport();
-      } else {
-        await fetchSyncedLyrics(song);
-      }
-    }
-
-    function startPlaybackForCurrentSong() {
-      const song = deckLibrary[currentSongIndex];
-      if (!song) return;
-
-      clearInterval(fallbackTimer);
-      htmlAudioPlayer.pause();
-
-      if (song.spotifyUri && spotifyController) {
-        try {
-          spotifyController.play();
-        } catch (_) {}
-      }
-
-      if (song.previewUrl) {
-        htmlAudioPlayer.src = song.previewUrl;
-        htmlAudioPlayer.volume = currentVolume;
-        htmlAudioPlayer.play().catch(() => {});
-      }
-
-      isPlaying = true;
-      updateTransportUI();
-
-      // Smooth 250ms progression timer (synced or overridden whenever Spotify IFrame emits playback_update)
-      fallbackTimer = setInterval(() => {
-        if (!isPlaying) return;
-        if (htmlAudioPlayer.src && !htmlAudioPlayer.paused) {
-          currentPositionSec = htmlAudioPlayer.currentTime;
-        } else {
-          currentPositionSec += 0.25;
-          if (currentDurationSec > 0 && currentPositionSec >= currentDurationSec) {
-            playNextTrack();
-          }
-        }
-        updateScrubberAndLyricsUI();
-      }, 250);
-    }
-
-    function togglePlayPause() {
-      if (currentSongIndex === -1) {
-        if (deckLibrary.length > 0) {
-          selectSongFromLibrary(0);
-        } else {
-          openAddMusicModal();
-        }
-        return;
-      }
-
-      const song = deckLibrary[currentSongIndex];
-      isPlaying = !isPlaying;
-
-      if (song.spotifyUri && spotifyController) {
-        try {
-          spotifyController.togglePlay();
-        } catch (_) {}
-      }
-
-      if (song.previewUrl) {
-        if (isPlaying) {
-          htmlAudioPlayer.play().catch(() => {});
-        } else {
-          htmlAudioPlayer.pause();
-        }
-      }
-
-      updateTransportUI();
-      renderDeckLibrary();
-    }
-
-    function stopPlayback() {
-      isPlaying = false;
-      currentPositionSec = 0;
-      htmlAudioPlayer.pause();
-      htmlAudioPlayer.currentTime = 0;
-      if (spotifyController) {
-        try { spotifyController.pause(); } catch (_) {}
-      }
-      updateTransportUI();
-      updateScrubberAndLyricsUI();
-      renderDeckLibrary();
-      showDeckToast('PLAYBACK STOPPED');
-    }
-
-    function playPreviousTrack() {
-      if (deckLibrary.length === 0) return;
-      const prevIdx = (currentSongIndex - 1 + deckLibrary.length) % deckLibrary.length;
-      selectSongFromLibrary(prevIdx);
-    }
-
-    function playNextTrack() {
-      if (deckLibrary.length === 0) return;
-      let nextIdx;
-      if (isShuffle && deckLibrary.length > 1) {
-        nextIdx = Math.floor(Math.random() * deckLibrary.length);
-      } else {
-        nextIdx = (currentSongIndex + 1) % deckLibrary.length;
-      }
-      selectSongFromLibrary(nextIdx);
-    }
-
-    function toggleShuffleMode() {
-      isShuffle = !isShuffle;
-      const btn = document.getElementById('shuffleBtn');
-      btn.classList.toggle('text-[#1db954]', isShuffle);
-      btn.classList.toggle('text-gray-400', !isShuffle);
-      showDeckToast(isShuffle ? 'RANDOM SHUFFLE ON' : 'RANDOM SHUFFLE OFF');
-    }
-
-    function toggleFavoriteCurrent() {
-      if (currentSongIndex === -1 || !deckLibrary[currentSongIndex]) return;
-      deckLibrary[currentSongIndex].favorite = !deckLibrary[currentSongIndex].favorite;
-      updateFavoriteButtonUI();
-      saveLibraryToStorage();
-      showDeckToast(deckLibrary[currentSongIndex].favorite ? 'ADDED TO FAVORITES ♥' : 'REMOVED FROM FAVORITES');
-    }
-
-    function updateFavoriteButtonUI() {
-      const btn = document.getElementById('favoriteBtn');
-      const isFav = deckLibrary[currentSongIndex]?.favorite;
-      btn.classList.toggle('text-[#1db954]', !!isFav);
-      btn.classList.toggle('text-gray-400', !isFav);
-    }
-
-    function updateTransportUI() {
-      document.getElementById('playIcon').classList.toggle('hidden', isPlaying);
-      document.getElementById('pauseIcon').classList.toggle('hidden', !isPlaying);
-      const dot = document.getElementById('playbackStatusDot');
-      const badge = document.getElementById('playbackStatusText');
-      if (isPlaying) {
-        dot.className = 'w-2 h-2 rounded-full bg-[#1db954] animate-ping';
-        badge.textContent = 'PLAYING';
-      } else {
-        dot.className = 'w-2 h-2 rounded-full bg-amber-400';
-        badge.textContent = 'PAUSED';
-      }
-    }
-
-    /*************************************************************************
-     * 5. REAL SYNCED LYRICS ENGINE (LRCLIB API + BOTTOM-TO-TOP AUTO-SCROLL)
-     *************************************************************************/
-    function parseLrcString(lrcText, fallbackDuration = 180) {
-      const lines = lrcText.split('\n');
-      const parsed = [];
-      const timeRegex = /\[(\d{2}):(\d{2})(?:\.(\d{2,3}))?\]/g;
-
-      for (const rawLine of lines) {
-        const text = rawLine.replace(timeRegex, '').trim();
-        let match;
-        timeRegex.lastIndex = 0;
-        let foundTimestamp = false;
-        while ((match = timeRegex.exec(rawLine)) !== null) {
-          foundTimestamp = true;
-          const mins = parseInt(match[1], 10);
-          const secs = parseInt(match[2], 10);
-          const ms = match[3] ? parseInt(match[3].padEnd(3, '0'), 10) : 0;
-          const totalSec = mins * 60 + secs + ms / 1000;
-          if (text) parsed.push({ time: totalSec, text });
-        }
-        if (!foundTimestamp && text && !text.startsWith('[')) {
-          parsed.push({ time: -1, text });
-        }
-      }
-
-      // If plain text lyrics without timestamps, space them evenly across the track
-      if (parsed.length > 0 && parsed.every(p => p.time === -1)) {
-        const step = fallbackDuration / (parsed.length + 1);
-        parsed.forEach((p, idx) => {
-          p.time = Math.round(step * idx * 10) / 10;
-        });
-      }
-
-      return parsed.sort((a, b) => a.time - b.time);
-    }
-
-    async function fetchSyncedLyrics(song) {
-      const viewport = document.getElementById('lyricsViewport');
-      viewport.innerHTML = `<div class="text-xs text-cyan-300 animate-pulse py-6">Fetching synced lyrics for "${song.title}"...</div>`;
-
-      try {
-        const cleanQuery = `${song.title} ${song.artist !== 'Spotify Playlist' && song.artist !== 'Spotify Artist' ? song.artist : ''}`.trim();
-        const res = await fetch(`https://lrclib.net/api/search?q=${encodeURIComponent(cleanQuery)}`);
-        const results = await res.json();
-
-        if (Array.isArray(results) && results.length > 0) {
-          const best = results.find(r => r.syncedLyrics) || results.find(r => r.plainLyrics) || results[0];
-          if (best.duration && (!song.duration || song.duration === 195)) {
-            song.duration = Math.round(best.duration);
-            currentDurationSec = song.duration;
-          }
-          if (best.syncedLyrics) {
-            activeLyrics = parseLrcString(best.syncedLyrics, song.duration);
-          } else if (best.plainLyrics) {
-            activeLyrics = parseLrcString(best.plainLyrics, song.duration);
-          }
-          song.lyrics = activeLyrics;
-          saveLibraryToStorage();
-          renderLyricsViewport();
-          return;
-        }
-      } catch (_) {}
-
-      // Fallback message if no lyrics found yet
-      activeLyrics = [
-        { time: 0, text: `♪ ${song.title} — ${song.artist}` },
-        { time: 4, text: 'Tap "Edit" above to paste custom lyrics or tap "Spotify Engine" for full playlist controls.' }
-      ];
-      renderLyricsViewport();
-    }
-
-    function renderLyricsViewport() {
-      const viewport = document.getElementById('lyricsViewport');
-      if (!activeLyrics || activeLyrics.length === 0) {
-        viewport.innerHTML = `<div class="text-xs text-gray-500 italic py-6">No lyrics loaded.</div>`;
-        return;
-      }
-
-      viewport.innerHTML = activeLyrics.map((line, idx) => `
-        <div 
-          id="lyricRow-${idx}" 
-          onclick="seekToSecond(${line.time})"
-          class="lyric-line cursor-pointer py-1.5 px-2 rounded-lg text-sm font-bold text-gray-500 opacity-45 hover:opacity-90"
-        >
-          ${line.text}
-        </div>
-      `).join('');
-      activeLyricIndex = -1;
-    }
-
-    function updateScrubberAndLyricsUI() {
-      const pct = currentDurationSec > 0 ? Math.min(100, (currentPositionSec / currentDurationSec) * 100) : 0;
-      document.getElementById('seekBarFill').style.width = `${pct}%`;
-      document.getElementById('currentTimeLabel').textContent = formatTime(Math.floor(currentPositionSec));
-      document.getElementById('durationTimeLabel').textContent = formatTime(Math.floor(currentDurationSec));
-
-      if (!activeLyrics || activeLyrics.length === 0) return;
-
-      // Determine active lyric line for current playback timestamp
-      let newActiveIdx = 0;
-      for (let i = 0; i < activeLyrics.length; i++) {
-        if (currentPositionSec >= activeLyrics[i].time) {
-          newActiveIdx = i;
-        } else {
-          break;
-        }
-      }
-
-      if (newActiveIdx !== activeLyricIndex) {
-        activeLyricIndex = newActiveIdx;
-        activeLyrics.forEach((_, idx) => {
-          const row = document.getElementById(`lyricRow-${idx}`);
-          if (!row) return;
-          if (idx === activeLyricIndex) {
-            row.classList.add('lyric-line-active', 'bg-white/5');
-            row.classList.remove('text-gray-500', 'opacity-45');
-            // Smoothly scroll active line from bottom toward vertical center of the lyrics box
-            row.scrollIntoView({ behavior: 'smooth', block: 'center' });
-          } else {
-            row.classList.remove('lyric-line-active', 'bg-white/5');
-            row.classList.add('text-gray-500', 'opacity-45');
-          }
-        });
-      }
-    }
-
-    function seekToSecond(targetSec) {
-      currentPositionSec = Math.max(0, Math.min(currentDurationSec, targetSec));
-      if (htmlAudioPlayer.src && htmlAudioPlayer.duration) {
-        htmlAudioPlayer.currentTime = Math.min(htmlAudioPlayer.duration - 0.5, currentPositionSec);
-      }
-      if (spotifyController) {
-        try { spotifyController.seek(Math.floor(currentPositionSec)); } catch (_) {}
-      }
-      updateScrubberAndLyricsUI();
-    }
-
-    document.getElementById('seekBarTrack').addEventListener('pointerdown', (e) => {
-      if (currentDurationSec <= 0) return;
-      const rect = e.currentTarget.getBoundingClientRect();
-      const clickPct = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
-      seekToSecond(clickPct * currentDurationSec);
-    });
-
-    function refetchLyricsForCurrent() {
-      if (currentSongIndex === -1 || !deckLibrary[currentSongIndex]) return;
-      fetchSyncedLyrics(deckLibrary[currentSongIndex]);
-    }
-
-    function openCustomLyricsModal() {
-      if (currentSongIndex === -1 || !deckLibrary[currentSongIndex]) {
-        showDeckToast('SELECT A SONG FIRST');
-        return;
-      }
-      const existing = (deckLibrary[currentSongIndex].lyrics || [])
-        .map(l => `[${formatTimePadded(l.time)}] ${l.text}`)
-        .join('\n');
-      document.getElementById('customLyricsTextarea').value = existing;
-      document.getElementById('customLyricsModal').classList.remove('hidden');
-      document.getElementById('customLyricsModal').classList.add('flex');
-    }
-
-    function closeCustomLyricsModal() {
-      document.getElementById('customLyricsModal').classList.add('hidden');
-      document.getElementById('customLyricsModal').classList.remove('flex');
-    }
-
-    function saveCustomLyrics() {
-      if (currentSongIndex === -1 || !deckLibrary[currentSongIndex]) return;
-      const raw = document.getElementById('customLyricsTextarea').value;
-      const song = deckLibrary[currentSongIndex];
-      activeLyrics = parseLrcString(raw, song.duration || 180);
-      song.lyrics = activeLyrics;
-      saveLibraryToStorage();
-      renderLyricsViewport();
-      closeCustomLyricsModal();
-      showDeckToast('LYRICS UPDATED & SYNCED');
-    }
-
-    /*************************************************************************
-     * 6. RENDER DECK LIBRARY (Right Panel)
-     *************************************************************************/
-    function renderDeckLibrary() {
-      const container = document.getElementById('playlistContainer');
-      const itemsToRender = showFavoritesOnly
-        ? deckLibrary.map((s, idx) => ({ s, idx })).filter(x => x.s.favorite)
-        : deckLibrary.map((s, idx) => ({ s, idx }));
-
-      document.getElementById('libraryCountBadge').textContent = `${itemsToRender.length} ${itemsToRender.length === 1 ? 'Song' : 'Songs'}`;
-
-      if (itemsToRender.length === 0) {
-        container.innerHTML = `
-          <div class="h-full flex flex-col items-center justify-center text-center p-4 border border-dashed border-white/10 rounded-xl">
-            <p class="text-xs font-bold text-gray-300 mb-1">Your Deck Library is Empty</p>
-            <p class="text-[10px] text-gray-500 mb-3">Paste any Spotify link or search a song to add it here.</p>
-            <button onclick="openAddMusicModal()" class="px-3 py-1.5 rounded-lg bg-[#1db954] text-black font-extrabold text-[11px]">
-              + Add First Song / URL
-            </button>
-          </div>
-        `;
-        return;
-      }
-
-      container.innerHTML = itemsToRender.map(({ s, idx }) => {
-        const active = idx === currentSongIndex;
-        return `
-          <div 
-            onclick="selectSongFromLibrary(${idx})"
-            class="group cursor-pointer w-full p-2 rounded-xl flex items-center gap-2.5 text-left transition-all ${active ? 'bg-[#1db954]/20 border border-[#1db954]/50' : 'bg-white/5 hover:bg-white/10 border border-transparent'}"
-          >
-            <img src="${s.cover}" alt="${s.title}" class="w-10 h-10 rounded-lg object-cover shrink-0 border border-white/10" />
-            <div class="min-w-0 flex-1">
-              <div class="text-xs font-bold truncate ${active ? 'text-[#1db954]' : 'text-white'}">${s.title}</div>
-              <div class="text-[10px] text-gray-400 truncate">${s.artist}</div>
-            </div>
-            <button 
-              onclick="event.stopPropagation(); removeSongFromLibrary(${idx});" 
-              class="opacity-60 group-hover:opacity-100 p-1 rounded hover:bg-rose-500/20 text-gray-400 hover:text-rose-300 text-[10px]"
-              title="Remove from Deck Library"
-            >
-              ✕
-            </button>
-          </div>
-        `;
-      }).join('');
-    }
-
-    function removeSongFromLibrary(idx) {
-      deckLibrary.splice(idx, 1);
-      if (currentSongIndex === idx) {
-        stopPlayback();
-        currentSongIndex = -1;
-      } else if (currentSongIndex > idx) {
-        currentSongIndex--;
-      }
-      saveLibraryToStorage();
-    }
-
-    function toggleFavoritesFilter() {
-      showFavoritesOnly = !showFavoritesOnly;
-      const btn = document.getElementById('favFilterBtn');
-      btn.classList.toggle('bg-[#1db954]/25', showFavoritesOnly);
-      btn.classList.toggle('text-[#1db954]', showFavoritesOnly);
-      renderDeckLibrary();
-    }
-
-    function clearDeckLibrary() {
-      deckLibrary = [];
-      currentSongIndex = -1;
-      stopPlayback();
-      saveLibraryToStorage();
-      showDeckToast('DECK LIBRARY CLEARED');
-    }
-
-    function openAddMusicModal() {
-      document.getElementById('addMusicModal').classList.remove('hidden');
-      document.getElementById('addMusicModal').classList.add('flex');
-    }
-
-    function closeAddMusicModal() {
-      document.getElementById('addMusicModal').classList.add('hidden');
-      document.getElementById('addMusicModal').classList.remove('flex');
-    }
-
-    function toggleSpotifyEngineDrawer() {
-      const drawer = document.getElementById('spotifyEngineDrawer');
-      drawer.classList.toggle('hidden');
-      drawer.classList.toggle('flex');
-    }
-
-    function formatTime(sec) {
-      const s = Math.max(0, Math.floor(sec || 0));
-      const m = Math.floor(s / 60);
-      const rem = s % 60;
-      return `${m}:${rem < 10 ? '0' : ''}${rem}`;
-    }
-
-    function formatTimePadded(sec) {
-      const s = Math.max(0, Math.floor(sec || 0));
-      const m = String(Math.floor(s / 60)).padStart(2, '0');
-      const rem = String(s % 60).padStart(2, '0');
-      return `${m}:${rem}.00`;
-    }
-
-    /*************************************************************************
-     * 7. TWO VERTICAL SLIDERS (Touch & Pointer Drag for Sound & Brightness)
-     *************************************************************************/
-    function bindVerticalSlider(trackEl, onUpdate) {
-      let dragging = false;
-
-      const calculateVerticalPercent = (clientY) => {
-        const rect = trackEl.getBoundingClientRect();
-        const relativeY = rect.bottom - clientY;
-        const clamped = Math.max(0, Math.min(1, relativeY / rect.height));
-        onUpdate(clamped);
-      };
-
-      trackEl.addEventListener('pointerdown', (e) => {
-        dragging = true;
-        trackEl.setPointerCapture(e.pointerId);
-        calculateVerticalPercent(e.clientY);
-      });
-
-      trackEl.addEventListener('pointermove', (e) => {
-        if (!dragging) return;
-        calculateVerticalPercent(e.clientY);
-      });
-
-      trackEl.addEventListener('pointerup', () => {
-        dragging = false;
-      });
-    }
-
-    // Bind Vertical Slider 1: Sound Volume (0% - 100%)
-    bindVerticalSlider(document.getElementById('volumeSliderTrack'), (pct) => {
-      currentVolume = pct;
-      const displayPct = Math.round(pct * 100);
-      document.getElementById('volumeSliderFill').style.height = `${displayPct}%`;
-      document.getElementById('volumeValueText').textContent = `${displayPct}%`;
-      htmlAudioPlayer.volume = currentVolume;
-    });
-
-    // Bind Vertical Slider 2: Display Brightness (15% - 100%)
-    bindVerticalSlider(document.getElementById('brightnessSliderTrack'), (pct) => {
-      const safePct = Math.max(0.15, pct);
-      const displayPct = Math.round(safePct * 100);
-      document.getElementById('brightnessSliderFill').style.height = `${displayPct}%`;
-      document.getElementById('brightnessValueText').textContent = `${displayPct}%`;
-
-      const darknessOpacity = Math.max(0, Math.min(0.85, 1 - safePct));
-      document.getElementById('brightnessOverlay').style.opacity = darknessOpacity.toFixed(2);
-    });
-
-    /*************************************************************************
-     * 8. 5-BUTTON DOCK CONFIGURATION MODAL
-     *************************************************************************/
-    function openDockConfigModal(slotIdx = 0) {
-      activeEditSlotIndex = slotIdx;
-      document.getElementById('dockConfigModal').classList.remove('hidden');
-      document.getElementById('dockConfigModal').classList.add('flex');
-      renderSlotModalState();
-    }
-
-    function closeDockConfigModal() {
-      document.getElementById('dockConfigModal').classList.add('hidden');
-      document.getElementById('dockConfigModal').classList.remove('flex');
-    }
-
-    function renderSlotModalState() {
-      const tabsEl = document.getElementById('slotSelectorTabs');
-      tabsEl.innerHTML = dockSlots.map((s, i) => `
-        <button 
-          onclick="activeEditSlotIndex = ${i}; renderSlotModalState();"
-          class="py-2 px-2 rounded-xl text-xs font-bold border transition-all ${i === activeEditSlotIndex ? 'bg-cyan-400 text-black border-cyan-300' : 'bg-white/5 text-gray-300 border-white/10'}"
-        >
-          Button ${i + 1}: ${s.name}
-        </button>
-      `).join('');
-
-      const presets = [
-        { name: 'Discord', sub: 'Voice & Comms', iconKey: 'discord', url: 'discord://' },
-        { name: 'Steam Link', sub: 'Game Stream', iconKey: 'steam', url: 'steamlink://' },
-        { name: 'Spotify App', sub: 'Native iOS App', iconKey: 'spotify', url: 'spotify://' },
-        { name: 'Moonlight', sub: 'PC Host Stream', iconKey: 'moonlight', url: 'moonlight://' },
-        { name: 'YouTube', sub: 'Video Deck', iconKey: 'youtube', url: 'youtube://' },
-        { name: 'GitHub', sub: 'Aiman2404', iconKey: 'github', url: 'https://github.com/Aiman2404' }
-      ];
-
-      document.getElementById('presetPillsContainer').innerHTML = presets.map(p => `
-        <button 
-          onclick="applyPresetToModal('${p.name}', '${p.sub}', '${p.iconKey}', '${p.url}')"
-          class="px-2.5 py-1 rounded-lg bg-white/10 hover:bg-white/20 text-[11px] font-semibold text-white"
-        >
-          + ${p.name}
-        </button>
-      `).join('');
-
-      const current = dockSlots[activeEditSlotIndex];
-      document.getElementById('slotNameInput').value = current.name;
-      document.getElementById('slotSubInput').value = current.sub;
-      document.getElementById('slotUrlInput').value = current.url;
-    }
-
-    function applyPresetToModal(name, sub, iconKey, url) {
-      document.getElementById('slotNameInput').value = name;
-      document.getElementById('slotSubInput').value = sub;
-      document.getElementById('slotUrlInput').value = url;
-    }
-
-    function handleSlotNameInput(val) {
-      const detectedKey = detectIconKeyFromName(val);
-      const brand = BRAND_ICONS[detectedKey];
-      if (brand) {
-        document.getElementById('slotSubInput').value = brand.defaultSub;
-        document.getElementById('slotUrlInput').value = brand.defaultUrl;
-      }
-    }
-
-    function saveCurrentSlotConfig() {
-      const name = document.getElementById('slotNameInput').value.trim() || `App ${activeEditSlotIndex + 1}`;
-      const sub = document.getElementById('slotSubInput').value.trim() || 'Ready';
-      const url = document.getElementById('slotUrlInput').value.trim() || 'steamlink://';
-      const iconKey = detectIconKeyFromName(name);
-
-      dockSlots[activeEditSlotIndex] = { name, sub, iconKey, url };
-      localStorage.setItem('steamDeck_dockSlots_v2', JSON.stringify(dockSlots));
-      renderBottomDock();
-      closeDockConfigModal();
-      showDeckToast(`BUTTON ${activeEditSlotIndex + 1} ASSIGNED TO ${name.toUpperCase()}`);
-    }
-
-    function resetDockDefaults() {
-      dockSlots = JSON.parse(JSON.stringify(DEFAULT_DOCK_SLOTS));
-      localStorage.setItem('steamDeck_dockSlots_v2', JSON.stringify(dockSlots));
-      renderBottomDock();
-      closeDockConfigModal();
-      showDeckToast('DOCK RESET TO DEFAULTS');
-    }
-
-    function toggleBezelGuide() {
-      document.getElementById('hardwareGrid').classList.toggle('bezel-guide-active');
-      showDeckToast('3D PRINT BEZEL ALIGNMENT GUIDES TOGGLED');
-    }
-
-    let toastTimeout = null;
-    function showDeckToast(msg) {
-      const toast = document.getElementById('deckToast');
-      document.getElementById('deckToastText').textContent = msg;
-      toast.classList.remove('opacity-0', '-translate-y-4');
-      clearTimeout(toastTimeout);
-      toastTimeout = setTimeout(() => {
-        toast.classList.add('opacity-0', '-translate-y-4');
-      }, 2200);
-    }
-
-    function updateClock() {
-      const now = new Date();
-      const hrs = String(now.getHours()).padStart(2, '0');
-      const mins = String(now.getMinutes()).padStart(2, '0');
-      document.getElementById('liveClock').textContent = `${hrs}:${mins}`;
-    }
-
-    window.onload = function () {
-      updateClock();
-      setInterval(updateClock, 15000);
-      renderBottomDock();
-      renderDeckLibrary();
-      if (deckLibrary.length > 0) {
-        selectSongFromLibrary(0);
-        stopPlayback();
-      }
-
-      if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('./sw.js').catch(() => {});
-      }
-    };
-  </script>
+  <script type="module" src="js/main.js"></script>
 </body>
 </html>
