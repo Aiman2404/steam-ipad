@@ -10,6 +10,8 @@ import { QueueView } from './views/queue-view.js';
 import { Sliders } from './views/sliders.js';
 import { Dock } from './views/dock.js';
 import { Settings } from './views/settings.js';
+import { getLyrics } from './lyrics.js';
+import { spotify } from './spotify-api.js';
 import { bindSheets } from './views/sheet.js';
 
 const player = new Player();
@@ -94,7 +96,36 @@ player.on('track', (track) => {
   lyrics.setTrack(track);
   library.setCurrent(track);
   queue.invalidate();
+  schedulePrefetch(track);
 });
+
+// Warm the lyrics cache for the next song so they appear the instant it starts.
+let prefetchTimer = null;
+function schedulePrefetch(track) {
+  clearTimeout(prefetchTimer);
+  if (!track) return;
+  prefetchTimer = setTimeout(async () => {
+    let next = null;
+    if (player.state.source === 'local') {
+      const local = player.local;
+      const pos = local.order.indexOf(local.index);
+      const row = local.tracks[local.order[pos + 1]];
+      if (row) next = { title: row.title, artist: row.artist, album: row.album, durationMs: row.durationMs };
+    } else {
+      const q = await spotify.queue().catch(() => null);
+      const t = q && q.queue && q.queue[0];
+      if (t && t.type !== 'episode') {
+        next = {
+          title: t.name,
+          artist: (t.artists || []).map((a) => a.name).join(', '),
+          album: (t.album && t.album.name) || '',
+          durationMs: t.duration_ms
+        };
+      }
+    }
+    if (next) getLyrics(next).catch(() => {});
+  }, 8000);
+}
 
 player.on('state', (s) => {
   nowPlaying.setState(s);
