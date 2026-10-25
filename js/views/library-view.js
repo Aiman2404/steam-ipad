@@ -118,7 +118,7 @@ export class LibraryView {
       .map((p, i) => {
         const cover = p.images && p.images.length ? p.images[p.images.length > 1 ? 1 : 0].url : '';
         const count = (p.items && p.items.total) != null ? p.items.total : p.tracks && p.tracks.total;
-        const sub = [p.owner && p.owner.display_name, count != null ? `${count} songs` : ''].filter(Boolean).join(' · ');
+        const sub = [p.owner && p.owner.display_name, count != null ? `${count} ${count === 1 ? 'song' : 'songs'}` : ''].filter(Boolean).join(' · ');
         return `<button class="row" data-pl="${i}">${art(cover)}<div class="row-text"><div class="row-title">${escapeHtml(p.name)}</div><div class="row-sub">${escapeHtml(sub)}</div></div></button>`;
       })
       .join('');
@@ -216,7 +216,8 @@ export class LibraryView {
     const d = this.detail;
     const p = d.playlist;
     const cover = p.images && p.images.length ? p.images[0].url : '';
-    const count = d.tracks ? `${d.tracks.length} songs` : 'Loading…';
+    const n = d.tracks ? d.tracks.length : 0;
+    const count = d.tracks ? `${n} ${n === 1 ? 'song' : 'songs'}` : 'Loading…';
     root.innerHTML = `
       <button class="back" data-act="back">${ICON_BACK}Library</button>
       <div class="detail-head">
