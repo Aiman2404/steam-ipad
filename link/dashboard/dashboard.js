@@ -61,6 +61,19 @@ function showGate() {
   $('#gateFine').textContent = setup
     ? 'The owner is an admin nobody else can remove. You can add family and friends afterwards.'
     : 'Ask an admin for an account if you don\'t have one.';
+  // A fresh Link only accepts its owner from the laptop itself.
+  const remoteSetup = setup && !onLaptop;
+  ['username', 'password'].forEach((n) => ($('#gateForm')[n].closest('.field').hidden = remoteSetup));
+  $('#gateBtn').hidden = remoteSetup;
+  if (remoteSetup) {
+    $('#displayField').hidden = true;
+    $('#gateSub').textContent = 'Finish setup on the laptop';
+    $('#gateFine').textContent =
+      'This DeckOS Link has no owner yet. On the laptop, click the DeckOS Link icon (or open http://127.0.0.1:' +
+      (location.port || '80') +
+      '/dashboard/) and create the owner account there. Then sign in here.';
+    return;
+  }
   $('#gateForm').username.focus();
 }
 
