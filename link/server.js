@@ -354,6 +354,26 @@ router.add('POST', '/api/media', async (ctx) => {
   return { ok: true };
 });
 
+// Laptop screen brightness (the deck's DISPLAY slider): any signed-in member,
+// like the media keys. Built-in laptop screens only.
+router.add('GET', '/api/laptop/brightness', async (ctx) => {
+  requireUser(ctx);
+  if (!features().input) return { supported: false, level: null };
+  try {
+    return await helper.brightness();
+  } catch (_) {
+    return { supported: false, level: null };
+  }
+});
+
+router.add('POST', '/api/laptop/brightness', async (ctx) => {
+  requireUser(ctx);
+  if (!features().input) throw new HttpError(503, 'Laptop brightness needs DeckOS Link running on Windows.');
+  const body = await readJson(ctx.req);
+  if (!helper.setBrightness(body.level)) throw new HttpError(400, 'Brightness must be a number from 0 to 100.');
+  return { ok: true };
+});
+
 // -------------------------------------------------------------- spotify
 
 const spotifyRedirect = () => `http://127.0.0.1:${PORT}/api/spotify/callback`;

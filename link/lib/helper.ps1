@@ -3,13 +3,13 @@
 # on stdin and writes binary messages on stdout:
 #   1 byte type ('F' JPEG frame, 'I' JSON info, 'E' error reply, 'L' log)
 #   4 bytes little-endian length, then the payload.
-# Only 'capture' and 'info' reply; everything else is fire-and-forget.
+# Only 'capture', 'info' and 'brightget' reply; everything else is fire-and-forget.
 
 $ErrorActionPreference = 'Stop'
 Add-Type -AssemblyName System.Drawing
 Add-Type -AssemblyName System.Windows.Forms
 
-Add-Type -ReferencedAssemblies System.Drawing, System.Windows.Forms -TypeDefinition @'
+Add-Type -ReferencedAssemblies System.Drawing, System.Windows.Forms, System.Management -TypeDefinition @'
 using System;
 using System.IO;
 using System.Text;
@@ -17,6 +17,7 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using System.Drawing.Drawing2D;
 using System.Globalization;
+using System.Management;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
 
@@ -102,6 +103,24 @@ public static class DeckHelper {
     }
   }
 
+  // Built-in laptop panels expose brightness over WMI. External monitors
+  // usually don't, so this reports supported=false for them.
+  static string BrightnessGet() {
+    try {
+      using (ManagementObjectSearcher s = new ManagementObjectSearcher("root\\WMI", "SELECT CurrentBrightness FROM WmiMonitorBrightness WHERE Active=TRUE")) {
+        foreach (ManagementObject o in s.Get()) return "{\"supported\":true,\"level\":" + Convert.ToInt32(o["CurrentBrightness"]) + "}";
+      }
+    } catch (Exception) {}
+    return "{\"supported\":false,\"level\":null}";
+  }
+
+  static void BrightnessSet(int level) {
+    level = Math.Max(0, Math.Min(100, level));
+    using (ManagementObjectSearcher s = new ManagementObjectSearcher("root\\WMI", "SELECT * FROM WmiMonitorBrightnessMethods WHERE Active=TRUE")) {
+      foreach (ManagementObject o in s.Get()) o.InvokeMethod("WmiSetBrightness", new object[] { (uint)1, (byte)level });
+    }
+  }
+
   static void Mouse(uint flags, int data) { mouse_event(flags, 0, 0, data, UIntPtr.Zero); }
 
   static void Button(string which, bool down) {
@@ -155,6 +174,8 @@ public static class DeckHelper {
         for (int i = keys.Length - 1; i >= 0; i--) Key(byte.Parse(keys[i]), false);
         return false;
       }
+      case "brightget": Send('I', Encoding.UTF8.GetBytes(BrightnessGet())); return true;
+      case "brightset": BrightnessSet(int.Parse(a[1])); return false;
       case "text": Text(Encoding.UTF8.GetString(Convert.FromBase64String(a[1]))); return false;
       case "media": {
         int i = Array.IndexOf(MediaNames, a[1]);
@@ -174,7 +195,7 @@ public static class DeckHelper {
     string line;
     while ((line = input.ReadLine()) != null) {
       if (line.Length == 0) continue;
-      bool replies = line.StartsWith("capture") || line.StartsWith("info");
+      bool replies = line.StartsWith("capture") || line.StartsWith("info") || line.StartsWith("brightget");
       try { Handle(line); }
       catch (Exception e) { Send(replies ? 'E' : 'L', Encoding.UTF8.GetBytes(e.Message)); }
     }

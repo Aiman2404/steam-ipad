@@ -161,6 +161,18 @@ export class Helper {
     }
   }
 
+  // Laptop screen brightness, 0-100. { supported, level } from the helper.
+  async brightness() {
+    const json = await this.request('brightget');
+    return JSON.parse(json.toString('utf8'));
+  }
+
+  setBrightness(level) {
+    const n = Math.round(Number(level));
+    if (!Number.isFinite(n)) return false;
+    return this.send(`brightset ${Math.max(0, Math.min(100, n))}`);
+  }
+
   media(action) {
     if (!['playpause', 'next', 'prev', 'volup', 'voldown', 'mute'].includes(action)) return false;
     return this.send(`media ${action}`);
