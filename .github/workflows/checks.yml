@@ -19,3 +19,18 @@ jobs:
         run: npm run check
       - name: Unit tests
         run: npm test
+
+  windows-app:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Parse-check the PowerShell scripts
+        shell: powershell
+        run: |
+          $bad = 0
+          Get-ChildItem -Recurse -Filter *.ps1 | ForEach-Object {
+            $errs = $null
+            [System.Management.Automation.Language.Parser]::ParseFile($_.FullName, [ref]$null, [ref]$errs) | Out-Null
+            $errs | ForEach-Object { Write-Host "$($_.Extent.File):$($_.Extent.StartLineNumber) $($_.Message)"; $bad++ }
+          }
+          if ($bad) { exit 1 } else { Write-Host 'PowerShell scripts OK' }

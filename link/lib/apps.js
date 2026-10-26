@@ -6,7 +6,7 @@ import { randomUUID } from 'node:crypto';
 import { homedir } from 'node:os';
 
 export const DEFAULT_APPS = [
-  { name: 'GitHub', target: 'https://github.com/Aiman2404', icon: 'github' },
+  { name: 'GitHub', target: 'https://github.com/', icon: 'github' },
   { name: 'VS Code', target: 'vscode://', icon: 'code' },
   { name: 'Steam', target: 'steam://open/main', icon: 'steam' },
   { name: 'Discord', target: 'discord://', icon: 'discord' },
