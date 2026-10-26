@@ -16,19 +16,25 @@ import { Helper } from './lib/helper.js';
 import { SpotifyLink } from './lib/spotify.js';
 import { seedApps, sanitizeApps, launch, sanitizeDock, resolveDock, DECK_VIEWS } from './lib/apps.js';
 import { Router, HttpError, parseCookies, readJson, send, redirect, serveStatic } from './lib/http.js';
+import { isLoopbackAddress, isPrivateAddress, isAllowedHost } from './lib/net.js';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const REPO = join(HERE, '..');
 const PORT = Number(process.env.PORT) || 7777;
 const COOKIE = 'deckos_session';
 const VERSION = 1;
+// Extra host names to accept (comma-separated), e.g. a router-assigned name.
+const EXTRA_HOSTS = String(process.env.DECKOS_HOSTS || '').split(',');
+// Only for people who really know why they need it.
+const ALLOW_PUBLIC = process.env.DECKOS_ALLOW_PUBLIC === '1';
 
 const store = new Store(process.env.DECKOS_DATA || join(HERE, 'data', 'link.json'));
 const auth = new Auth(store);
 const helper = new Helper();
 const spotifyLink = new SpotifyLink(store);
 seedApps(store);
-helper.start();
+// Tests boot the server without the Windows screen helper.
+if (process.env.DECKOS_NO_HELPER !== '1') helper.start();
 
 const router = new Router();
 
@@ -39,8 +45,7 @@ function clientIp(req) {
 }
 
 function isLoopback(req) {
-  const ip = clientIp(req);
-  return ip === '127.0.0.1' || ip === '::1' || ip === '::ffff:127.0.0.1';
+  return isLoopbackAddress(clientIp(req));
 }
 
 function sessionCookie(token, maxAge) {
@@ -100,6 +105,11 @@ router.add('GET', '/api/link/info', (ctx) => ({
 }));
 
 router.add('POST', '/api/setup', async (ctx) => {
+  // The owner account is created on the laptop itself, so nobody else on the
+  // Wi-Fi can grab a fresh Link before its owner does.
+  if (!isLoopback(ctx.req)) {
+    throw new HttpError(403, `Create the owner account on the laptop itself: open http://127.0.0.1:${PORT}/dashboard/ there.`);
+  }
   const body = await readJson(ctx.req);
   auth.setupOwner(body);
   return signIn(ctx, body.username, body.password);
@@ -235,7 +245,11 @@ function pumpFrames() {
       latest = { seq: latest.seq + 1, buf: frame };
       frameWaiters.forEach((w) => w());
       frameWaiters.clear();
-      const head = Buffer.from(`--frame\r\nContent-Type: image/jpeg\r\nContent-Length: ${frame.length}\r\n\r\n`);
+      const head = Buffer.from(`--frame
+\r\nContent-Type: image/jpeg
+\r\nContent-Length: ${frame.length}
+\r\n
+\r\n`);
       for (const v of viewers) {
         // Skip a slow viewer instead of buffering frames for it.
         if (v.busy) continue;
@@ -414,8 +428,14 @@ const server = createServer(async (req, res) => {
   // Baseline hardening for every response.
   res.setHeader('X-Frame-Options', 'DENY');
   res.setHeader('Referrer-Policy', 'same-origin');
+  res.setHeader('X-Content-Type-Options', 'nosniff');
 
   try {
+    // Home network only: refuse the internet (e.g. a forwarded router port)
+    // and requests addressed to a foreign domain name (DNS rebinding).
+    if (!ALLOW_PUBLIC && !isPrivateAddress(clientIp(req))) throw new HttpError(403, 'DeckOS Link only answers devices on your home network.');
+    if (!isAllowedHost(req.headers.host, EXTRA_HOSTS)) throw new HttpError(403, 'Open DeckOS Link by its IP address, like http://192.168.1.25:7777/.');
+
     if (path.startsWith('/api/')) {
       // State-changing calls must carry our header. Browsers won't send a
       // custom header cross-site without a CORS preflight, which we never
