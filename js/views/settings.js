@@ -34,6 +34,7 @@ export class Settings {
     this.prefs[key] = value;
     store.set(K_PREFS, this.prefs);
     applyPrefs(this.prefs);
+    window.dispatchEvent(new CustomEvent('deck:prefs'));
   }
 
   async open(focus) {
@@ -107,6 +108,10 @@ export class Settings {
         </div>`}
       <div class="group">
         <h3>Display</h3>
+        ${inLink() ? `<div class="toggle-row">
+          <span>DISPLAY slider dims this ${DEVICE}<small>Off: it sets the laptop's screen brightness (built-in laptop screens)</small></span>
+          <button class="switch" role="switch" aria-checked="${!!this.prefs.ipadDim}" data-pref="ipadDim"></button>
+        </div>` : ''}
         <div class="toggle-row">
           <span>Calm background<small>Stop the aurora from drifting (saves battery)</small></span>
           <button class="switch" role="switch" aria-checked="${!!this.prefs.calm}" data-pref="calm"></button>
