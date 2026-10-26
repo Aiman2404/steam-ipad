@@ -1,11 +1,42 @@
-# DeckOS — Steam Deck–style dashboard for iPad Air 2
+# DeckOS — Steam Deck–style dashboard for iPad (and any tablet)
 
 [![Live](https://img.shields.io/badge/Live-aiman2404.github.io%2Fsteam--ipad-38bdf8?style=for-the-badge&logo=github)](https://aiman2404.github.io/steam-ipad/)
 [![Deploy](https://img.shields.io/badge/Deploy-GitHub%20Pages-a855f7?style=for-the-badge&logo=githubactions)](https://github.com/Aiman2404/steam-ipad/actions)
+[![License: MIT](https://img.shields.io/badge/License-MIT-22c55e?style=for-the-badge)](LICENSE)
 
 A landscape web app for an **iPad Air 2** mounted in a custom 3D-printed Steam Deck–style bezel. It's a music deck with synced lyrics, two hardware-style sliders and five launcher buttons, in an "Aurora Glass" design that re-tints itself to the album cover of whatever is playing.
 
 **Live:** https://aiman2404.github.io/steam-ipad/
+
+It's free, there's nothing to buy or sign up for, and you don't need to be technical to set it up.
+
+---
+
+## Quick start
+
+### 1. The deck on your iPad (2 minutes)
+
+1. On the iPad, open **https://aiman2404.github.io/steam-ipad/** in **Safari**.
+2. Tap **Share → Add to Home Screen**. DeckOS is now an app on your iPad.
+3. Want Spotify? Follow [Spotify setup](#spotify-setup-one-time-2-minutes) below. Songs saved on the iPad and lyrics work without it.
+
+That's all you need for the music deck. Everything stays on your iPad: no account, no server.
+
+### 2. Optional: connect your laptop (Windows, 3 minutes)
+
+This adds the laptop screen, laptop apps and family accounts to the deck.
+
+1. **[Download DeckOS](https://github.com/Aiman2404/steam-ipad/archive/refs/heads/main.zip)** and unzip it (right-click → *Extract All*). Put the folder somewhere it can stay, like *Documents*.
+2. Open the folder and double-click **`Start DeckOS Link`**.
+   - If Windows says *"Windows protected your PC"*, click **More info → Run anyway**. (It says this about any app that isn't from a big company.)
+   - If Node.js isn't installed, DeckOS offers to install it. Click **Yes**.
+   - If Windows asks about the firewall, tick **Private networks** and click **Allow**.
+3. The dashboard opens in your browser. Create your **owner** account.
+4. On the dashboard's **Overview**, scan the QR code with the iPad (same Wi-Fi), sign in, and **Add to Home Screen**.
+
+From now on, use the **DeckOS Link** icon on your Desktop or Start menu. It runs quietly in the tray next to the clock: click the icon to open the dashboard, or right-click it for *Start with Windows* and *Quit*.
+
+On macOS or Linux, install [Node.js](https://nodejs.org) and open `link/start.command` instead (screen sharing is Windows-only).
 
 ---
 
@@ -55,14 +86,13 @@ DeckOS Link is a small server you run on your laptop. Nothing to install except 
 
 ### Start it
 
-1. Install Node.js LTS on the laptop.
-2. Double-click **`link\start.cmd`** (or run `node link/server.js`). Allow it on **Private networks** when Windows Firewall asks.
-3. The dashboard opens at `http://127.0.0.1:7777/dashboard/`. Create the **owner** account.
-4. **People:** add family/friends as members or admins.
-5. **Spotify:** in your Spotify developer app add the Redirect URI `http://127.0.0.1:7777/api/spotify/callback`, paste the Client ID, press **Link Spotify**.
-6. **Overview** shows the deck address (like `http://192.168.1.25:7777/`) with a QR code. Open it on the iPad (same Wi-Fi), sign in, and **Add to Home Screen**.
+1. Double-click **`Start DeckOS Link`** (see [Quick start](#2-optional-connect-your-laptop-windows-3-minutes)). After the first time, use the **DeckOS Link** shortcut.
+2. The dashboard opens at `http://127.0.0.1:7777/dashboard/`. Create the **owner** account. This only works on the laptop itself, so nobody else on your Wi-Fi can claim it first.
+3. **People:** add family/friends as members or admins.
+4. **Spotify:** in your Spotify developer app add the Redirect URI `http://127.0.0.1:7777/api/spotify/callback`, paste the Client ID, press **Link Spotify**.
+5. **Overview** shows the deck address (like `http://192.168.1.25:7777/`) with a QR code. Open it on the iPad (same Wi-Fi), sign in, and **Add to Home Screen**.
 
-The iPad and laptop must be on the same Wi-Fi, and Link must be running for the Laptop tab. Screen sharing and remote control need Windows; accounts, apps and Spotify also work on macOS/Linux. Accounts and tokens are stored in `link/data/` on the laptop (never committed).
+The iPad and laptop must be on the same Wi-Fi, and Link must be running for the Laptop tab. Prefer a terminal? `link\start.cmd` or `node link/server.js` still work, and the tray app happily uses a server that's already running. Screen sharing and remote control need Windows; accounts, apps and Spotify also work on macOS/Linux. Accounts and tokens are stored in `link/data/` on the laptop (never committed).
 
 > The GitHub Pages deck still works on its own with no laptop and no login. The Link deck is a second home-screen app that adds accounts and the laptop.
 
@@ -80,6 +110,15 @@ The deck measures the real screen and scales itself to fit: iPad Air 2, iPad 9, 
 2. Settings → Display & Brightness → Auto-Lock → **Never**, so the deck stays on in the bezel.
 3. Optional: Settings → Accessibility → **Guided Access** to lock the iPad to DeckOS.
 4. iPad songs play through Web Audio. If they're silent, check that the iPad isn't muted (side switch / Control Center).
+
+---
+
+## Safety
+
+- Link only answers devices on your **home network** and refuses the internet. **Never port-forward port 7777** on your router; use [Tailscale](https://tailscale.com) if you want it away from home.
+- Only make people you fully trust **admins**: admins can control the laptop's mouse and keyboard.
+- Use Link on your home Wi-Fi, not public Wi-Fi.
+- Found a security problem? See [SECURITY.md](SECURITY.md) and report it privately.
 
 ---
 
@@ -101,8 +140,10 @@ js/fit.js                    fits the deck to any screen (safe areas, portrait, 
 js/link.js                   talks to DeckOS Link when served by the laptop
 js/views/*                   now playing, lyrics, library, queue, laptop, sliders, dock, settings
 sw.js                        network-first service worker (offline shell)
+Start DeckOS Link.cmd        one-click start for Windows (tray app)
+link/app/                    the tray app (PowerShell) and its icon
 link/server.js               DeckOS Link server (zero dependencies)
-link/lib/                    accounts, store, Spotify link, app launcher, Windows helper
+link/lib/                    accounts, store, network rules, Spotify link, app launcher, Windows helper
 link/dashboard/              the Link dashboard
 tests/                       node --test suites (npm test)
 ```
@@ -133,6 +174,16 @@ To run Spotify against a local server, add `http://127.0.0.1:8000/` as a second 
 ```
 
 Settings → **3D-print bezel guides** outlines every zone for test-fitting the frame.
+
+---
+
+## Contributing
+
+Issues and pull requests are welcome. There's no build step: edit, then run `npm run check` and `npm test` (Node 18+). Please keep it dependency-free.
+
+## License
+
+[MIT](LICENSE): free to use, change and share, including in your own projects. Just keep the copyright notice.
 
 ---
 
