@@ -52,7 +52,7 @@ On macOS or Linux, install [Node.js](https://nodejs.org) and open `link/start.co
 
 ### 🎚️ Sliders
 - **SOUND:** the real output volume. That's the Spotify device volume, or the audio gain for iPad songs. (iOS ignores the usual web volume control, so this goes through Web Audio.)
-- **DISPLAY:** dims the screen with an overlay. Web pages can't change the iPad's real brightness.
+- **DISPLAY:** in the deck served by DeckOS Link, sets the **laptop's real screen brightness** (built-in laptop screens on Windows) and follows its brightness keys. On its own, it dims the iPad with an overlay, since web pages can't change the iPad's real brightness. Settings → Display switches it back to dimming the iPad.
 
 ### 🕹️ Dock
 Five launcher buttons. Tap to open an app (`steamlink://`, `discord://`, `spotify://`, `moonlight://`, `youtube://`, any web link) or a deck view (`deck:lyrics`, `deck:library`, `deck:queue`). **Long-press** a button to change it.
