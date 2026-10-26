@@ -252,6 +252,7 @@ async function boot() {
   if (link) {
     useLinkSpotify(link.spotify);
     dock.useLink();
+    sliders.useLaptop();
     $('.tab[data-tab="laptop"]').hidden = false;
     moveInk();
     if (store.get('deckos.tab', 'lyrics') === 'laptop') showTab('laptop');

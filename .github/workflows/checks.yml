@@ -34,3 +34,10 @@ jobs:
             $errs | ForEach-Object { Write-Host "$($_.Extent.File):$($_.Extent.StartLineNumber) $($_.Message)"; $bad++ }
           }
           if ($bad) { exit 1 } else { Write-Host 'PowerShell scripts OK' }
+      - name: Compile the screen helper
+        shell: powershell
+        run: |
+          # With no input the helper compiles, reports ready and exits; a C# error fails here.
+          $out = '' | powershell -NoProfile -ExecutionPolicy Bypass -File link\lib\helper.ps1 2>&1 | Out-String
+          if ($LASTEXITCODE -ne 0 -or $out -notmatch 'ready') { Write-Host $out; exit 1 }
+          Write-Host 'Screen helper compiles'

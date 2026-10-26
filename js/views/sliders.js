@@ -1,8 +1,12 @@
 // The two tall hardware sliders. SOUND drives the real output: Spotify device
 // volume over the API, or the Web Audio gain for songs on this iPad.
 // DISPLAY dims the screen with an overlay (web pages can't set iPad brightness).
+// In the deck served by DeckOS Link, DISPLAY sets the laptop's real screen
+// brightness instead, unless Settings says to dim the iPad.
 
 import { $, clamp, store, throttle } from '../util.js';
+import { linkApi } from '../link.js';
+import { loadPrefs } from './settings.js';
 
 const K_BRIGHT = 'deckos.brightness';
 
@@ -75,12 +79,63 @@ export class Sliders {
       onCommit: (r) => sendVolume(Math.round(r * 100))
     });
 
-    const bright = store.get(K_BRIGHT, 100);
-    this.setBrightness(bright / 100);
-    bindVertical(this.brightEl, {
-      onInput: (r) => this.setBrightness(r),
-      onCommit: (r) => store.set(K_BRIGHT, Math.round(Math.max(0.15, r) * 100))
+    this.laptop = null; // { level } once the laptop reports its brightness
+    const sendLaptop = throttle((level) => {
+      linkApi('/api/laptop/brightness', { method: 'POST', body: { level } }).catch(() => {});
+    }, 250);
+
+    this.setBrightness(store.get(K_BRIGHT, 100) / 100);
+    this.isDraggingBright = bindVertical(this.brightEl, {
+      onInput: (r) => {
+        if (!this.onLaptop()) return this.setBrightness(r);
+        this.laptop.level = Math.round(r * 100);
+        this.brightTouchedAt = Date.now();
+        this.paintLaptop();
+        sendLaptop(this.laptop.level);
+      },
+      onCommit: (r) => {
+        if (this.onLaptop()) sendLaptop(Math.round(r * 100));
+        else store.set(K_BRIGHT, Math.round(Math.max(0.15, r) * 100));
+      }
     });
+    window.addEventListener('deck:prefs', () => this.applyTarget());
+  }
+
+  onLaptop() {
+    return !!this.laptop && !loadPrefs().ipadDim;
+  }
+
+  // Called when the deck runs inside DeckOS Link. Keeps following the laptop,
+  // so its own brightness keys show up on the slider too.
+  async useLaptop() {
+    const poll = async () => {
+      try {
+        const b = await linkApi('/api/laptop/brightness');
+        const had = !!this.laptop;
+        if (!b.supported) this.laptop = null;
+        // Skip a reading that may predate the value just sent from the slider.
+        else if (!this.isDraggingBright() && Date.now() - (this.brightTouchedAt || 0) > 2000) this.laptop = { level: b.level };
+        else if (!this.laptop) this.laptop = { level: b.level };
+        if (had !== !!this.laptop || this.onLaptop()) this.applyTarget();
+      } catch (_) {}
+    };
+    await poll();
+    setInterval(poll, 5000);
+  }
+
+  applyTarget() {
+    if (this.onLaptop()) {
+      $('#dimmer').style.opacity = '0';
+      this.paintLaptop();
+    } else {
+      this.setBrightness(store.get(K_BRIGHT, 100) / 100);
+    }
+  }
+
+  paintLaptop() {
+    const v = clamp(this.laptop.level / 100, 0, 1);
+    paint(this.brightEl, v, `${Math.round(v * 100)}%`);
+    this.brightEl.querySelector('.slider-sub').textContent = 'Laptop';
   }
 
   setBrightness(r) {
