@@ -10,9 +10,11 @@
   --radius: 22px;
   --radius-sm: 14px;
 
-  --accent-rgb: 56, 189, 248;
-  --accent-2-rgb: 168, 85, 247;
-  --accent-3-rgb: 236, 72, 153;
+  /* Brand colours from the logo. Shown until a cover is playing, then the
+     palette extractor overwrites them with colours from the artwork. */
+  --accent-rgb: 239, 139, 125;   /* coral */
+  --accent-2-rgb: 139, 149, 220; /* periwinkle */
+  --accent-3-rgb: 188, 141, 176; /* mauve, where the two meet */
   --accent: rgb(var(--accent-rgb));
 
   --ink: #f5f7fb;

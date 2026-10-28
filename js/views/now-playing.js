@@ -2,7 +2,7 @@
 // colours all switch from the same 'track' event, so they can't drift apart.
 
 import { $, formatTime, clamp } from '../util.js';
-import { extractPalette, applyPalette } from '../palette.js';
+import { extractPalette, applyPalette, FALLBACK } from '../palette.js';
 
 export class NowPlaying {
   constructor(player) {
@@ -86,7 +86,8 @@ export class NowPlaying {
       media.classList.remove('has-cover');
       ['#coverImgA', '#coverImgB'].forEach((id) => $(id).classList.remove('is-on'));
       this.setBackdrop('');
-      applyPalette({ a: [56, 189, 248], b: [168, 85, 247], c: [236, 72, 153] });
+      // Nothing playing: fall back to the brand colours instead of the last song's.
+      applyPalette(FALLBACK);
       return;
     }
     const img = this.coverFlip ? $('#coverImgA') : $('#coverImgB');
