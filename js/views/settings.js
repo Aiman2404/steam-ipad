@@ -8,6 +8,7 @@ import { spotify } from '../spotify-api.js';
 import { idb } from '../idb.js';
 import { getEdges, setEdges } from '../fit.js';
 import { inLink, linkUser, linkIsAdmin, linkInfo, linkLogout } from '../link.js';
+import { VERSION } from '../version.js';
 
 const K_PREFS = 'deckos.prefs';
 
@@ -144,6 +145,10 @@ export class Settings {
           <button class="pill" data-act="dock">Edit dock buttons</button>
           <button class="pill" data-act="clear-local">Remove all saved songs</button>
         </div>
+      </div>
+      <div class="group">
+        <h3>About</h3>
+        <p>DeckOS v${VERSION} · free and open source (MIT). <a href="https://github.com/Aiman2404/steam-ipad/blob/main/CHANGELOG.md" target="_blank" rel="noopener">What's new</a> · <a href="https://github.com/Aiman2404/steam-ipad" target="_blank" rel="noopener">GitHub</a></p>
       </div>`;
 
     $$('#settingsBody [data-pref]').forEach((sw) =>

@@ -66,6 +66,9 @@ export class SpotifySource extends Emitter {
 
   stop() {
     this.running = false;
+    // Invalidate any poll still in flight, or it would bring the old track
+    // back after logout (and nothing would poll again to clear it).
+    this.epoch += 1;
     clearTimeout(this.timer);
     this.state = { ...BLANK };
     this.emit('state', this.state);

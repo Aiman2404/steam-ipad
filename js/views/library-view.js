@@ -25,6 +25,7 @@ export class LibraryView {
     this.detail = null; // { kind: 'playlist'|'liked', playlist, tracks, note }
     this.searchResults = null;
     this.searchTimer = null;
+    this.searchTok = 0;
     this.currentUri = null;
 
     $$('.lib-switch .seg').forEach((btn) =>
@@ -116,7 +117,9 @@ export class LibraryView {
     if (!this.playlists) {
       list.innerHTML = '<div class="spinner"></div>';
       try {
-        this.playlists = await spotify.playlists();
+        // Spotify sometimes sends null entries; drop them here so the row index
+        // (data-pl) and this.playlists always point at the same playlist.
+        this.playlists = (await spotify.playlists()).filter(Boolean);
       } catch (e) {
         list.innerHTML = `<div class="note">Couldn't load playlists: ${escapeHtml(e.message)}</div>`;
         return;
@@ -124,7 +127,6 @@ export class LibraryView {
       if (!$('#spList')) return;
     }
     const rows = this.playlists
-      .filter(Boolean)
       .map((p, i) => {
         const cover = p.images && p.images.length ? p.images[p.images.length > 1 ? 1 : 0].url : '';
         const count = (p.items && p.items.total) != null ? p.items.total : p.tracks && p.tracks.total;
@@ -146,6 +148,9 @@ export class LibraryView {
   }
 
   async search(q) {
+    // Only the newest search may paint: a slow reply for "beat" must not
+    // overwrite the results for "beatles", or reappear after the box is cleared.
+    const tok = ++this.searchTok;
     if (!q) {
       this.searchResults = null;
       this.paintPlaylists();
@@ -155,8 +160,10 @@ export class LibraryView {
     if (list) list.innerHTML = '<div class="spinner"></div>';
     try {
       const res = await spotify.search(q);
+      if (tok !== this.searchTok) return;
       this.searchResults = { q, tracks: (res.tracks && res.tracks.items) || [] };
     } catch (e) {
+      if (tok !== this.searchTok) return;
       this.searchResults = { q, tracks: [], error: e.message };
     }
     this.paintSearch();

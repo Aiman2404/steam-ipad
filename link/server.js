@@ -6,6 +6,7 @@
 // (with remote mouse/keyboard for admins) to the deck.
 
 import { createServer } from 'node:http';
+import { readFileSync } from 'node:fs';
 import { networkInterfaces, hostname } from 'node:os';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
@@ -21,7 +22,16 @@ import { isLoopbackAddress, isPrivateAddress, isAllowedHost } from './lib/net.js
 const HERE = dirname(fileURLToPath(import.meta.url));
 const REPO = join(HERE, '..');
 const PORT = Number(process.env.PORT) || 7777;
+const APP_VERSION = (() => {
+  try {
+    return JSON.parse(readFileSync(join(REPO, 'package.json'), 'utf8')).version || '';
+  } catch {
+    return '';
+  }
+})();
 const COOKIE = 'deckos_session';
+// VERSION is the Link API version (bump only on breaking API changes);
+// APP_VERSION is the DeckOS release, read from package.json so it's never stale.
 const VERSION = 1;
 // Extra host names to accept (comma-separated), e.g. a router-assigned name.
 const EXTRA_HOSTS = String(process.env.DECKOS_HOSTS || '').split(',');
@@ -95,6 +105,7 @@ const features = () => ({
 router.add('GET', '/api/link/info', (ctx) => ({
   link: true,
   version: VERSION,
+  appVersion: APP_VERSION,
   name: store.data.settings.name,
   host: hostname(),
   urls: lanUrls(),
@@ -245,11 +256,9 @@ function pumpFrames() {
       latest = { seq: latest.seq + 1, buf: frame };
       frameWaiters.forEach((w) => w());
       frameWaiters.clear();
-      const head = Buffer.from(`--frame
-\r\nContent-Type: image/jpeg
-\r\nContent-Length: ${frame.length}
-\r\n
-\r\n`);
+      // One line on purpose: real newlines inside the template literal used to
+      // add stray blank lines to each multipart header.
+      const head = Buffer.from(`--frame\r\nContent-Type: image/jpeg\r\nContent-Length: ${frame.length}\r\n\r\n`);
       for (const v of viewers) {
         // Skip a slow viewer instead of buffering frames for it.
         if (v.busy) continue;

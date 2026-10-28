@@ -14,6 +14,17 @@ const MIME = {
   '.webmanifest': 'application/manifest+json'
 };
 
+// decodeURIComponent throws on a stray '%' (e.g. a cookie set by some other
+// app on localhost), which used to turn every request into a 500. Keep the raw
+// text instead: it simply won't match a route, file or session.
+function safeDecode(s) {
+  try {
+    return decodeURIComponent(s);
+  } catch {
+    return s;
+  }
+}
+
 export class HttpError extends Error {
   constructor(status, message) {
     super(message);
@@ -27,7 +38,7 @@ export function parseCookies(req) {
     .split(';')
     .forEach((part) => {
       const i = part.indexOf('=');
-      if (i > 0) out[part.slice(0, i).trim()] = decodeURIComponent(part.slice(i + 1).trim());
+      if (i > 0) out[part.slice(0, i).trim()] = safeDecode(part.slice(i + 1).trim());
     });
   return out;
 }
@@ -73,7 +84,7 @@ export function redirect(res, location, headers = {}) {
 // Serves files from `root`, only under the allowed top-level entries, never
 // outside root (path traversal) and never dotfiles.
 export function serveStatic(req, res, root, urlPath, allowed) {
-  let rel = decodeURIComponent(urlPath.split('?')[0]);
+  let rel = safeDecode(urlPath.split('?')[0]);
   if (rel.endsWith('/')) rel += 'index.html';
   rel = rel.replace(/^\/+/, '');
   const top = rel.split('/')[0];
@@ -123,7 +134,7 @@ export class Router {
       const m = path.match(r.re);
       if (m) {
         const params = {};
-        r.keys.forEach((k, i) => (params[k] = decodeURIComponent(m[i + 1])));
+        r.keys.forEach((k, i) => (params[k] = safeDecode(m[i + 1])));
         return { handler: r.handler, params };
       }
     }

@@ -102,6 +102,9 @@ export class LyricsView {
     }
 
     this.trackEl.innerHTML = '';
+    // Drop the last song's "No lyrics" message (or an earlier shimmer from a
+    // quick skip) before showing the loading state.
+    this.clearMessage();
     this.root.insertAdjacentHTML('beforeend', '<div class="lyrics-empty" data-msg><div class="shimmer"></div><div class="shimmer"></div><div class="shimmer"></div></div>');
     this.setBadge('Finding lyrics…');
 

@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { createServer } from 'node:http';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
-import { serveStatic, Router } from '../link/lib/http.js';
+import { serveStatic, Router, parseCookies } from '../link/lib/http.js';
 import { sanitizeApps } from '../link/lib/apps.js';
 
 const REPO = join(dirname(fileURLToPath(import.meta.url)), '..');
@@ -77,4 +77,15 @@ test('custom dock is validated and survives a deleted app', () => {
   const slots = resolveDock({ data: { apps: [], dock } });
   assert.equal(slots[0].kind, 'view'); // GitHub was removed -> falls back
   assert.equal(slots[1].name, 'Laptop screen');
+});
+
+test('a malformed cookie or path does not throw', () => {
+  // Some other app on localhost can set cookies like this one.
+  const cookies = parseCookies({ headers: { cookie: 'junk=100%; deckos_session=abc' } });
+  assert.equal(cookies.junk, '100%');
+  assert.equal(cookies.deckos_session, 'abc');
+
+  const router = new Router();
+  router.add('GET', '/api/users/:id', () => ({}));
+  assert.equal(router.match('GET', '/api/users/%E0').params.id, '%E0');
 });

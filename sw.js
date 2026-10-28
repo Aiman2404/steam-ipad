@@ -1,7 +1,8 @@
 // DeckOS service worker.
 // Network-first for the app shell so a new deploy shows up on the next launch;
 // the cache is only a fallback for when the iPad is offline.
-const CACHE_NAME = 'deckos-shell-v7';
+// Bump on every release so iPads drop the old shell (new icons, new colours).
+const CACHE_NAME = 'deckos-shell-v8';
 const SHELL = [
   './',
   './index.html',
@@ -11,6 +12,7 @@ const SHELL = [
   './icons/icon-180.png',
   './js/main.js',
   './js/util.js',
+  './js/version.js',
   './js/fit.js',
   './js/idb.js',
   './js/tags.js',
@@ -52,7 +54,10 @@ self.addEventListener('activate', (event) => {
 function isCacheable(request) {
   if (request.method !== 'GET') return false;
   const url = new URL(request.url);
-  if (url.origin === self.location.origin) return true;
+  // Same-origin files are the app shell. /api/* only exists when DeckOS Link
+  // serves the deck: screen frames, tokens and sign-in state must always be live
+  // (caching them filled the iPad's storage and kept stale logins around).
+  if (url.origin === self.location.origin) return !url.pathname.startsWith('/api/');
   // Fonts are safe to keep; never cache Spotify, LRCLIB or other API traffic.
   return url.hostname === 'fonts.googleapis.com' || url.hostname === 'fonts.gstatic.com';
 }

@@ -1,14 +1,33 @@
-# DeckOS — Steam Deck–style dashboard for iPad (and any tablet)
+<p align="center">
+  <img src="icons/icon.svg" width="112" alt="DeckOS logo" />
+</p>
 
-[![Live](https://img.shields.io/badge/Live-aiman2404.github.io%2Fsteam--ipad-38bdf8?style=for-the-badge&logo=github)](https://aiman2404.github.io/steam-ipad/)
-[![Deploy](https://img.shields.io/badge/Deploy-GitHub%20Pages-a855f7?style=for-the-badge&logo=githubactions)](https://github.com/Aiman2404/steam-ipad/actions)
-[![License: MIT](https://img.shields.io/badge/License-MIT-22c55e?style=for-the-badge)](LICENSE)
+<h1 align="center">DeckOS</h1>
 
-A landscape web app for an **iPad Air 2** mounted in a custom 3D-printed Steam Deck–style bezel. It's a music deck with synced lyrics, two hardware-style sliders and five launcher buttons, in an "Aurora Glass" design that re-tints itself to the album cover of whatever is playing.
+<p align="center">
+  <b>Turn your old iPad into a control deck for your music and your PC.</b><br />
+  Spotify, synced lyrics, hardware-style sliders and your laptop's screen, on one screen. Free and open source.
+</p>
 
-**Live:** https://aiman2404.github.io/steam-ipad/
+<p align="center">
+  <a href="https://aiman2404.github.io/steam-ipad/"><img src="https://img.shields.io/badge/Try%20it-live%20demo-ef8b7d?style=for-the-badge" alt="Live demo" /></a>
+  <a href="https://github.com/Aiman2404/steam-ipad/releases/latest"><img src="https://img.shields.io/github/v/release/Aiman2404/steam-ipad?style=for-the-badge&color=8b95dc" alt="Latest release" /></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-bc8db0?style=for-the-badge" alt="MIT license" /></a>
+</p>
 
-It's free, there's nothing to buy or sign up for, and you don't need to be technical to set it up.
+<p align="center">
+  <img src="docs/deck.png" width="820" alt="The DeckOS deck: now playing, library, SOUND and DISPLAY sliders, five launcher buttons" />
+</p>
+
+Got an iPad collecting dust in a drawer? DeckOS gives it a second life as a handheld-console-style deck that sits next to your laptop. It started as a dashboard for an **iPad Air 2** in a custom 3D-printed bezel, and now fits any iPad, Android tablet or phone. The whole deck re-tints itself to the album cover of whatever's playing.
+
+- 🎵 **Control Spotify** with full-length playback, your playlists and Liked Songs
+- 🎤 **Synced lyrics** with a karaoke-style sweep
+- 🎚️ **Real sliders** for volume and your laptop's screen brightness
+- 💻 **Your laptop on the deck:** watch its screen, launch apps, control it by touch
+- 👨‍👩‍👧 **Family accounts** with owner, admin and member roles
+
+It's free. Nothing to buy, no sign-up, and you don't need to be technical to set it up. See what changed in the [changelog](CHANGELOG.md).
 
 ---
 

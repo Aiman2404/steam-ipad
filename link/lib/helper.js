@@ -28,6 +28,9 @@ export class Helper {
       { stdio: ['pipe', 'pipe', 'pipe'], windowsHide: true }
     );
     this.proc = proc;
+    // If the helper dies mid-capture, the next write gets EPIPE. Without a
+    // listener that error would crash Link; the 'exit' handler restarts it.
+    proc.stdin.on('error', () => {});
     proc.stdout.on('data', (chunk) => this.onData(chunk));
     proc.stderr.on('data', (d) => this.log(`[helper] ${String(d).trim()}`));
     proc.on('exit', (code) => {

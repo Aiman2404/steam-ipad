@@ -2,7 +2,9 @@
 // to the song. Spotify (i.scdn.co) and iTunes artwork both send CORS headers,
 // and embedded local artwork is a blob: URL, so the canvas is never tainted.
 
-const FALLBACK = { a: [56, 189, 248], b: [168, 85, 247], c: [236, 72, 153] };
+// DeckOS brand colours (coral, periwinkle, mauve): used when there's no cover
+// or it's too grey to pull anything interesting out of.
+export const FALLBACK = { a: [239, 139, 125], b: [139, 149, 220], c: [188, 141, 176] };
 const cache = new Map();
 
 function rgbToHsl(r, g, b) {

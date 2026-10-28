@@ -162,7 +162,8 @@ async function overview() {
           ? 'As an admin you control everything: people, laptop apps, the screen and remote mouse/keyboard, and the Spotify link.'
           : 'As a member you can use the whole deck: music and lyrics, open the laptop apps an admin set up, watch the laptop screen and use its media keys. Admins handle accounts and remote control.'
       }</p>
-    </div>`;
+    </div>
+    ${info.appVersion ? `<p class="muted">DeckOS v${esc(info.appVersion)}</p>` : ''}`;
   $$('[data-copy]').forEach((b) =>
     b.addEventListener('click', () => {
       navigator.clipboard.writeText(b.dataset.copy).then(() => toast('Copied'));
