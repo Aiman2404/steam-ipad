@@ -1,7 +1,7 @@
 {
   "name": "DeckOS",
   "short_name": "DeckOS",
-  "description": "Steam Deck-style music and launcher dashboard for a 3D-printed iPad Air 2 bezel",
+  "description": "Turn an old iPad (or any tablet) into a handheld-style control deck: music, synced lyrics, sliders and your laptop on one screen",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
