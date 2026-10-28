@@ -43,6 +43,13 @@ export class Store {
           writeFileSync(tmp, JSON.stringify(this.data, null, 2));
           renameSync(tmp, this.file);
         }
+      } catch (e) {
+        // On Windows, antivirus or OneDrive can briefly lock link.json and the
+        // rename fails with EPERM/EBUSY. Thrown here (inside setImmediate) it
+        // would kill Link, so log it and try again shortly instead.
+        console.error(`[store] couldn't save ${this.file}: ${e.message}. Retrying…`);
+        this.dirty = true;
+        setTimeout(() => this.save(), 2000);
       } finally {
         this.writing = false;
       }

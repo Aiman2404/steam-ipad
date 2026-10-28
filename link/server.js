@@ -256,11 +256,9 @@ function pumpFrames() {
       latest = { seq: latest.seq + 1, buf: frame };
       frameWaiters.forEach((w) => w());
       frameWaiters.clear();
-      const head = Buffer.from(`--frame
-\r\nContent-Type: image/jpeg
-\r\nContent-Length: ${frame.length}
-\r\n
-\r\n`);
+      // One line on purpose: real newlines inside the template literal used to
+      // add stray blank lines to each multipart header.
+      const head = Buffer.from(`--frame\r\nContent-Type: image/jpeg\r\nContent-Length: ${frame.length}\r\n\r\n`);
       for (const v of viewers) {
         // Skip a slow viewer instead of buffering frames for it.
         if (v.busy) continue;
