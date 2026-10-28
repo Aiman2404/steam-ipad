@@ -6,6 +6,7 @@
 // (with remote mouse/keyboard for admins) to the deck.
 
 import { createServer } from 'node:http';
+import { readFileSync } from 'node:fs';
 import { networkInterfaces, hostname } from 'node:os';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
@@ -21,7 +22,16 @@ import { isLoopbackAddress, isPrivateAddress, isAllowedHost } from './lib/net.js
 const HERE = dirname(fileURLToPath(import.meta.url));
 const REPO = join(HERE, '..');
 const PORT = Number(process.env.PORT) || 7777;
+const APP_VERSION = (() => {
+  try {
+    return JSON.parse(readFileSync(join(REPO, 'package.json'), 'utf8')).version || '';
+  } catch {
+    return '';
+  }
+})();
 const COOKIE = 'deckos_session';
+// VERSION is the Link API version (bump only on breaking API changes);
+// APP_VERSION is the DeckOS release, read from package.json so it's never stale.
 const VERSION = 1;
 // Extra host names to accept (comma-separated), e.g. a router-assigned name.
 const EXTRA_HOSTS = String(process.env.DECKOS_HOSTS || '').split(',');
@@ -95,6 +105,7 @@ const features = () => ({
 router.add('GET', '/api/link/info', (ctx) => ({
   link: true,
   version: VERSION,
+  appVersion: APP_VERSION,
   name: store.data.settings.name,
   host: hostname(),
   urls: lanUrls(),

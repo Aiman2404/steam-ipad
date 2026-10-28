@@ -12,6 +12,7 @@ const SHELL = [
   './icons/icon-180.png',
   './js/main.js',
   './js/util.js',
+  './js/version.js',
   './js/fit.js',
   './js/idb.js',
   './js/tags.js',

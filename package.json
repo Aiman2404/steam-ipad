@@ -1,5 +1,6 @@
 {
   "name": "deckos",
+  "version": "1.1.0",
   "private": true,
   "type": "module",
   "description": "No build step; this file only exists so Node treats js/ as ES modules for checks and tests.",
