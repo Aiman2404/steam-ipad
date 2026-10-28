@@ -157,7 +157,9 @@ export class NowPlaying {
     const el = $('#scrub');
     const toMs = (clientX) => {
       const rect = $('.scrub-track').getBoundingClientRect();
-      this.trackWidth = rect.width;
+      // rect is in screen pixels (after fit.js scales the deck), but the knob
+      // moves inside the scaled deck, so it needs the unscaled offsetWidth.
+      this.trackWidth = $('.scrub-track').offsetWidth;
       return clamp((clientX - rect.left) / rect.width, 0, 1) * (this.track ? this.track.durationMs : 0);
     };
     el.addEventListener('pointerdown', (e) => {
